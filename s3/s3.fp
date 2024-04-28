@@ -7,7 +7,7 @@ locals {
 variable "s3_bucket_default_lifecycle_policy" {
   type        = string
   description = "The default S3 bucket lifecycle policy to apply"
-  default     = <<EOF
+  default     = <<-EOF
 {
   "Rules": [
     {
