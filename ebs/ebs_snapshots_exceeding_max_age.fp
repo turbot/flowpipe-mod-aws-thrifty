@@ -161,7 +161,12 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
+pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
+  title         = "Respond to EBS snapshot exceeding max age"
+  description   = "Responds to an EBS snapshot exceeding max age."
+  documentation = file("./ebs/ebs_snapshots_exceeding_max_age.md")
+  tags          = merge(local.ebs_common_tags, { class = "unused" })
+
   param "title" {
     type        = string
     description = local.TitleDescription
