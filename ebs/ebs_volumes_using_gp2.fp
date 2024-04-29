@@ -1,8 +1,6 @@
 trigger "query" "detect_and_respond_to_ebs_volumes_using_gp2" {
   title         = "Detect and respond to EBS volumes using gp2"
   description   = "Detects EBS volumes using gp2 and responds with your chosen action."
-  documentation = file("./ebs/ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
