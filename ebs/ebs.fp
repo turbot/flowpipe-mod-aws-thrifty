@@ -21,3 +21,27 @@ variable "ebs_snapshot_age_max_days_responses" {
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete"]
 }
+
+variable "ebs_volume_using_gp2_default_response" {
+  type        = string
+  description = "The default response to use when EBS volumes are using gp2."
+  default     = "notify"
+}
+
+variable "ebs_volume_using_gp2_responses" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "update"]
+}
+
+variable "ebs_volume_using_io1_default_response" {
+  type        = string
+  description = "The default response to use when EBS volumes are using io1."
+  default     = "notify"
+}
+
+variable "ebs_volume_using_io1_responses" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "update"]
+}

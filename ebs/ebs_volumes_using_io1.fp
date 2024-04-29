@@ -1,39 +1,27 @@
-locals {
-  ebs_snapshots_exceeding_max_age_query = <<-EOQ
-  select
-    concat(snapshot_id, ' [', region, '/', account_id, ']') as title,
-    snapshot_id,
-    region,
-    _ctx ->> 'connection_name' as cred
-  from
-    aws_ebs_snapshot
-  where
-    (current_timestamp - (${var.ebs_snapshot_age_max_days}::int || ' days')::interval) > start_time
-  EOQ
-}
-
-trigger "query" "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
-  title       = "Detect and respond to EBS snapshots exceeding max age"
-  description = "Detects EBS snapshots exceeding max age and responds with your chosen action."
+trigger "query" "detect_and_respond_to_ebs_volumes_using_io1" {
+  title         = "Detect and respond to EBS volumes using io1"
+  description   = "Detects EBS volumes using io1 and responds with your chosen action."
+  documentation = file("./ebs/ebs_volumes_using_io1.md")
+  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = local.ebs_snapshots_exceeding_max_age_query
+  sql      = file("./ebs/ebs_volumes_using_io1.sql")
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_snapshots_exceeding_max_age
+    pipeline = pipeline.respond_to_ebs_volumes_using_io1
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
-  title         = "Detect and respond to EBS snapshots exceeding max age"
-  description   = "Detects EBS snapshots exceeding max age and responds with your chosen action."
-  documentation = file("./ebs/ebs_snapshots_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
+  title         = "Detect and respond to EBS volumes using io1"
+  description   = "Detects EBS volumes using io1 and responds with your chosen action."
+  documentation = file("./ebs/ebs_volumes_using_io1.md")
+  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
     type        = string
@@ -62,22 +50,22 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response
+    default     = var.ebs_volume_using_io1_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_responses
+    default     = var.ebs_volume_using_io1_responses
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ebs_snapshots_exceeding_max_age_query
+    sql      = file("./ebs/ebs_volumes_using_io1.sql")
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_snapshots_exceeding_max_age
+    pipeline = pipeline.respond_to_ebs_volumes_using_io1
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
@@ -89,18 +77,18 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
-  title         = "Respond to EBS snapshots exceeding max age"
-  description   = "Responds to a collection of EBS snapshots exceeding max age."
-  documentation = file("./ebs/ebs_snapshots_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+pipeline "respond_to_ebs_volumes_using_io1" {
+  title         = "Respond to EBS volumes using io1"
+  description   = "Responds to a collection of EBS volumes using io1."
+  documentation = file("./ebs/ebs_volumes_using_io1.md")
+  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
-    type = list(object({
-      title       = string
-      snapshot_id = string
-      region      = string
-      cred        = string
+    type        = list(object({
+      title      = string
+      volume_id  = string
+      region     = string
+      cred       = string
     }))
   }
 
@@ -125,32 +113,32 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response
+    default     = var.ebs_volume_using_io1_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_responses
+    default     = var.ebs_volume_using_io1_responses
   }
 
   step "message" "notify_detection_count" {
     if       = var.notifier_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS Snapshots exceeding maximum age."
+    text     = "Detected ${length(param.items)} EBS volumes using io1."
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.snapshot_id => row }
+    value = {for row in param.items : row.volume_id => row }
   }
 
   step "pipeline" "respond_to_item" {
     for_each        = step.transform.items_by_id
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_snapshot_exceeding_max_age
+    pipeline        = pipeline.respond_to_ebs_volume_using_io1
     args            = {
       title            = each.value.title
-      snapshot_id      = each.value.snapshot_id
+      volume_id        = each.value.volume_id
       region           = each.value.region
       cred             = each.value.cred
       notifier         = param.notifier
@@ -162,20 +150,20 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
-  title         = "Respond to EBS snapshot exceeding max age"
-  description   = "Responds to an EBS snapshot exceeding max age."
-  documentation = file("./ebs/ebs_snapshots_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+pipeline "respond_to_ebs_volume_using_io1" {
+  title         = "Respond to EBS volume using io1"
+  description   = "Responds to an EBS volume using io1."
+  documentation = file("./ebs/ebs_volumes_using_io1.md")
+  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
     type        = string
     description = local.TitleDescription
   }
 
-  param "snapshot_id" {
+  param "volume_id" {
     type        = string
-    description = "The ID of the EBS snapshot."
+    description = "EBS volume ID."
   }
 
   param "region" {
@@ -209,13 +197,13 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response
+    default     = var.ebs_volume_using_io1_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_responses
+    default     = var.ebs_volume_using_io1_responses
   }
 
   step "pipeline" "respond" {
@@ -224,7 +212,7 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
       notifier         = param.notifier
       notifier_level   = param.notifier_level
       approvers        = param.approvers
-      detect_msg       = "Detected EBS Snapshot ${param.title} exceeding maximum age."
+      detect_msg       = "Detected EBS volume ${param.title} using io1."
       default_response = param.default_response
       responses        = param.responses
       response_options = {
@@ -236,23 +224,24 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notifier_level == local.NotifierLevelVerbose
-            text     = "Skipped EBS Snapshot ${param.title} exceeding maximum age."
+            text     = "Skipped EBS volume ${param.title} using io1."
           }
           success_msg = ""
           error_msg   = ""
         },
-        "delete" = {
-          label  = "Delete"
-          value  = "delete"
-          style  = local.StyleAlert
-          pipeline_ref  = local.aws_pipeline_delete_ebs_snapshot
+        "update" = {
+          label  = "Update to io2"
+          value  = "update"
+          style  = local.StyleOk
+          pipeline_ref  = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {
-            snapshot_id = param.snapshot_id
+            volume_id   = param.volume_id
+            volume_type = "io2"
             region      = param.region
             cred        = param.cred
           }
-          success_msg = "Deleted EBS Snapshot ${param.title}."
-          error_msg   = "Error deleting EBS Snapshot ${param.title}."
+          success_msg = "Updated EBS volume ${param.title} to io2."
+          error_msg   = "Error updating EBS volume ${param.title} to io2"
         }
       }
     }
