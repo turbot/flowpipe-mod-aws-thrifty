@@ -1,2 +1,2 @@
-# EBS Volumes using GP2
+# EBS Volumes using IO1
 
