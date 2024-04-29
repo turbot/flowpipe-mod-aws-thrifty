@@ -35,4 +35,5 @@ locals {
 locals {
   approval_pipeline_skipped_action_notification = approval.pipeline.skipped_action_notification
   aws_pipeline_delete_ebs_snapshot = aws.pipeline.delete_ebs_snapshot
+  aws_pipeline_modify_ebs_volume   = aws.pipeline.modify_ebs_volume
 }
