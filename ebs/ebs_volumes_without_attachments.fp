@@ -75,7 +75,7 @@ pipeline "detect_and_respond_to_ebs_volumes_without_attachments" {
   }
 }
 
-pipelines "respond_to_ebs_volumes_without_attachments" {
+pipeline "respond_to_ebs_volumes_without_attachments" {
   title         = "Respond to EBS volumes without attachments"
   description   = "Responds to a collection of EBS volumes without attachments."
   documentation = file("./ebs/ebs_volumes_without attachments.md")
@@ -148,7 +148,7 @@ pipelines "respond_to_ebs_volumes_without_attachments" {
   }
 }
 
-pipelines "respond_to_ebs_volume_without_attachments" {
+pipeline "respond_to_ebs_volume_without_attachments" {
   title         = "Respond to EBS volume without attachments"
   description   = "Responds to an EBS volume without attachments."
   documentation = file("./ebs/ebs_volumes_without attachments.md")
