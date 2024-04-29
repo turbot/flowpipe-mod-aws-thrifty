@@ -82,7 +82,7 @@ pipeline "respond_to_ebs_volumes_using_io1" {
   tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
-    type        = list(object({
+    type = list(object({
       title      = string
       volume_id  = string
       region     = string

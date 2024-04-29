@@ -1,25 +1,25 @@
-trigger "query" "detect_and_respond_to_ebs_volumes_using_gp2" {
-  title         = "Detect and respond to EBS volumes using gp2"
-  description   = "Detects EBS volumes using gp2 and responds with your chosen action."
+trigger "query" "detect_and_respond_to_ebs_volumes_without_attachments" {
+  title         = "Detect and respond to EBS volumes without attachments"
+  description   = "Detects EBS volumes without attachments and responds with your chosen action."
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = file("./ebs/ebs_volumes_using_gp2.sql")
+  sql      = file("./ebs/ebs_volumes_without_attachments.sql")
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_using_gp2
+    pipeline = pipeline.respond_to_ebs_volumes_without_attachments
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
-  title         = "Detect and respond to EBS volumes using gp2"
-  description   = "Detects EBS volumes using gp2 and responds with your chosen action."
-  documentation = file("./ebs/ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "detect_and_respond_to_ebs_volumes_without_attachments" {
+  title         = "Detect and respond to EBS volumes without attachments"
+  description   = "Detects EBS volumes without attachments and responds with your chosen action."
+  documentation = file("./ebs/ebs_volumes_without attachments.md")
+  tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -48,22 +48,22 @@ pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_gp2_default_response
+    default     = var.ebs_volume_without_attachments_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_gp2_responses
+    default     = var.ebs_volume_without_attachments_responses
   }
 
   step "query" "detect" {
-    database = param.database
-    sql      = file("./ebs/ebs_volumes_using_gp2.sql")
+    database = var.database
+    sql      = file("./ebs/ebs_volumes_without_attachments.sql")
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_using_gp2
+    pipeline = pipeline.respond_to_ebs_volumes_without_attachments
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
@@ -75,18 +75,18 @@ pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_using_gp2" {
-  title         = "Respond to EBS volumes using gp2"
-  description   = "Responds to a collection of EBS volumes using gp2."
-  documentation = file("./ebs/ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipelines "respond_to_ebs_volumes_without_attachments" {
+  title         = "Respond to EBS volumes without attachments"
+  description   = "Responds to a collection of EBS volumes without attachments."
+  documentation = file("./ebs/ebs_volumes_without attachments.md")
+  tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
-      title      = string
-      volume_id  = string
-      region     = string
-      cred       = string
+      title     = string
+      volume_id = string
+      region    = string
+      cred      = string
     }))
   }
 
@@ -111,19 +111,19 @@ pipeline "respond_to_ebs_volumes_using_gp2" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_gp2_default_response
+    default     = var.ebs_volume_without_attachments_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_gp2_responses
+    default     = var.ebs_volume_without_attachments_responses
   }
 
   step "message" "notify_detection_count" {
     if       = var.notifier_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS volumes using gp2."
+    text     = "Detected ${length(param.items)} EBS volumes without attachments."
   }
 
   step "transform" "items_by_id" {
@@ -133,7 +133,7 @@ pipeline "respond_to_ebs_volumes_using_gp2" {
   step "pipeline" "respond_to_item" {
     for_each        = step.transform.items_by_id
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_using_gp2
+    pipeline        = pipeline.respond_to_ebs_volume_without_attachments
     args            = {
       title            = each.value.title
       volume_id        = each.value.volume_id
@@ -148,11 +148,11 @@ pipeline "respond_to_ebs_volumes_using_gp2" {
   }
 }
 
-pipeline "respond_to_ebs_volume_using_gp2" {
-  title         = "Respond to EBS volume using gp2"
-  description   = "Responds to an EBS volume using gp2."
-  documentation = file("./ebs/ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipelines "respond_to_ebs_volume_without_attachments" {
+  title         = "Respond to EBS volume without attachments"
+  description   = "Responds to an EBS volume without attachments."
+  documentation = file("./ebs/ebs_volumes_without attachments.md")
+  tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
@@ -227,21 +227,39 @@ pipeline "respond_to_ebs_volume_using_gp2" {
           success_msg = ""
           error_msg   = ""
         },
-        "update" = {
-          label  = "Update to GP3"
-          value  = "update"
-          style  = local.StyleOk
-          pipeline_ref  = local.aws_pipeline_modify_ebs_volume
+        "delete" = {
+          label  = "Delete"
+          value  = "delete"
+          style  = local.StyleAlert
+          pipeline_ref  = pipeline.mock_aws_pipeline_delete_ebs_volume // TODO: Replace with real pipeline when added to aws library mod.
           pipeline_args = {
             volume_id   = param.volume_id
-            volume_type = "gp3"
             region      = param.region
             cred        = param.cred
           }
-          success_msg = "Updated EBS volume ${param.title} to gp3."
-          error_msg   = "Error updating EBS volume ${param.title} to gp3"
+          success_msg = "Deleted EBS volume ${param.title}."
+          error_msg   = "Error deleting EBS volume ${param.title}"
         }
       }
     }
+  }
+}
+
+// TODO: We can remove this mock pipeline once the real pipeline is added to the aws library mod.
+pipeline "mock_aws_pipeline_delete_ebs_volume" {
+  param "volume_id" {
+    type = string
+  }
+
+  param "region" {
+    type = string
+  }
+
+  param "cred" {
+    type = string
+  }
+
+  output "result" {
+    value = "Mocked: Delete EBS Volume [Volume_ID: ${param.volume_id}, Region: ${param.region}, Cred: ${param.cred}]"
   }
 }
