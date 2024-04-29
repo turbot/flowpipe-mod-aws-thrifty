@@ -18,8 +18,8 @@ trigger "query" "detect_and_respond_to_ebs_volumes_using_io1" {
 pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
   title         = "Detect and respond to EBS volumes using io1"
   description   = "Detects EBS volumes using io1 and responds with your chosen action."
-  documentation = file("./ebs/ebs_volumes_using_io1.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  // documentation = file("./ebs/ebs_volumes_using_io1.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
     type        = string
@@ -78,8 +78,8 @@ pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
 pipeline "respond_to_ebs_volumes_using_io1" {
   title         = "Respond to EBS volumes using io1"
   description   = "Responds to a collection of EBS volumes using io1."
-  documentation = file("./ebs/ebs_volumes_using_io1.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  // documentation = file("./ebs/ebs_volumes_using_io1.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
     type = list(object({
@@ -151,8 +151,8 @@ pipeline "respond_to_ebs_volumes_using_io1" {
 pipeline "respond_to_ebs_volume_using_io1" {
   title         = "Respond to EBS volume using io1"
   description   = "Responds to an EBS volume using io1."
-  documentation = file("./ebs/ebs_volumes_using_io1.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  // documentation = file("./ebs/ebs_volumes_using_io1.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
     type        = string

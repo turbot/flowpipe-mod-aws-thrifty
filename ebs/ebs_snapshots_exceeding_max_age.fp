@@ -33,7 +33,7 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   title         = "Detect and respond to EBS snapshots exceeding max age"
   description   = "Detects EBS snapshots exceeding max age and responds with your chosen action."
   documentation = file("./ebs/ebs_snapshots_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -93,7 +93,7 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
   title         = "Respond to EBS snapshots exceeding max age"
   description   = "Responds to a collection of EBS snapshots exceeding max age."
   documentation = file("./ebs/ebs_snapshots_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -166,7 +166,7 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
   title         = "Respond to EBS snapshot exceeding max age"
   description   = "Responds to an EBS snapshot exceeding max age."
   documentation = file("./ebs/ebs_snapshots_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
