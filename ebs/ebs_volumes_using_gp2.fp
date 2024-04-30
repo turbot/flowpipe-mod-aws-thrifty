@@ -1,8 +1,6 @@
 trigger "query" "detect_and_respond_to_ebs_volumes_using_gp2" {
   title         = "Detect and respond to EBS volumes using gp2"
   description   = "Detects EBS volumes using gp2 and responds with your chosen action."
-  documentation = file("./ebs/ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
@@ -20,8 +18,8 @@ trigger "query" "detect_and_respond_to_ebs_volumes_using_gp2" {
 pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
   title         = "Detect and respond to EBS volumes using gp2"
   description   = "Detects EBS volumes using gp2 and responds with your chosen action."
-  documentation = file("./ebs/ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  // documentation = file("./ebs/ebs_volumes_using_gp2.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
     type        = string
@@ -80,11 +78,11 @@ pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
 pipeline "respond_to_ebs_volumes_using_gp2" {
   title         = "Respond to EBS volumes using gp2"
   description   = "Responds to a collection of EBS volumes using gp2."
-  documentation = file("./ebs/ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  // documentation = file("./ebs/ebs_volumes_using_gp2.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
-    type        = list(object({
+    type = list(object({
       title      = string
       volume_id  = string
       region     = string
@@ -133,7 +131,7 @@ pipeline "respond_to_ebs_volumes_using_gp2" {
   }
 
   step "pipeline" "respond_to_item" {
-    for_each        = step.transform.items_by_id
+    for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.respond_to_ebs_volume_using_gp2
     args            = {
@@ -153,8 +151,8 @@ pipeline "respond_to_ebs_volumes_using_gp2" {
 pipeline "respond_to_ebs_volume_using_gp2" {
   title         = "Respond to EBS volume using gp2"
   description   = "Responds to an EBS volume using gp2."
-  documentation = file("./ebs/ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  // documentation = file("./ebs/ebs_volumes_using_gp2.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
     type        = string

@@ -52,6 +52,12 @@ variable "ebs_volume_unattached_default_response" {
   default     = "notify"
 }
 
+variable "ebs_volume_unattached_responses" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete"]
+}
+
 variable "ebs_volumes_attached_to_stopped_instances_default_response" {
   type        = string
   description = "The default response to use when EBS volumes attached to stopped instances."
@@ -64,7 +70,13 @@ variable "ebs_volumes_attached_to_stopped_instances_responses" {
   default     = ["skip", "detach", "delete"]
 }
 
-variable "ebs_volume_unattached_responses" {
+variable "ebs_volume_without_attachments_default_response" {
+  type        = string
+  description = "The default response to use when EBS volumes are unattached."
+  default     = "notify"
+}
+
+variable "ebs_volume_without_attachments_responses" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete"]

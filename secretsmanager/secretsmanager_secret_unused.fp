@@ -1,25 +1,39 @@
-trigger "query" "detect_and_respond_to_ebs_volumes_using_io1" {
-  title         = "Detect and respond to EBS volumes using io1"
-  description   = "Detects EBS volumes using io1 and responds with your chosen action."
+locals {
+  secretsmanager_secrets_unused_query = <<-EOQ
+  select
+    concat(name, ' [', region, '/', account_id, ']') as title,
+    name,
+    region,
+    _ctx ->> 'connection_name' as cred
+  from
+    aws_secretsmanager_secret
+  where
+    date_part('day', now()-last_accessed_date) > ${var.secretsmanager_secret_unused_days}::int
+  EOQ
+}
+
+trigger "query" "detect_and_respond_to_secretsmanager_secrets_unused" {
+  title       = "Detect and respond to SecretsManager secrets that are unused"
+  description = "Detects SecretsManager secrets that are unused (not access in last n days) and responds with your chosen action."
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = file("./ebs/ebs_volumes_using_io1.sql")
+  sql      = local.secretsmanager_secrets_unused_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_using_io1
+    pipeline = pipeline.respond_to_secretsmanager_secrets_unused
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
-  title         = "Detect and respond to EBS volumes using io1"
-  description   = "Detects EBS volumes using io1 and responds with your chosen action."
-  // documentation = file("./ebs/ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
+  title         = "Detect and respond to SecretsManager secrets that are unused"
+  description   = "Detects SecretsManager secrets that are unused (not access in last n days) and responds with your chosen action."
+  documentation = file("./secretsmanager/secretsmanager_secret_unused.md")
+  tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -48,22 +62,22 @@ pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_io1_default_response
+    default     = var.secretsmanager_secret_unused_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_io1_responses
+    default     = var.secretsmanager_secret_unused_responses
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = file("./ebs/ebs_volumes_using_io1.sql")
+    sql      = local.secretsmanager_secrets_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_using_io1
+    pipeline = pipeline.respond_to_secretsmanager_secrets_unused
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
@@ -75,18 +89,18 @@ pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_using_io1" {
-  title         = "Respond to EBS volumes using io1"
-  description   = "Responds to a collection of EBS volumes using io1."
-  // documentation = file("./ebs/ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "respond_to_secretsmanager_secrets_unused" {
+  title         = "Respond to SecretsManager secrets that are unused"
+  description   = "Responds to a collection of SecretsManager secrets that are unused (not access in last n days)."
+  documentation = file("./secretsmanager/secretsmanager_secret_unused.md")
+  tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
-      title      = string
-      volume_id  = string
-      region     = string
-      cred       = string
+      title  = string
+      name   = string
+      region = string
+      cred   = string
     }))
   }
 
@@ -111,32 +125,32 @@ pipeline "respond_to_ebs_volumes_using_io1" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_io1_default_response
+    default     = var.secretsmanager_secret_unused_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_io1_responses
+    default     = var.secretsmanager_secret_unused_responses
   }
 
   step "message" "notify_detection_count" {
     if       = var.notifier_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS volumes using io1."
+    text     = "Detected ${length(param.items)} SecretsManager secrets unused for ${var.secretsmanager_secret_unused_days} days."
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.volume_id => row }
+    value = {for row in param.items : row.name => row }
   }
 
   step "pipeline" "respond_to_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_using_io1
+    pipeline        = pipeline.respond_to_secretsmanager_secret_unused
     args            = {
       title            = each.value.title
-      volume_id        = each.value.volume_id
+      name             = each.value.name
       region           = each.value.region
       cred             = each.value.cred
       notifier         = param.notifier
@@ -148,20 +162,20 @@ pipeline "respond_to_ebs_volumes_using_io1" {
   }
 }
 
-pipeline "respond_to_ebs_volume_using_io1" {
-  title         = "Respond to EBS volume using io1"
-  description   = "Responds to an EBS volume using io1."
-  // documentation = file("./ebs/ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "respond_to_secretsmanager_secret_unused" {
+  title         = "Respond to SecretsManager secret that are unused"
+  description   = "Responds to a SecretsManager secret that are unused (not access in last n days)."
+  documentation = file("./secretsmanager/secretsmanager_secret_unused.md")
+  tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
     description = local.TitleDescription
   }
 
-  param "volume_id" {
+  param "name" {
     type        = string
-    description = "EBS volume ID."
+    description = "The friendly name of the SecretsManager secret."
   }
 
   param "region" {
@@ -195,13 +209,13 @@ pipeline "respond_to_ebs_volume_using_io1" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_io1_default_response
+    default     = var.secretsmanager_secret_unused_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_io1_responses
+    default     = var.secretsmanager_secret_unused_responses
   }
 
   step "pipeline" "respond" {
@@ -210,7 +224,7 @@ pipeline "respond_to_ebs_volume_using_io1" {
       notifier         = param.notifier
       notifier_level   = param.notifier_level
       approvers        = param.approvers
-      detect_msg       = "Detected EBS volume ${param.title} using io1."
+      detect_msg       = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
       default_response = param.default_response
       responses        = param.responses
       response_options = {
@@ -222,26 +236,44 @@ pipeline "respond_to_ebs_volume_using_io1" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notifier_level == local.NotifierLevelVerbose
-            text     = "Skipped EBS volume ${param.title} using io1."
+            text     = "Skipped SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
           }
           success_msg = ""
           error_msg   = ""
         },
-        "update" = {
-          label  = "Update to io2"
-          value  = "update"
-          style  = local.StyleOk
-          pipeline_ref  = local.aws_pipeline_modify_ebs_volume
+        "delete" = {
+          label  = "Delete"
+          value  = "delete"
+          style  = local.StyleAlert
+          pipeline_ref  = pipeline.mock_aws_pipeline_delete_secretsmanager_secret // TODO: Replace with real pipeline when added to aws library mod.
           pipeline_args = {
-            volume_id   = param.volume_id
-            volume_type = "io2"
-            region      = param.region
-            cred        = param.cred
+            name   = param.name
+            region = param.region
+            cred   = param.cred
           }
-          success_msg = "Updated EBS volume ${param.title} to io2."
-          error_msg   = "Error updating EBS volume ${param.title} to io2"
+          success_msg = "Deleted SecretsManager secret ${param.title}."
+          error_msg   = "Error deleting SecretsManager secret ${param.title}."
         }
       }
     }
+  }
+}
+
+// TODO: We can remove this mock pipeline once the real pipeline is added to the aws library mod.
+pipeline "mock_aws_pipeline_delete_secretsmanager_secret" {
+  param "name" {
+    type = string
+  }
+
+  param "region" {
+    type = string
+  }
+
+  param "cred" {
+    type = string
+  }
+
+  output "result" {
+    value = "Mocked: Delete SecretsManager secret [Name: ${param.name}, Region: ${param.region}, Cred: ${param.cred}]"
   }
 }
