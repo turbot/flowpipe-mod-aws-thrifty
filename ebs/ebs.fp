@@ -45,3 +45,15 @@ variable "ebs_volume_using_io1_responses" {
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "update"]
 }
+
+variable "ebs_volume_without_attachments_default_response" {
+  type        = string
+  description = "The default response to use when EBS volumes are unattached."
+  default     = "notify"
+}
+
+variable "ebs_volume_without_attachments_responses" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete"]
+}
