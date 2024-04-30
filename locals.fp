@@ -34,6 +34,10 @@ locals {
 // Pipeline References
 locals {
   approval_pipeline_skipped_action_notification = approval.pipeline.skipped_action_notification
-  aws_pipeline_delete_ebs_snapshot = aws.pipeline.delete_ebs_snapshot
-  aws_pipeline_modify_ebs_volume   = aws.pipeline.modify_ebs_volume
+  aws_pipeline_delete_ebs_snapshot              = aws.pipeline.delete_ebs_snapshot
+  aws_pipeline_modify_ebs_volume                = aws.pipeline.modify_ebs_volume
+  aws_pipeline_delete_ebs_volume                = aws.pipeline.delete_ebs_volume
+  aws_pipeline_detach_ebs_volume                = aws.pipeline.detach_ebs_volume
+  aws_pipeline_release_eip                      = aws.pipeline.release_eip
+  aws_pipeline_delete_nat_gateway               = aws.pipeline.delete_nat_gateway
 }

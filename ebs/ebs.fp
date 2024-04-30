@@ -45,3 +45,27 @@ variable "ebs_volume_using_io1_responses" {
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "update"]
 }
+
+variable "ebs_volume_unattached_default_response" {
+  type        = string
+  description = "The default response to use when EBS volumes are unattached."
+  default     = "notify"
+}
+
+variable "ebs_volumes_attached_to_stopped_instances_default_response" {
+  type        = string
+  description = "The default response to use when EBS volumes attached to stopped instances."
+  default     = "notify"
+}
+
+variable "ebs_volumes_attached_to_stopped_instances_responses" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "detach", "delete"]
+}
+
+variable "ebs_volume_unattached_responses" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete"]
+}
