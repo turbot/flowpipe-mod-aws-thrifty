@@ -145,7 +145,7 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
   }
 
   step "pipeline" "respond_to_item" {
-    for_each        = step.transform.items_by_id
+    for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.respond_to_secretsmanager_secret_unused
     args            = {

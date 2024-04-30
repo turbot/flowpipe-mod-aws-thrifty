@@ -131,7 +131,7 @@ pipeline "respond_to_ebs_volumes_without_attachments" {
   }
 
   step "pipeline" "respond_to_item" {
-    for_each        = step.transform.items_by_id
+    for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.respond_to_ebs_volume_without_attachments
     args            = {
