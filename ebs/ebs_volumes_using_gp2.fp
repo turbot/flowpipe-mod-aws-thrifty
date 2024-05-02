@@ -18,7 +18,6 @@ trigger "query" "detect_and_respond_to_ebs_volumes_using_gp2" {
 pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
   title         = "Detect and respond to EBS volumes using gp2"
   description   = "Detects EBS volumes using gp2 and responds with your chosen action."
-  // documentation = file("./ebs/ebs_volumes_using_gp2.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
@@ -78,7 +77,6 @@ pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
 pipeline "respond_to_ebs_volumes_using_gp2" {
   title         = "Respond to EBS volumes using gp2"
   description   = "Responds to a collection of EBS volumes using gp2."
-  // documentation = file("./ebs/ebs_volumes_using_gp2.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
@@ -151,7 +149,6 @@ pipeline "respond_to_ebs_volumes_using_gp2" {
 pipeline "respond_to_ebs_volume_using_gp2" {
   title         = "Respond to EBS volume using gp2"
   description   = "Responds to an EBS volume using gp2."
-  // documentation = file("./ebs/ebs_volumes_using_gp2.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {

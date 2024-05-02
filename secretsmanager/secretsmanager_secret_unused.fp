@@ -32,7 +32,6 @@ trigger "query" "detect_and_respond_to_secretsmanager_secrets_unused" {
 pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
   title         = "Detect and respond to SecretsManager secrets that are unused"
   description   = "Detects SecretsManager secrets that are unused (not access in last n days) and responds with your chosen action."
-  documentation = file("./secretsmanager/secretsmanager_secret_unused.md")
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "database" {
@@ -92,7 +91,6 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
 pipeline "respond_to_secretsmanager_secrets_unused" {
   title         = "Respond to SecretsManager secrets that are unused"
   description   = "Responds to a collection of SecretsManager secrets that are unused (not access in last n days)."
-  documentation = file("./secretsmanager/secretsmanager_secret_unused.md")
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "items" {
@@ -165,7 +163,6 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
 pipeline "respond_to_secretsmanager_secret_unused" {
   title         = "Respond to SecretsManager secret that are unused"
   description   = "Responds to a SecretsManager secret that are unused (not access in last n days)."
-  documentation = file("./secretsmanager/secretsmanager_secret_unused.md")
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "title" {

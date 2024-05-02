@@ -18,7 +18,6 @@ trigger "query" "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
 pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
   title         = "Detect and respond to S3 buckets without lifecycle policy"
   description   = "Detects S3 buckets which do not have a lifecycle policy and responds with your chosen action."
-  documentation = file("./s3/s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "database" {
@@ -85,7 +84,6 @@ pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
 pipeline "respond_to_s3_buckets_without_lifecycle_policy" {
   title         = "Respond to S3 buckets without lifecycle policy"
   description   = "Responds to a collection of S3 buckets which do not have a lifecycle policy."
-  documentation = file("./s3/s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "items" {
@@ -165,7 +163,6 @@ pipeline "respond_to_s3_buckets_without_lifecycle_policy" {
 pipeline "respond_to_s3_bucket_without_lifecycle_policy" {
   title         = "Respond to S3 bucket without lifecycle policy"
   description   = "Responds to an individual S3 bucket which does not have a lifecycle policy."
-  documentation = file("./s3/s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "title" {

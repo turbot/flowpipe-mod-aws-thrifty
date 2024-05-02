@@ -4,6 +4,7 @@ locals {
   })
 }
 
+// TODO: Change to an array of objects (contents of 'Rules') - let lib mod wrap it; no JSONified strings!
 variable "s3_bucket_default_lifecycle_policy" {
   type        = string
   description = "The default S3 bucket lifecycle policy to apply"
@@ -22,12 +23,14 @@ variable "s3_bucket_default_lifecycle_policy" {
   EOF
 }
 
+// TODO: suffixed to: response_option / default_response_option / response_option_default
 variable "s3_bucket_without_lifecycle_policy_default_response" {
   type        = string
   description = "The default response to use for S3 buckets without lifecycle policy."
   default     = "notify"
 }
 
+// TODO: rename suffix to: response_options / enabled_response_options
 variable "s3_bucket_without_lifecycle_policy_responses" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."

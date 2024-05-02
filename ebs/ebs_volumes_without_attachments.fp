@@ -18,7 +18,6 @@ trigger "query" "detect_and_respond_to_ebs_volumes_without_attachments" {
 pipeline "detect_and_respond_to_ebs_volumes_without_attachments" {
   title         = "Detect and respond to EBS volumes without attachments"
   description   = "Detects EBS volumes without attachments and responds with your chosen action."
-  // documentation = file("./ebs/ebs_volumes_without_attachments.md")
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
@@ -78,7 +77,6 @@ pipeline "detect_and_respond_to_ebs_volumes_without_attachments" {
 pipeline "respond_to_ebs_volumes_without_attachments" {
   title         = "Respond to EBS volumes without attachments"
   description   = "Responds to a collection of EBS volumes without attachments."
-  // documentation = file("./ebs/ebs_volumes_without_attachments.md")
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
@@ -151,7 +149,6 @@ pipeline "respond_to_ebs_volumes_without_attachments" {
 pipeline "respond_to_ebs_volume_without_attachments" {
   title         = "Respond to EBS volume without attachments"
   description   = "Responds to an EBS volume without attachments."
-  // documentation = file("./ebs/ebs_volumes_without_attachments.md")
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
