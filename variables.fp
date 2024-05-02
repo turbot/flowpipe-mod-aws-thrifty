@@ -16,7 +16,7 @@ variable "notifier" {
   default     = "default"
 }
 
-variable "notifier_level" {
+variable "notification_level" {
   type        = string
   description = "The verbosity level of notification messages to send. Valid options are 'verbose', 'info', 'error'."
   default     = "verbose"
@@ -24,7 +24,7 @@ variable "notifier_level" {
 
 variable "approvers" {
   type        = list(string)
-  description = "List of notifiers to be used for obtaining action/approval decisions."
+  description = "List of notifiers to be used for obtaining action/approval decisions, when empty list will perform the default response associated with the detection."
   default     = []
 }
 
