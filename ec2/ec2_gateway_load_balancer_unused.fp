@@ -71,13 +71,13 @@ pipeline "detect_and_respond_to_ec2_gateway_load_balancer_unused" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ec2_instance_age_max_days_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ec2_instance_age_max_days_enabled_response_options
@@ -136,13 +136,13 @@ pipeline "respond_to_ec2_gateway_load_balancers_unused" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ec2_gateway_load_balancer_unused_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ec2_gateway_load_balancer_unused_enabled_response_options
@@ -225,13 +225,13 @@ pipeline "respond_to_ec2_gateway_load_balancer_unused" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ec2_gateway_load_balancer_unused_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ec2_gateway_load_balancer_unused_enabled_response_options

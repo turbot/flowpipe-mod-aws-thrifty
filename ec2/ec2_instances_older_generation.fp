@@ -60,13 +60,13 @@ pipeline "detect_and_respond_to_ec2_instances_older_generation" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ec2_instance_older_generation_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ec2_instance_older_generation_enabled_response_options
@@ -124,13 +124,13 @@ pipeline "respond_to_ec2_instances_older_generation" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ec2_instance_older_generation_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ec2_instance_older_generation_enabled_response_options
@@ -207,13 +207,13 @@ pipeline "respond_to_ec2_instance_older_generation" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ec2_instance_older_generation_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ec2_instance_older_generation_enabled_response_options
