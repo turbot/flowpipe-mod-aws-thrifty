@@ -1,39 +1,40 @@
 locals {
-  ec2_instances_exceeding_max_age_query = <<-EOQ
-  select
-    concat(instance_id, ' [', region, '/', account_id, ']') as title,
-    instance_id,
-    region,
-    _ctx ->> 'connection_name' as cred
-  from
-    aws_ec2_instance
-  where
-    date_part('day', now()-launch_time) > ${var.ec2_instance_age_max_days}
-    and instance_state in ('running', 'pending', 'rebooting')
+  ec2_classic_load_balancer_unused_query = <<-EOQ
+    select
+      concat(name, ' [', region, '/', account_id, ']') as title,
+      name,
+      arn,
+      region,
+      _ctx ->> 'connection_name' as cred
+    from
+      aws_ec2_classic_load_balancer
+    where
+      jsonb_array_length(instances) <= 0
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ec2_instances_exceeding_max_age" {
-  title       = "Detect and respond to EC2 instances exceeding max age"
-  description = "Detects EC2 instances exceeding max age and responds with your chosen action."
+
+trigger "query" "detect_and_respond_to_ec2_classic_load_balancer_unused" {
+  title       = "Detect and respond to unused EC2 classic load balancers"
+  description = "Detects EC2 classic load balancers that are unused."
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = local.ec2_instances_exceeding_max_age_query
+  sql      = local.ec2_classic_load_balancer_unused_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ec2_instances_exceeding_max_age
+    pipeline = pipeline.respond_to_ec2_classic_load_balancer_unused
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ec2_instances_exceeding_max_age" {
-  title         = "Detect and respond to EC2 instances exceeding max age"
-  description   = "Detects EC2 instances exceeding max age and responds with your chosen action."
-  documentation = file("./ec2/ec2_instances_exceeding_max_age.md")
+pipeline "detect_and_respond_to_ec2_classic_load_balancer_unused" {
+  title         = "Detect and respond to EC2 unused classic load balancers"
+  description   = "Detects unused EC2 classic load balancers and responds with your chosen action."
+  documentation = file("./ec2/ec2_classic_load_balancer_unused.md")
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
   // })
@@ -76,11 +77,11 @@ pipeline "detect_and_respond_to_ec2_instances_exceeding_max_age" {
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ec2_instances_exceeding_max_age_query
+    sql      = local.ec2_classic_load_balancer_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ec2_instances_exceeding_max_age
+    pipeline = pipeline.respond_to_ec2_classic_load_balancers_unused
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
@@ -92,10 +93,10 @@ pipeline "detect_and_respond_to_ec2_instances_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_ec2_instances_exceeding_max_age" {
-  title         = "Respond to EC2 instances exceeding max age"
-  description   = "Responds to a collection of EC2 instances exceeding max age."
-  documentation = file("./ec2/ec2_instances_exceeding_max_age.md")
+pipeline "respond_to_ec2_classic_load_balancers_unused" {
+  title         = "Respond to EC2 classic load balancers exceeding max age"
+  description   = "Responds to a collection of EC2 classic load balancers exceeding max age."
+  documentation = file("./ec2/ec2_classic_load_balancer_unused.md")
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 
   // })
@@ -103,7 +104,8 @@ pipeline "respond_to_ec2_instances_exceeding_max_age" {
   param "items" {
     type = list(object({
       title       = string
-      instance_id = string
+      name        = string
+      arn         = string
       region      = string
       cred        = string
     }))
@@ -130,19 +132,19 @@ pipeline "respond_to_ec2_instances_exceeding_max_age" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_age_max_days_default_response
+    default     = var.ec2_classic_load_balancer_unused_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_age_max_days_responses
+    default     = var.ec2_classic_load_balancer_unused_responses
   }
 
   step "message" "notify_detection_count" {
     if       = var.notifier_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EC2 instances exceeding maximum age."
+    text     = "Detected ${length(param.items)} unused EC2 classic load balancers."
   }
 
   step "transform" "items_by_id" {
@@ -152,10 +154,11 @@ pipeline "respond_to_ec2_instances_exceeding_max_age" {
   step "pipeline" "respond_to_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ec2_instance_exceeding_max_age
+    pipeline        = pipeline.respond_to_ec2_classic_load_balancer_unused
     args            = {
       title            = each.value.title
-      instance_id      = each.value.instance_id
+      arn              = each.value.arn
+      name             = each.value.name
       region           = each.value.region
       cred             = each.value.cred
       notifier         = param.notifier
@@ -167,10 +170,10 @@ pipeline "respond_to_ec2_instances_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_ec2_instance_exceeding_max_age" {
-  title         = "Respond to EC2 instance exceeding max age"
-  description   = "Responds to an EC2 instance exceeding max age."
-  documentation = file("./ec2/ec2_instances_exceeding_max_age.md")
+pipeline "respond_to_ec2_classic_load_balancer_unused" {
+  title         = "Respond to unused EC2 classic load balancer"
+  description   = "Responds to an unused EC2 classic load balancer."
+  documentation = file("./ec2/ec2_classic_load_balancer_unused.md")
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
@@ -178,9 +181,14 @@ pipeline "respond_to_ec2_instance_exceeding_max_age" {
     description = local.TitleDescription
   }
 
-  param "instance_id" {
+  param "name" {
     type        = string
-    description = "The ID of the EC2 instance."
+    description = "The name of the EC2 classic load balancer."
+  }
+
+  param "arn" {
+    type        = string
+    description = "The ARN of the EC2 classic load balancer."
   }
 
   param "region" {
@@ -214,13 +222,13 @@ pipeline "respond_to_ec2_instance_exceeding_max_age" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_age_max_days_default_response
+    default     = var.ec2_classic_load_balancer_unused_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_age_max_days_responses
+    default     = var.ec2_classic_load_balancer_unused_responses
   }
 
   step "pipeline" "respond" {
@@ -229,7 +237,7 @@ pipeline "respond_to_ec2_instance_exceeding_max_age" {
       notifier         = param.notifier
       notifier_level   = param.notifier_level
       approvers        = param.approvers
-      detect_msg       = "Detected EC2 Instance ${param.title} exceeding maximum age."
+      detect_msg       = "Detected unused EC2 Classic Load Balancer ${param.title}."
       default_response = param.default_response
       responses        = param.responses
       response_options = {
@@ -241,38 +249,49 @@ pipeline "respond_to_ec2_instance_exceeding_max_age" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notifier_level == local.NotifierLevelVerbose
-            text     = "Skipped EC2 Instance ${param.title} exceeding maximum age."
+            text     = "Skipped unused EC2 Classic Load Balancer ${param.title}."
           }
           success_msg = ""
           error_msg   = ""
         },
-        "stop" = {
-          label  = "Stop"
-          value  = "stop"
+        "delete" = {
+          label  = "Delete"
+          value  = "delete"
           style  = local.StyleAlert
-          pipeline_ref  = local.aws_pipeline_stop_ec2_instances
+          // pipeline_ref  = local.aws_pipeline_delete_ec2_classic_load_balancer // TODO: update it when you develop the pipeline
+          pipeline_ref = pipeline.mock_aws_lib_delete_classic_load_balancer
           pipeline_args = {
-            instance_ids = [param.instance_id]
-            region       = param.region
-            cred         = param.cred
+            load_balancer_arn = [param.arn]
+            region            = param.region
+            cred              = param.cred
           }
-          success_msg = "Stopped EC2 Instance ${param.title}."
-          error_msg   = "Error stopping EC2 Instance ${param.title}."
-        }
-        "terminate" = {
-          label  = "Terminate"
-          value  = "terminate"
-          style  = local.StyleAlert
-          pipeline_ref  = local.aws_pipeline_terminate_ec2_instances
-          pipeline_args = {
-            instance_ids = [param.instance_id]
-            region       = param.region
-            cred         = param.cred
-          }
-          success_msg = "Deleted EC2 Instance ${param.title}."
-          error_msg   = "Error deleting EC2 Instance ${param.title}."
+          success_msg = "Deleted EC2 Classic Load Balancer ${param.title}."
+          error_msg   = "Error deleting EC2 Classic Load Balancer ${param.title}."
         }
       }
     }
+  }
+}
+
+pipeline "mock_aws_lib_delete_classic_load_balancer" {
+  param "cred" {
+    type = string
+    default = "default"
+  }
+
+  param "load_balancer_arn" {
+    type = string
+  }
+
+  param "region" {
+    type = string
+  }
+
+  param "account_id" {
+    type = string
+  }
+
+  output "result" {
+    value = "Mocked: aws.pipeline.mock_aws_lib_delete_classic_load_balancer ${param.load_balancer_arn} [${param.region}/${param.account_id}]."
   }
 }
