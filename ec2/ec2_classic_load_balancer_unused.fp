@@ -146,7 +146,7 @@ pipeline "respond_to_ec2_classic_load_balancers_unused" {
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.instance_id => row }
+    value = {for row in param.items : row.name => row }
   }
 
   step "pipeline" "respond_to_item" {
