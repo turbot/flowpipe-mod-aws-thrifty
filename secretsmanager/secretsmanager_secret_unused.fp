@@ -46,10 +46,10 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -58,13 +58,13 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.secretsmanager_secret_unused_default_response
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.secretsmanager_secret_unused_responses
@@ -80,10 +80,10 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
-      notifier_level   = param.notifier_level
+      notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      default_response_option = param.default_response_option
+      enabled_response_options        = param.enabled_response_options
     }
   }
 }
@@ -108,10 +108,10 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -120,20 +120,20 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.secretsmanager_secret_unused_default_response
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.secretsmanager_secret_unused_responses
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notifier_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} SecretsManager secrets unused for ${var.secretsmanager_secret_unused_days} days."
   }
@@ -147,15 +147,15 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.respond_to_secretsmanager_secret_unused
     args            = {
-      title            = each.value.title
-      name             = each.value.name
-      region           = each.value.region
-      cred             = each.value.cred
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      title                    = each.value.title
+      name                     = each.value.name
+      region                   = each.value.region
+      cred                     = each.value.cred
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }
@@ -191,10 +191,10 @@ pipeline "respond_to_secretsmanager_secret_unused" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -203,13 +203,13 @@ pipeline "respond_to_secretsmanager_secret_unused" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.secretsmanager_secret_unused_default_response
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.secretsmanager_secret_unused_responses
@@ -218,12 +218,12 @@ pipeline "respond_to_secretsmanager_secret_unused" {
   step "pipeline" "respond" {
     pipeline = approval.pipeline.respond_action_handler
     args     = {
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      detect_msg       = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
-      default_response = param.default_response
-      responses        = param.responses
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      detect_msg               = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
       response_options = {
         "skip" = {
           label  = "Skip"
@@ -232,7 +232,7 @@ pipeline "respond_to_secretsmanager_secret_unused" {
           pipeline_ref  = local.approval_pipeline_skipped_action_notification
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notifier_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.NotifierLevelVerbose
             text     = "Skipped SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
           }
           success_msg = ""

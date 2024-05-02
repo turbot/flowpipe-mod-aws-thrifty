@@ -46,10 +46,10 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -58,13 +58,13 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ebs_snapshot_age_max_days_default_response
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ebs_snapshot_age_max_days_responses
@@ -78,12 +78,12 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   step "pipeline" "respond" {
     pipeline = pipeline.respond_to_ebs_snapshots_exceeding_max_age
     args     = {
-      items            = step.query.detect.rows
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      items                    = step.query.detect.rows
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }
@@ -108,10 +108,10 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -120,20 +120,20 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ebs_snapshot_age_max_days_default_response
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ebs_snapshot_age_max_days_responses
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notifier_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} EBS Snapshots exceeding maximum age."
   }
@@ -147,15 +147,15 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.respond_to_ebs_snapshot_exceeding_max_age
     args            = {
-      title            = each.value.title
-      snapshot_id      = each.value.snapshot_id
-      region           = each.value.region
-      cred             = each.value.cred
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      title                    = each.value.title
+      snapshot_id              = each.value.snapshot_id
+      region                   = each.value.region
+      cred                     = each.value.cred
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }
@@ -191,10 +191,10 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -203,13 +203,13 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
     default     = var.ebs_snapshot_age_max_days_default_response
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
     default     = var.ebs_snapshot_age_max_days_responses
@@ -218,12 +218,12 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
   step "pipeline" "respond" {
     pipeline = approval.pipeline.respond_action_handler
     args     = {
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      detect_msg       = "Detected EBS Snapshot ${param.title} exceeding maximum age."
-      default_response = param.default_response
-      responses        = param.responses
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      detect_msg               = "Detected EBS Snapshot ${param.title} exceeding maximum age."
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
       response_options = {
         "skip" = {
           label  = "Skip"
@@ -232,7 +232,7 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
           pipeline_ref  = local.approval_pipeline_skipped_action_notification
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notifier_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.NotifierLevelVerbose
             text     = "Skipped EBS Snapshot ${param.title} exceeding maximum age."
           }
           success_msg = ""

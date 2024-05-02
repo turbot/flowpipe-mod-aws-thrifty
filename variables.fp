@@ -16,7 +16,7 @@ variable "notifier" {
   default     = "default"
 }
 
-variable "notifier_level" { // TODO: message/notification + _level ? _verbosity => notification_level
+variable "notification_level" {
   type        = string
   description = "The verbosity level of notification messages to send. Valid options are 'verbose', 'info', 'error'."
   default     = "info"
