@@ -55,5 +55,5 @@ variable "ebs_volume_without_attachments_default_response" {
 variable "ebs_volume_without_attachments_responses" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete"]
+  default     = ["skip", "delete_volume"]
 }
