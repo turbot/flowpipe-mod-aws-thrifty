@@ -47,13 +47,13 @@ pipeline "detect_and_respond_to_ebs_volumes_without_attachments" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_without_attachments_default_response
+    default     = var.ebs_volume_without_attachments_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_without_attachments_responses
+    default     = var.ebs_volume_without_attachments_enabled_response_options
   }
 
   step "query" "detect" {
@@ -109,13 +109,13 @@ pipeline "respond_to_ebs_volumes_without_attachments" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_without_attachments_default_response
+    default     = var.ebs_volume_without_attachments_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_without_attachments_responses
+    default     = var.ebs_volume_without_attachments_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
@@ -192,13 +192,13 @@ pipeline "respond_to_ebs_volume_without_attachments" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_gp2_default_response
+    default     = var.ebs_volume_without_attachments_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_gp2_responses
+    default     = var.ebs_volume_without_attachments_enabled_response_options
   }
 
   step "pipeline" "respond" {

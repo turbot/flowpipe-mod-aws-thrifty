@@ -53,13 +53,13 @@ pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_response
+    default     = var.s3_bucket_without_lifecycle_policy_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_responses
+    default     = var.s3_bucket_without_lifecycle_policy_enabled_response_options
   }
 
   step "query" "detect" {
@@ -122,13 +122,13 @@ pipeline "respond_to_s3_buckets_without_lifecycle_policy" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_response
+    default     = var.s3_bucket_without_lifecycle_policy_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_responses
+    default     = var.s3_bucket_without_lifecycle_policy_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
@@ -212,13 +212,13 @@ pipeline "respond_to_s3_bucket_without_lifecycle_policy" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_response
+    default     = var.s3_bucket_without_lifecycle_policy_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_responses
+    default     = var.s3_bucket_without_lifecycle_policy_enabled_response_options
   }
 
   step "pipeline" "respond" {

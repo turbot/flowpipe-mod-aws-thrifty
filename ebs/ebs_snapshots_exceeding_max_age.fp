@@ -61,13 +61,13 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response
+    default     = var.ebs_snapshot_age_max_days_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_responses
+    default     = var.ebs_snapshot_age_max_days_enabled_response_options
   }
 
   step "query" "detect" {
@@ -123,13 +123,13 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response
+    default     = var.ebs_snapshot_age_max_days_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_responses
+    default     = var.ebs_snapshot_age_max_days_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
@@ -206,13 +206,13 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response
+    default     = var.ebs_snapshot_age_max_days_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_responses
+    default     = var.ebs_snapshot_age_max_days_enabled_response_options
   }
 
   step "pipeline" "respond" {

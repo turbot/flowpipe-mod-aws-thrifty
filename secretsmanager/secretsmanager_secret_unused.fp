@@ -61,13 +61,13 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response
+    default     = var.secretsmanager_secret_unused_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_responses
+    default     = var.secretsmanager_secret_unused_enabled_response_options
   }
 
   step "query" "detect" {
@@ -123,13 +123,13 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response
+    default     = var.secretsmanager_secret_unused_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_responses
+    default     = var.secretsmanager_secret_unused_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
@@ -206,13 +206,13 @@ pipeline "respond_to_secretsmanager_secret_unused" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response
+    default     = var.secretsmanager_secret_unused_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_responses
+    default     = var.secretsmanager_secret_unused_enabled_response_options
   }
 
   step "pipeline" "respond" {
