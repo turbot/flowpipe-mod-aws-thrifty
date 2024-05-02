@@ -13,7 +13,7 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ec2_instances_large " {
+trigger "query" "detect_and_respond_to_ec2_instances_large" {
   title       = "Detect and respond to large EC2 instances"
   description = "Detects large EC2 instances and responds with your chosen action."
 
