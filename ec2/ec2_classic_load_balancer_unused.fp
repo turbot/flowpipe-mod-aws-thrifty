@@ -34,7 +34,6 @@ trigger "query" "detect_and_respond_to_ec2_classic_load_balancer_unused" {
 pipeline "detect_and_respond_to_ec2_classic_load_balancer_unused" {
   title         = "Detect and respond to EC2 unused classic load balancers"
   description   = "Detects unused EC2 classic load balancers and responds with your chosen action."
-  documentation = file("./ec2/ec2_classic_load_balancer_unused.md")
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
   // })
@@ -51,10 +50,10 @@ pipeline "detect_and_respond_to_ec2_classic_load_balancer_unused" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -66,13 +65,13 @@ pipeline "detect_and_respond_to_ec2_classic_load_balancer_unused" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_age_max_days_default_response
+    default     = var.ec2_instance_age_max_days_default_response_option
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_age_max_days_responses
+    default     = var.ec2_instance_age_max_days_enabled_response_options
   }
 
   step "query" "detect" {
@@ -85,7 +84,7 @@ pipeline "detect_and_respond_to_ec2_classic_load_balancer_unused" {
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
-      notifier_level   = param.notifier_level
+      notification_level   = param.notification_level
       approvers        = param.approvers
       default_response = param.default_response
       responses        = param.responses
@@ -94,9 +93,8 @@ pipeline "detect_and_respond_to_ec2_classic_load_balancer_unused" {
 }
 
 pipeline "respond_to_ec2_classic_load_balancers_unused" {
-  title         = "Respond to EC2 classic load balancers exceeding max age"
-  description   = "Responds to a collection of EC2 classic load balancers exceeding max age."
-  documentation = file("./ec2/ec2_classic_load_balancer_unused.md")
+  title         = "Respond to unused EC2 classic load balancers"
+  description   = "Responds to a collection of unused EC2 classic load balancers."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 
   // })
@@ -117,10 +115,10 @@ pipeline "respond_to_ec2_classic_load_balancers_unused" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -132,17 +130,17 @@ pipeline "respond_to_ec2_classic_load_balancers_unused" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_classic_load_balancer_unused_default_response
+    default     = var.ec2_classic_load_balancer_unused_default_response_option
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_classic_load_balancer_unused_responses
+    default     = var.ec2_classic_load_balancer_unused_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notifier_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} unused EC2 classic load balancers."
   }
@@ -162,7 +160,7 @@ pipeline "respond_to_ec2_classic_load_balancers_unused" {
       region           = each.value.region
       cred             = each.value.cred
       notifier         = param.notifier
-      notifier_level   = param.notifier_level
+      notification_level   = param.notification_level
       approvers        = param.approvers
       default_response = param.default_response
       responses        = param.responses
@@ -173,7 +171,6 @@ pipeline "respond_to_ec2_classic_load_balancers_unused" {
 pipeline "respond_to_ec2_classic_load_balancer_unused" {
   title         = "Respond to unused EC2 classic load balancer"
   description   = "Responds to an unused EC2 classic load balancer."
-  documentation = file("./ec2/ec2_classic_load_balancer_unused.md")
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
@@ -207,10 +204,10 @@ pipeline "respond_to_ec2_classic_load_balancer_unused" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -222,20 +219,20 @@ pipeline "respond_to_ec2_classic_load_balancer_unused" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_classic_load_balancer_unused_default_response
+    default     = var.ec2_classic_load_balancer_unused_default_response_option
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_classic_load_balancer_unused_responses
+    default     = var.ec2_classic_load_balancer_unused_enabled_response_options
   }
 
   step "pipeline" "respond" {
     pipeline = approval.pipeline.respond_action_handler
     args     = {
       notifier         = param.notifier
-      notifier_level   = param.notifier_level
+      notification_level   = param.notification_level
       approvers        = param.approvers
       detect_msg       = "Detected unused EC2 Classic Load Balancer ${param.title}."
       default_response = param.default_response
@@ -248,15 +245,15 @@ pipeline "respond_to_ec2_classic_load_balancer_unused" {
           pipeline_ref  = local.approval_pipeline_skipped_action_notification
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notifier_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.NotifierLevelVerbose
             text     = "Skipped unused EC2 Classic Load Balancer ${param.title}."
           }
-          success_msg = ""
-          error_msg   = ""
+          success_msg = "Skipped unused EC2 Classic Load Balancer ${param.title}."
+          error_msg   = "Error skipping EC2 Classic Load Balancer ${param.title}."
         },
-        "delete" = {
-          label  = "Delete"
-          value  = "delete"
+        "delete_ec2_classic_load_balancer" = {
+          label  = "Delete EC2 Classic Load Balancer"
+          value  = "delete_ec2_classic_load_balancer"
           style  = local.StyleAlert
           // pipeline_ref  = local.aws_pipeline_delete_ec2_classic_load_balancer // TODO: update it when you develop the pipeline
           pipeline_ref = pipeline.mock_aws_lib_delete_classic_load_balancer

@@ -34,7 +34,7 @@ pipeline "detect_and_respond_to_ec2_instances_large" {
   title         = "Detect and respond to large EC2 instances"
   description   = "Detects large EC2 instances and responds with your chosen action."
   // tags          = merge(local.ec2_common_tags, {
-  //   class = "unused" 
+  //   class = "deprecated" 
   // })
 
   param "database" {
@@ -49,10 +49,10 @@ pipeline "detect_and_respond_to_ec2_instances_large" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -64,13 +64,13 @@ pipeline "detect_and_respond_to_ec2_instances_large" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_large_default_response
+    default     = var.ec2_instance_large_default_response_option
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_large_responses
+    default     = var.ec2_instance_large_enabled_response_options
   }
 
   step "query" "detect" {
@@ -83,7 +83,7 @@ pipeline "detect_and_respond_to_ec2_instances_large" {
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
-      notifier_level   = param.notifier_level
+      notification_level   = param.notification_level
       approvers        = param.approvers
       default_response = param.default_response
       responses        = param.responses
@@ -113,10 +113,10 @@ pipeline "respond_to_ec2_instances_large" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -128,17 +128,17 @@ pipeline "respond_to_ec2_instances_large" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_large_default_response
+    default     = var.ec2_instance_large_default_response_option
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_large_responses
+    default     = var.ec2_instance_large_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notifier_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} large EC2 instances."
   }
@@ -157,7 +157,7 @@ pipeline "respond_to_ec2_instances_large" {
       region           = each.value.region
       cred             = each.value.cred
       notifier         = param.notifier
-      notifier_level   = param.notifier_level
+      notification_level   = param.notification_level
       approvers        = param.approvers
       default_response = param.default_response
       responses        = param.responses
@@ -168,7 +168,7 @@ pipeline "respond_to_ec2_instances_large" {
 pipeline "respond_to_ec2_instance_large" {
   title         = "Respond to large EC2 instance"
   description   = "Responds to a large EC2 instance."
-  // tags          = merge(local.ec2_common_tags, { class = "unused" })
+  // tags          = merge(local.ec2_common_tags, { class = "deprecated" })
 
   param "title" {
     type        = string
@@ -196,10 +196,10 @@ pipeline "respond_to_ec2_instance_large" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -211,20 +211,20 @@ pipeline "respond_to_ec2_instance_large" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_large_default_response
+    default     = var.ec2_instance_large_default_response_option
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_large_responses
+    default     = var.ec2_instance_large_enabled_response_options
   }
 
   step "pipeline" "respond" {
     pipeline = approval.pipeline.respond_action_handler
     args     = {
       notifier         = param.notifier
-      notifier_level   = param.notifier_level
+      notification_level   = param.notification_level
       approvers        = param.approvers
       detect_msg       = "Detected large EC2 Instance ${param.title}."
       default_response = param.default_response
@@ -237,15 +237,15 @@ pipeline "respond_to_ec2_instance_large" {
           pipeline_ref  = local.approval_pipeline_skipped_action_notification
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notifier_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.NotifierLevelVerbose
             text     = "Skipped large EC2 Instance ${param.title}."
           }
-          success_msg = ""
-          error_msg   = ""
+          success_msg = "Skipped EC2 Instance ${param.title}."
+          error_msg   = "Error skipping EC2 Instance ${param.title}."
         },
-        "stop" = {
-          label  = "Stop"
-          value  = "stop"
+        "stop_instance" = {
+          label  = "Stop instance"
+          value  = "stop_instance"
           style  = local.StyleAlert
           pipeline_ref  = local.aws_pipeline_stop_ec2_instances
           pipeline_args = {
@@ -256,9 +256,9 @@ pipeline "respond_to_ec2_instance_large" {
           success_msg = "Stopped EC2 Instance ${param.title}."
           error_msg   = "Error stopping EC2 Instance ${param.title}."
         }
-        "terminate" = {
-          label  = "Terminate"
-          value  = "terminate"
+        "terminate_instance" = {
+          label  = "Terminate Instance"
+          value  = "terminate_instance"
           style  = local.StyleAlert
           pipeline_ref  = local.aws_pipeline_terminate_ec2_instances
           pipeline_args = {

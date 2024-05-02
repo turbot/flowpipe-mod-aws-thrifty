@@ -10,64 +10,64 @@ variable "ec2_instance_age_max_days" {
   default     = 90 
 }
 
-variable "ec2_instance_age_max_days_default_response" {
+variable "ec2_instance_age_max_days_default_response_option" {
   type        = string
   description = "The default response to use when EC2 instances are older than the maximum number of days."
   default     = "notify"
 }
 
-variable "ec2_instance_age_max_days_responses" {
+variable "ec2_instance_age_max_days_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "stop", "terminate"]
+  default     = ["skip", "stop_instance", "terminate_instance"]
 }
 
-variable "ec2_application_load_balancer_unused_default_response" {
+variable "ec2_application_load_balancer_unused_default_response_option" {
   type        = string
   description = "The default response to use for unused EC2 application load balancers."
   default     = "notify"
 }
 
-variable "ec2_application_load_balancer_unused_responses" {
+variable "ec2_application_load_balancer_unused_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete"]
+  default     = ["skip", "delete_application_load_balancer"]
 }
 
-variable "ec2_classic_load_balancer_unused_default_response" {
+variable "ec2_classic_load_balancer_unused_default_response_option" {
   type        = string
   description = "The default response to use for unused EC2 classic load balancers."
   default     = "notify"
 }
 
-variable "ec2_classic_load_balancer_unused_responses" {
+variable "ec2_classic_load_balancer_unused_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete"]
+  default     = ["skip", "delete_classic_load_balancer"]
 }
 
-variable "ec2_gateway_load_balancer_unused_default_response" {
+variable "ec2_gateway_load_balancer_unused_default_response_option" {
   type        = string
   description = "The default response to use for unused EC2 classic load balancers."
   default     = "notify"
 }
 
-variable "ec2_gateway_load_balancer_unused_responses" {
+variable "ec2_gateway_load_balancer_unused_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete"]
+  default     = ["skip", "delete_gateway_load_balancer"]
 }
 
-variable "ec2_network_load_balancer_unused_default_response" {
+variable "ec2_network_load_balancer_unused_default_response_option" {
   type        = string
   description = "The default response to use for unused EC2 classic load balancers."
   default     = "notify"
 }
 
-variable "ec2_network_load_balancer_unused_responses" {
+variable "ec2_network_load_balancer_unused_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete"]
+  default     = ["skip", "delete_network_load_balancer"]
 }
 
 variable "ec2_instance_allowed_types" {
@@ -76,38 +76,38 @@ variable "ec2_instance_allowed_types" {
   default     = ["%.nano", "%.micro", "%.small", "%.medium", "%.large", "%.xlarge", "%._xlarge"]
 }
 
-variable "ec2_instance_large_default_response" {
+variable "ec2_instance_large_default_response_option" {
   type        = string
   description = "The default response to use when EC2 instances are larger than the specified types."
   default     = "notify"
 }
 
-variable "ec2_instance_large_responses" {
+variable "ec2_instance_large_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "stop", "terminate"]
+  default     = ["skip", "stop_instance", "terminate_instance"]
 }
 
-variable "ec2_instance_older_generation_default_response" {
+variable "ec2_instance_older_generation_default_response_option" {
   type        = string
   description = "The default response to use when there are older generation EC2 instances."
   default     = "notify"
 }
 
-variable "ec2_instance_older_generation_responses" {
+variable "ec2_instance_older_generation_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "stop", "terminate"]
+  default     = ["skip", "stop_instance", "terminate_instance"]
 }
 
-variable "ec2_instance_without_graviton_default_response" {
+variable "ec2_instance_without_graviton_default_response_option" {
   type        = string
   description = "The default response to use when there are older generation EC2 instances."
   default     = "notify"
 }
 
-variable "ec2_instance_without_graviton_responses" {
+variable "ec2_instance_without_graviton_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "stop", "terminate"]
+  default     = ["skip", "stop_instance", "terminate_instance"]
 }
