@@ -69,3 +69,22 @@ variable "ec2_network_load_balancer_unused_responses" {
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete"]
 }
+
+variable "ec2_instance_allowed_types" {
+  type        = list(string)
+  description = "A list of allowed instance types. PostgreSQL wildcards are supported."
+  default     = ["%.nano", "%.micro", "%.small", "%.medium", "%.large", "%.xlarge", "%._xlarge"]
+}
+
+variable "ec2_instance_large_default_response" {
+  type        = string
+  description = "The default response to use when EC2 instances are larger than the specified types."
+  default     = "notify"
+}
+
+variable "ec2_instance_large_responses" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "stop", "terminate"]
+}
+
