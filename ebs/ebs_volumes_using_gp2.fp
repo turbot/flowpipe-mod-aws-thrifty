@@ -224,9 +224,9 @@ pipeline "respond_to_ebs_volume_using_gp2" {
           success_msg = ""
           error_msg   = ""
         },
-        "update" = {
-          label  = "Update to GP3"
-          value  = "update"
+        "update_to_gp3" = {
+          label  = "Update to gp3"
+          value  = "update_to_gp3"
           style  = local.StyleOk
           pipeline_ref  = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {

@@ -19,7 +19,7 @@ variable "ebs_snapshot_age_max_days_default_response" {
 variable "ebs_snapshot_age_max_days_responses" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete"]
+  default     = ["skip", "delete_snapshot"]
 }
 
 variable "ebs_volume_using_gp2_default_response" {
@@ -31,7 +31,7 @@ variable "ebs_volume_using_gp2_default_response" {
 variable "ebs_volume_using_gp2_responses" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "update"]
+  default     = ["skip", "update_to_gp3"]
 }
 
 variable "ebs_volume_using_io1_default_response" {
@@ -43,7 +43,7 @@ variable "ebs_volume_using_io1_default_response" {
 variable "ebs_volume_using_io1_responses" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "update"]
+  default     = ["skip", "update_to_io2"]
 }
 
 variable "ebs_volume_without_attachments_default_response" {

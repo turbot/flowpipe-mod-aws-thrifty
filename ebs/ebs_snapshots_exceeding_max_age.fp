@@ -238,9 +238,9 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
           success_msg = ""
           error_msg   = ""
         },
-        "delete" = {
-          label  = "Delete"
-          value  = "delete"
+        "delete_snapshot" = {
+          label  = "Delete Snapshot"
+          value  = "delete_snapshot"
           style  = local.StyleAlert
           pipeline_ref  = local.aws_pipeline_delete_ebs_snapshot
           pipeline_args = {

@@ -238,9 +238,9 @@ pipeline "respond_to_secretsmanager_secret_unused" {
           success_msg = ""
           error_msg   = ""
         },
-        "delete" = {
-          label  = "Delete"
-          value  = "delete"
+        "delete_secret" = {
+          label  = "Delete Secret"
+          value  = "delete_secret"
           style  = local.StyleAlert
           pipeline_ref  = pipeline.mock_aws_pipeline_delete_secretsmanager_secret // TODO: Replace with real pipeline when added to aws library mod.
           pipeline_args = {

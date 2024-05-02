@@ -19,5 +19,5 @@ variable "secretsmanager_secret_unused_default_response" {
 variable "secretsmanager_secret_unused_responses" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete"]
+  default     = ["skip", "delete_secret"]
 }

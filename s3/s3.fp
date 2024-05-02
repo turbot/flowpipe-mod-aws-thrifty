@@ -34,5 +34,5 @@ variable "s3_bucket_without_lifecycle_policy_default_response" {
 variable "s3_bucket_without_lifecycle_policy_responses" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "apply"]
+  default     = ["skip", "apply_policy"]
 }

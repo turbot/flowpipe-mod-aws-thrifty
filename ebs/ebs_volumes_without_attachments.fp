@@ -224,9 +224,9 @@ pipeline "respond_to_ebs_volume_without_attachments" {
           success_msg = ""
           error_msg   = ""
         },
-        "delete" = {
-          label  = "Delete"
-          value  = "delete"
+        "delete_volume" = {
+          label  = "Delete Volume"
+          value  = "delete_volume"
           style  = local.StyleAlert
           pipeline_ref  = pipeline.mock_aws_pipeline_delete_ebs_volume // TODO: Replace with real pipeline when added to aws library mod.
           pipeline_args = {

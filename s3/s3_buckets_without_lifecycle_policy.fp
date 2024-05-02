@@ -244,9 +244,9 @@ pipeline "respond_to_s3_bucket_without_lifecycle_policy" {
           success_msg = ""
           error_msg   = ""
         }
-        "apply" = {
-          label  = "Apply"
-          value  = "apply"
+        "apply_policy" = {
+          label  = "Apply Policy"
+          value  = "apply_policy"
           style  = local.StyleOk
           pipeline_ref  = pipeline.mock_aws_pipeline_put_s3_lifecycle_policy // TODO: Replace with real pipeline when added to aws library mod.
           pipeline_args = {

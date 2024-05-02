@@ -224,9 +224,9 @@ pipeline "respond_to_ebs_volume_using_io1" {
           success_msg = ""
           error_msg   = ""
         },
-        "update" = {
+        "update_to_io2" = {
           label  = "Update to io2"
-          value  = "update"
+          value  = "update_to_io2"
           style  = local.StyleOk
           pipeline_ref  = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {
