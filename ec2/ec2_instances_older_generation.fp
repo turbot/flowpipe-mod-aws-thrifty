@@ -84,8 +84,8 @@ pipeline "detect_and_respond_to_ec2_instances_older_generation" {
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      default_response_option           = param. default_response_option
+      enabled_response_options        = param. enabled_response_options
     }
   }
 }
@@ -158,8 +158,8 @@ pipeline "respond_to_ec2_instances_older_generation" {
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      default_response_option           = param. default_response_option
+      enabled_response_options        = param. enabled_response_options
     }
   }
 }
@@ -226,8 +226,8 @@ pipeline "respond_to_ec2_instance_older_generation" {
       notification_level   = param.notification_level
       approvers        = param.approvers
       detect_msg       = "Detected older generation EC2 Instance ${param.title}."
-      default_response = param.default_response
-      responses        = param.responses
+      default_response_option           = param. default_response_option
+      enabled_response_options        = param. enabled_response_options
       response_options = {
         "skip" = {
           label  = "Skip"
