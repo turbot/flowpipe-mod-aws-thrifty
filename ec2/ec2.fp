@@ -99,3 +99,15 @@ variable "ec2_instance_older_generation_responses" {
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "stop", "terminate"]
 }
+
+variable "ec2_instance_without_graviton_default_response" {
+  type        = string
+  description = "The default response to use when there are older generation EC2 instances."
+  default     = "notify"
+}
+
+variable "ec2_instance_without_graviton_responses" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "stop", "terminate"]
+}

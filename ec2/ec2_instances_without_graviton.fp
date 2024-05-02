@@ -1,5 +1,5 @@
 locals {
-  ec2_instances_older_generation_query = <<-EOQ
+  ec2_instances_without_graviton_query = <<-EOQ
   select
     concat(instance_id, ' [', region, '/', account_id, ']') as title,
     instance_id,
@@ -8,30 +8,31 @@ locals {
   from
     aws_ec2_instance
   where
-    instance_type like 't2.%' or instance_type like 'm3.%' or instance_type like 'm4.%'
+    platform != 'windows'
+    and architecture != 'arm64';
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ec2_instances_older_generation" {
-  title       = "Detect and respond to older generation EC2 instances"
-  description = "Detects older generation EC2 instances and responds with your chosen action."
+trigger "query" "detect_and_respond_to_ec2_instances_without_graviton" {
+  title       = "Detect and respond to EC2 instances without graviton processor"
+  description = "Detects EC2 instances without graviton processor and responds with your chosen action."
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = local.ec2_instances_older_generation_query
+  sql      = local.ec2_instances_without_graviton_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ec2_instances_older_generation
+    pipeline = pipeline.respond_to_ec2_instances_without_graviton
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ec2_instances_older_generation" {
-  title         = "Detect and respond to older generation EC2 instances"
-  description   = "Detects older generation EC2 instances and responds with your chosen action."
+pipeline "detect_and_respond_to_ec2_instances_without_graviton" {
+  title         = "Detect and respond to EC2 instances without graviton processor"
+  description   = "Detects EC2 instances without graviton processor and responds with your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
   // })
@@ -63,22 +64,22 @@ pipeline "detect_and_respond_to_ec2_instances_older_generation" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_older_generation_default_response
+    default     = var.ec2_instance_without_graviton_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_older_generation_responses
+    default     = var.ec2_instance_without_graviton_responses
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ec2_instances_older_generation_query
+    sql      = local.ec2_instances_without_graviton_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ec2_instances_older_generation
+    pipeline = pipeline.respond_to_ec2_instances_without_graviton
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
@@ -90,9 +91,9 @@ pipeline "detect_and_respond_to_ec2_instances_older_generation" {
   }
 }
 
-pipeline "respond_to_ec2_instances_older_generation" {
-  title         = "Respond to older generation EC2 instances"
-  description   = "Responds to a collection of older generation EC2 instances."
+pipeline "respond_to_ec2_instances_without_graviton" {
+  title         = "Respond to EC2 instances without graviton processor"
+  description   = "Responds to a collection of EC2 instances without graviton processor."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 
   // })
@@ -127,19 +128,19 @@ pipeline "respond_to_ec2_instances_older_generation" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_older_generation_default_response
+    default     = var.ec2_instance_without_graviton_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_older_generation_responses
+    default     = var.ec2_instance_without_graviton_responses
   }
 
   step "message" "notify_detection_count" {
     if       = var.notifier_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} older generation EC2 instances."
+    text     = "Detected ${length(param.items)} EC2 instances without graviton processor."
   }
 
   step "transform" "items_by_id" {
@@ -149,7 +150,7 @@ pipeline "respond_to_ec2_instances_older_generation" {
   step "pipeline" "respond_to_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ec2_instance_older_generation
+    pipeline        = pipeline.respond_to_ec2_instance_without_graviton
     args            = {
       title            = each.value.title
       instance_id      = each.value.instance_id
@@ -164,9 +165,9 @@ pipeline "respond_to_ec2_instances_older_generation" {
   }
 }
 
-pipeline "respond_to_ec2_instance_older_generation" {
-  title         = "Respond to older generation EC2 instance"
-  description   = "Responds to a older generation EC2 instance."
+pipeline "respond_to_ec2_instance_without_graviton" {
+  title         = "Respond to an EC2 instance without graviton processor"
+  description   = "Responds to an EC2 instance without graviton processor."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
@@ -210,13 +211,13 @@ pipeline "respond_to_ec2_instance_older_generation" {
   param "default_response" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_older_generation_default_response
+    default     = var.ec2_instance_without_graviton_default_response
   }
 
   param "responses" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_older_generation_responses
+    default     = var.ec2_instance_without_graviton_responses
   }
 
   step "pipeline" "respond" {
@@ -225,7 +226,7 @@ pipeline "respond_to_ec2_instance_older_generation" {
       notifier         = param.notifier
       notifier_level   = param.notifier_level
       approvers        = param.approvers
-      detect_msg       = "Detected older generation EC2 Instance ${param.title}."
+      detect_msg       = "Detected EC2 Instance ${param.title} without graviton processor."
       default_response = param.default_response
       responses        = param.responses
       response_options = {
@@ -237,10 +238,10 @@ pipeline "respond_to_ec2_instance_older_generation" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notifier_level == local.NotifierLevelVerbose
-            text     = "Skipped older generation EC2 Instance ${param.title}."
+            text     = "Skipped EC2 Instance ${param.title} without graviton processor."
           }
-          success_msg = ""
-          error_msg   = ""
+          success_msg = "Skipped EC2 Instance ${param.title}."
+          error_msg   = "Error skipping EC2 Instance ${param.title}."
         },
         "stop" = {
           label  = "Stop"
