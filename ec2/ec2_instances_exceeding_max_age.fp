@@ -81,12 +81,12 @@ pipeline "detect_and_respond_to_ec2_instances_exceeding_max_age" {
   step "pipeline" "respond" {
     pipeline = pipeline.respond_to_ec2_instances_exceeding_max_age
     args     = {
-      items            = step.query.detect.rows
-      notifier         = param.notifier
-      notification_level   = param.notification_level
-      approvers        = param.approvers
-      default_response_option           = param. default_response_option
-      enabled_response_options        = param. enabled_response_options
+      items                    = step.query.detect.rows
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }

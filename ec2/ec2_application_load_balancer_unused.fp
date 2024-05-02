@@ -96,8 +96,8 @@ pipeline "detect_and_respond_to_ec2_application_load_balancer_unused" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param. default_response_option
-      enabled_response_options = param. enabled_response_options
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }

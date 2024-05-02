@@ -163,16 +163,16 @@ pipeline "respond_to_ec2_gateway_load_balancers_unused" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.respond_to_ec2_gateway_load_balancer_unused
     args            = {
-      title            = each.value.title
-      arn              = each.value.arn
-      name             = each.value.name
-      region           = each.value.region
-      cred             = each.value.cred
-      notifier         = param.notifier
-      notification_level   = param.notification_level
-      approvers        = param.approvers
-      default_response_option           = param. default_response_option
-      enabled_response_options        = param. enabled_response_options
+      title                    = each.value.title
+      arn                      = each.value.arn
+      name                     = each.value.name
+      region                   = each.value.region
+      cred                     = each.value.cred
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }
