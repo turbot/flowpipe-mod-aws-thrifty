@@ -18,7 +18,6 @@ trigger "query" "detect_and_respond_to_ebs_volumes_using_io1" {
 pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
   title         = "Detect and respond to EBS volumes using io1"
   description   = "Detects EBS volumes using io1 and responds with your chosen action."
-  // documentation = file("./ebs/ebs_volumes_using_io1.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
@@ -33,10 +32,10 @@ pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -45,16 +44,16 @@ pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_io1_default_response
+    default     = var.ebs_volume_using_io1_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_io1_responses
+    default     = var.ebs_volume_using_io1_enabled_response_options
   }
 
   step "query" "detect" {
@@ -65,12 +64,12 @@ pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
   step "pipeline" "respond" {
     pipeline = pipeline.respond_to_ebs_volumes_using_io1
     args     = {
-      items            = step.query.detect.rows
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      items                    = step.query.detect.rows
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }
@@ -78,7 +77,6 @@ pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
 pipeline "respond_to_ebs_volumes_using_io1" {
   title         = "Respond to EBS volumes using io1"
   description   = "Responds to a collection of EBS volumes using io1."
-  // documentation = file("./ebs/ebs_volumes_using_io1.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
@@ -96,10 +94,10 @@ pipeline "respond_to_ebs_volumes_using_io1" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -108,20 +106,20 @@ pipeline "respond_to_ebs_volumes_using_io1" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_io1_default_response
+    default     = var.ebs_volume_using_io1_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_io1_responses
+    default     = var.ebs_volume_using_io1_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notifier_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} EBS volumes using io1."
   }
@@ -135,15 +133,15 @@ pipeline "respond_to_ebs_volumes_using_io1" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.respond_to_ebs_volume_using_io1
     args            = {
-      title            = each.value.title
-      volume_id        = each.value.volume_id
-      region           = each.value.region
-      cred             = each.value.cred
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      title                    = each.value.title
+      volume_id                = each.value.volume_id
+      region                   = each.value.region
+      cred                     = each.value.cred
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }
@@ -151,7 +149,6 @@ pipeline "respond_to_ebs_volumes_using_io1" {
 pipeline "respond_to_ebs_volume_using_io1" {
   title         = "Respond to EBS volume using io1"
   description   = "Responds to an EBS volume using io1."
-  // documentation = file("./ebs/ebs_volumes_using_io1.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
@@ -180,10 +177,10 @@ pipeline "respond_to_ebs_volume_using_io1" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -192,27 +189,27 @@ pipeline "respond_to_ebs_volume_using_io1" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_using_io1_default_response
+    default     = var.ebs_volume_using_io1_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_using_io1_responses
+    default     = var.ebs_volume_using_io1_enabled_response_options
   }
 
   step "pipeline" "respond" {
     pipeline = approval.pipeline.respond_action_handler
     args     = {
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      detect_msg       = "Detected EBS volume ${param.title} using io1."
-      default_response = param.default_response
-      responses        = param.responses
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      detect_msg               = "Detected EBS volume ${param.title} using io1."
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
       response_options = {
         "skip" = {
           label  = "Skip"
@@ -221,15 +218,15 @@ pipeline "respond_to_ebs_volume_using_io1" {
           pipeline_ref  = local.approval_pipeline_skipped_action_notification
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notifier_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.NotifierLevelVerbose
             text     = "Skipped EBS volume ${param.title} using io1."
           }
           success_msg = ""
           error_msg   = ""
         },
-        "update" = {
+        "update_to_io2" = {
           label  = "Update to io2"
-          value  = "update"
+          value  = "update_to_io2"
           style  = local.StyleOk
           pipeline_ref  = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {

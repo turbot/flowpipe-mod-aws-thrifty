@@ -59,7 +59,18 @@ flowpipe pipeline run detect_and_respond_to_ebs_snapshots_exceeding_max_age
 
 For more information, please see [Passing Input Variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables)
 
-### TODO: Document usage/behaviors
+### Running Your First Detection
+
+Once you've configured your variables, you can get started by simply running one of the available pipelines:
+
+```sh
+flowpipe pipeline run detect_and_respond_to_ebs_snapshots_exceeding_max_age
+```
+
+Each detection has a corresponding [Query Trigger](https://flowpipe.io/docs/flowpipe-hcl/trigger/query), by default - these are `Disabled` so that you can customize which you wish to enable and the frequency of their running. <!-- TODO: Get link to .fptriggers docs once available -->
+
+
+<!--> TODO: Mention how to obtain human input - link out for setup/instructions. -->
 
 ## Open Source & Contributing
 
