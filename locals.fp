@@ -34,8 +34,9 @@ locals {
 // Pipeline References
 locals {
   approval_pipeline_skipped_action_notification = approval.pipeline.skipped_action_notification
-  aws_pipeline_delete_ebs_snapshot = aws.pipeline.delete_ebs_snapshot
-  aws_pipeline_modify_ebs_volume   = aws.pipeline.modify_ebs_volume
-  aws_pipeline_stop_ec2_instances   = aws.pipeline.stop_ec2_instances
-  aws_pipeline_terminate_ec2_instances   = aws.pipeline.terminate_ec2_instances
+  aws_pipeline_delete_ebs_snapshot              = aws.pipeline.delete_ebs_snapshot
+  aws_pipeline_modify_ebs_volume                = aws.pipeline.modify_ebs_volume
+  aws_pipeline_stop_ec2_instances               = aws.pipeline.stop_ec2_instances
+  aws_pipeline_terminate_ec2_instances          = aws.pipeline.terminate_ec2_instances
+  aws_pipeline_delete_lambda_functions          = aws.pipeline.delete_lambda_function
 }
