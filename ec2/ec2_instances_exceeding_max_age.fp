@@ -159,8 +159,8 @@ pipeline "respond_to_ec2_instances_exceeding_max_age" {
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response_option           = param. default_response_option
-      enabled_response_options        = param. enabled_response_options
+      default_response_option           = param.default_response_option
+      enabled_response_options        = param.enabled_response_options
     }
   }
 }
@@ -227,8 +227,8 @@ pipeline "respond_to_ec2_instance_exceeding_max_age" {
       notification_level   = param.notification_level
       approvers        = param.approvers
       detect_msg       = "Detected EC2 Instance ${param.title} exceeding maximum age."
-      default_response_option           = param. default_response_option
-      enabled_response_options        = param. enabled_response_options
+      default_response_option           = param.default_response_option
+      enabled_response_options        = param.enabled_response_options
       response_options = {
         "skip" = {
           label  = "Skip"
