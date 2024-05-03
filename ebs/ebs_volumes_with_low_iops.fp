@@ -1,26 +1,39 @@
-trigger "query" "ebs_volumes_attached_to_stopped_instances" {
-  title       = "Detect and respond to EBS volumes attached to stopped instances"
-  description = "Detects EBS volumes which are attached to stopped instances and responds with your chosen action."
-  //tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+locals {
+  ebs_volumes_with_low_iops_query = <<-EOQ
+  select
+    concat(volume_id, ' [', region, '/', account_id, ']') as title,
+    volume_id,
+    region,
+    _ctx ->> 'connection_name' as cred
+  from
+    aws_ebs_volume
+  where
+    volume_type in ('io1', 'io2')
+    and iops <= 16000
+  EOQ
+}
+
+trigger "query" "detect_and_respond_to_ebs_volumes_with_low_iops" {
+  title       = "Detect and respond to EBS volumes with low IOPS"
+  description = "Detects EBS volumes with low IOPS and responds with your chosen action."
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = file("./ebs/ebs_volumes_attached_to_stopped_instances.sql")
+  sql      = local.ebs_volumes_with_low_iops_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_attached_to_stopped_instances
+    pipeline = pipeline.respond_to_ebs_volumes_with_low_iops
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Detect and respond to EBS volumes attached to stopped instances"
-  description = "Detects EBS volumes which are attached to stopped instances and responds with your chosen action."
-  // documentation = file("./ebs/ebs_volumes_attached_to_stopped_instances.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "detect_and_respond_to_ebs_volumes_with_low_iops" {
+  title       = "Detect and respond to EBS volumes with low IOPS"
+  description = "Detects EBS volumes with low IOPS and responds with your chosen action."
+  // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "database" {
     type        = string
@@ -49,22 +62,22 @@ pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volumes_attached_to_stopped_instances_default_response_option
+    default     = var.ebs_volume_with_low_iops_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volumes_attached_to_stopped_instances_enabled_response_options
+    default     = var.ebs_volume_with_low_iops_enabled_response_options
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = file("./ebs/ebs_volumes_attached_to_stopped_instances.sql")
+    sql      = local.ebs_volumes_with_low_iops_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_attached_to_stopped_instances
+    pipeline = pipeline.respond_to_ebs_volumes_with_low_iops
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -76,11 +89,10 @@ pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Respond to EBS volumes attached to stopped instances"
-  description = "Responds to a collection of EBS volumes which are attached to stopped instances."
-  // documentation = file("./ebs/ebs_volumes_attached_to_stopped_instances.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "respond_to_ebs_volumes_with_low_iops" {
+  title       = "Respond to EBS volumes with low IOPS"
+  description = "Responds to a collection of EBS volumes with low IOPS."
+  // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "items" {
     type = list(object({
@@ -112,19 +124,19 @@ pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volumes_attached_to_stopped_instances_default_response_option
+    default     = var.ebs_volume_with_low_iops_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volumes_attached_to_stopped_instances_enabled_response_options
+    default     = var.ebs_volume_with_low_iops_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS volumes attached to stopped instances."
+    text     = "Detected ${length(param.items)} EBS volumes with low IOPS."
   }
 
   step "transform" "items_by_id" {
@@ -134,7 +146,7 @@ pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
   step "pipeline" "respond_to_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_attached_to_stopped_instance
+    pipeline        = pipeline.respond_to_ebs_volume_with_low_iops
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -149,11 +161,10 @@ pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
   }
 }
 
-pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
-  title       = "Respond to EBS volume attached to stopped instance"
-  description = "Responds to an EBS volume attached to stopped instance."
-  // documentation = file("./ebs/ebs_volumes_attached_to_stopped_instances.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "respond_to_ebs_volume_with_low_iops" {
+  title       = "Respond to EBS volume with low IOPS"
+  description = "Responds to an EBS volume with low IOPS."
+  // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "title" {
     type        = string
@@ -162,7 +173,7 @@ pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
 
   param "volume_id" {
     type        = string
-    description = "EBS volume ID."
+    description = "The ID of the EBS volume."
   }
 
   param "region" {
@@ -196,13 +207,13 @@ pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volumes_attached_to_stopped_instances_default_response_option
+    default     = var.ebs_volume_with_low_iops_default_response_option
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volumes_attached_to_stopped_instances_enabled_response_options
+    default     = var.ebs_volume_with_low_iops_enabled_response_options
   }
 
   step "pipeline" "respond" {
@@ -211,7 +222,7 @@ pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      detect_msg               = "Detected EBS volume ${param.title} attached to stopped instance."
+      detect_msg               = "Detected EBS Volume ${param.title} with low IOPS."
       default_response_option  = param.default_response_option
       enabled_response_options = param.enabled_response_options
       response_options = {
@@ -223,24 +234,11 @@ pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose
-            text     = "Skipped EBS volume ${param.title} attached to stopped instance."
+            text     = "Skipped EBS Volume ${param.title} with low IOPS."
           }
-          success_msg = ""
-          error_msg   = ""
+          success_msg = "Skipped EBS Volume ${param.title}."
+          error_msg   = "Error skipping EBS Volume ${param.title}."
         },
-        "detach_volume" = {
-          label        = "Detach Volume"
-          value        = "detach_volume"
-          style        = local.StyleOk
-          pipeline_ref = local.aws_pipeline_detach_ebs_volume
-          pipeline_args = {
-            volume_id = param.volume_id
-            region    = param.region
-            cred      = param.cred
-          }
-          success_msg = "Detached EBS volume ${param.title} from the instance."
-          error_msg   = "Error detaching EBS volume ${param.title} from the instance."
-        }
         "delete_volume" = {
           label        = "Delete_volume"
           value        = "delete_volume"

@@ -34,10 +34,10 @@ pipeline "detect_and_respond_to_unused_nat_gateways" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -46,16 +46,16 @@ pipeline "detect_and_respond_to_unused_nat_gateways" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unused_nat_gateways_default_response
+    default     = var.unused_nat_gateways_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unused_nat_gateways_responses
+    default     = var.unused_nat_gateways_enabled_response_options
   }
 
   step "query" "detect" {
@@ -66,12 +66,12 @@ pipeline "detect_and_respond_to_unused_nat_gateways" {
   step "pipeline" "respond" {
     pipeline = pipeline.respond_to_unused_nat_gateways
     args = {
-      items            = step.query.detect.rows
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      items                    = step.query.detect.rows
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }
@@ -97,10 +97,10 @@ pipeline "respond_to_unused_nat_gateways" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -109,20 +109,20 @@ pipeline "respond_to_unused_nat_gateways" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unused_nat_gateways_default_response
+    default     = var.unused_nat_gateways_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unused_nat_gateways_responses
+    default     = var.unused_nat_gateways_enabled_response_options
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notifier_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} unused NAT Gateways."
   }
@@ -136,15 +136,15 @@ pipeline "respond_to_unused_nat_gateways" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.respond_to_unused_nat_gateway
     args = {
-      title            = each.value.title
-      nat_gateway_id   = each.value.nat_gateway_id
-      region           = each.value.region
-      cred             = each.value.cred
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      default_response = param.default_response
-      responses        = param.responses
+      title                    = each.value.title
+      nat_gateway_id           = each.value.nat_gateway_id
+      region                   = each.value.region
+      cred                     = each.value.cred
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
     }
   }
 }
@@ -181,10 +181,10 @@ pipeline "respond_to_unused_nat_gateway" {
     default     = var.notifier
   }
 
-  param "notifier_level" {
+  param "notification_level" {
     type        = string
     description = local.NotifierLevelDescription
-    default     = var.notifier_level
+    default     = var.notification_level
   }
 
   param "approvers" {
@@ -193,27 +193,27 @@ pipeline "respond_to_unused_nat_gateway" {
     default     = var.approvers
   }
 
-  param "default_response" {
+  param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unused_nat_gateways_default_response
+    default     = var.unused_nat_gateways_default_response_option
   }
 
-  param "responses" {
+  param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unused_nat_gateways_responses
+    default     = var.unused_nat_gateways_enabled_response_options
   }
 
   step "pipeline" "respond" {
     pipeline = approval.pipeline.respond_action_handler
     args = {
-      notifier         = param.notifier
-      notifier_level   = param.notifier_level
-      approvers        = param.approvers
-      detect_msg       = "Detected unused NAT Gateway ${param.title}."
-      default_response = param.default_response
-      responses        = param.responses
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      detect_msg               = "Detected unused NAT Gateway ${param.title}."
+      default_response_option  = param.default_response_option
+      enabled_response_options = param.enabled_response_options
       response_options = {
         "skip" = {
           label        = "Skip"
@@ -222,7 +222,7 @@ pipeline "respond_to_unused_nat_gateway" {
           pipeline_ref = local.approval_pipeline_skipped_action_notification
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notifier_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.NotifierLevelVerbose
             text     = "Skipped unused NAT Gateway ${param.title}."
           }
           success_msg = ""

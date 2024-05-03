@@ -4,25 +4,25 @@ locals {
   })
 }
 
-variable "unattached_elastic_ip_addresses_default_response" {
+variable "unattached_elastic_ip_addresses_default_response_option" {
   type        = string
   description = "The default response to use when elastic IP addresses are unattached."
   default     = "notify"
 }
 
-variable "unattached_elastic_ip_addresses_responses" {
+variable "unattached_elastic_ip_addresses_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "release"]
 }
 
-variable "unused_nat_gateways_default_response" {
+variable "unused_nat_gateways_default_response_option" {
   type        = string
   description = "The default response to use when NAT gateways are unused."
   default     = "notify"
 }
 
-variable "unused_nat_gateways_responses" {
+variable "unused_nat_gateways_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete"]
