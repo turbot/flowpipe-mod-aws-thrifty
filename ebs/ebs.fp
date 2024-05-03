@@ -10,6 +10,24 @@ variable "ebs_snapshot_age_max_days" {
   default     = 90
 }
 
+variable "ebs_volume_max_size_gb" {
+  type        = number
+  description = "The maximum size (GB) allowed for volumes."
+  default     = 100
+}
+
+variable "ebs_volume_avg_read_write_ops_low" {
+  type        = number
+  description = "The number of average read/write ops required for volumes to be considered infrequently used."
+  default     = 100
+}
+
+variable "ebs_volume_max_iops" {
+  type        = number
+  description = "The maximum IOPS allowed for volumes."
+  default     = 32000
+}
+
 variable "ebs_snapshot_age_max_days_default_response_option" {
   type        = string
   description = "The default response to use when EBS snapshots are older than the maximum number of days."
@@ -53,6 +71,78 @@ variable "ebs_volume_without_attachments_default_response_option" {
 }
 
 variable "ebs_volume_without_attachments_enabled_response_options" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
+}
+
+variable "ebs_volume_unattached_default_response_option" {
+  type        = string
+  description = "The default response to use when EBS volumes are unattached."
+  default     = "notify"
+}
+
+variable "ebs_volume_unattached_enabled_response_options" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
+}
+
+variable "ebs_volumes_attached_to_stopped_instances_default_response_option" {
+  type        = string
+  description = "The default response to use when EBS volumes attached to stopped instances."
+  default     = "notify"
+}
+
+variable "ebs_volumes_attached_to_stopped_instances_enabled_response_options" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "detach_volume", "delete_volume"]
+}
+
+variable "ec2_volume_large_default_response_option" {
+  type        = string
+  description = "The default response to use when EBS volumes are larger than the specified size."
+  default     = "notify"
+}
+
+variable "ec2_volume_large_enabled_response_options" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
+}
+
+variable "ebs_volume_with_low_usage_default_response_option" {
+  type        = string
+  description = "The default response to use when EBS volumes read/write ops are less than the specified average read/write ops."
+  default     = "notify"
+}
+
+variable "ebs_volume_with_low_usage_enabled_response_options" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
+}
+
+variable "ebs_volume_with_low_iops_default_response_option" {
+  type        = string
+  description = "The default response to use when EBS volumes with low iops."
+  default     = "notify"
+}
+
+variable "ebs_volume_with_low_iops_enabled_response_options" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
+}
+
+variable "ebs_volume_with_high_iops_default_response_option" {
+  type        = string
+  description = "The default response to use when EBS volumes with high iops."
+  default     = "notify"
+}
+
+variable "ebs_volume_with_high_iops_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_volume"]
