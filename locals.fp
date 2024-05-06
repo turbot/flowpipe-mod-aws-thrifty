@@ -15,7 +15,7 @@ locals {
   StyleOk              = "ok"
   StyleInfo            = "info"
   StyleAlert           = "alert"
-} 
+}
 
 // Common Texts
 locals {
@@ -39,4 +39,8 @@ locals {
   aws_pipeline_stop_ec2_instances               = aws.pipeline.stop_ec2_instances
   aws_pipeline_terminate_ec2_instances          = aws.pipeline.terminate_ec2_instances
   aws_pipeline_delete_lambda_functions          = aws.pipeline.delete_lambda_function
+  aws_pipeline_delete_ebs_volume                = aws.pipeline.delete_ebs_volume
+  aws_pipeline_detach_ebs_volume                = aws.pipeline.detach_ebs_volume
+  aws_pipeline_release_eip                      = aws.pipeline.release_eip
+  aws_pipeline_delete_nat_gateway               = aws.pipeline.delete_nat_gateway
 }
