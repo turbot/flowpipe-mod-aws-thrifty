@@ -16,8 +16,8 @@ trigger "query" "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
   title       = "Detect and respond to S3 buckets without lifecycle policy"
   description = "Detects S3 buckets which do not have a lifecycle policy and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.s3_buckets_without_lifecycle_policy_trigger_enabled
+  schedule = var.s3_buckets_without_lifecycle_policy_trigger_schedule
   database = var.database
   sql      = local.s3_buckets_without_lifecycle_policy_query
 

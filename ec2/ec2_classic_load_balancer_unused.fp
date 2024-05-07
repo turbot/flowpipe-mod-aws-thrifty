@@ -1,15 +1,15 @@
 locals {
   ec2_classic_load_balancer_unused_query = <<-EOQ
-    select
-      concat(name, ' [', region, '/', account_id, ']') as title,
-      name,
-      arn,
-      region,
-      _ctx ->> 'connection_name' as cred
-    from
-      aws_ec2_classic_load_balancer
-    where
-      jsonb_array_length(instances) <= 0
+select
+  concat(name, ' [', region, '/', account_id, ']') as title,
+  name,
+  arn,
+  region,
+  _ctx ->> 'connection_name' as cred
+from
+  aws_ec2_classic_load_balancer
+where
+  jsonb_array_length(instances) <= 0
   EOQ
 }
 
@@ -18,8 +18,8 @@ trigger "query" "detect_and_respond_to_ec2_classic_load_balancer_unused" {
   title       = "Detect and respond to unused EC2 classic load balancers"
   description = "Detects EC2 classic load balancers that are unused."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_classic_load_balancer_unused_trigger_enabled
+  schedule = var.ec2_classic_load_balancer_unused_trigger_schedule
   database = var.database
   sql      = local.ec2_classic_load_balancer_unused_query
 

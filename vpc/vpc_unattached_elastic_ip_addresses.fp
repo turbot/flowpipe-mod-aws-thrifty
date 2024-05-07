@@ -17,8 +17,8 @@ trigger "query" "detect_and_respond_to_vpc_unattached_elastic_ip_addresses" {
   description = "Detects unattached elastic IP addresses and responds with your chosen action."
   //tags          = merge(local.vpc_common_tags, { class = "unused" })
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.vpc_unattached_elastic_ip_addresses_trigger_enabled
+  schedule = var.vpc_unattached_elastic_ip_addresses_trigger_schedule
   database = var.database
   sql      = local.vpc_unattached_elastic_ip_addresses_query
 

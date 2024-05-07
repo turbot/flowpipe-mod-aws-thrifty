@@ -16,8 +16,8 @@ trigger "query" "detect_and_respond_to_ec2_instances_older_generation" {
   title       = "Detect and respond to older generation EC2 instances"
   description = "Detects older generation EC2 instances and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_instances_older_generation_trigger_enabled
+  schedule = var.ec2_instances_older_generation_trigger_schedule
   database = var.database
   sql      = local.ec2_instances_older_generation_query
 

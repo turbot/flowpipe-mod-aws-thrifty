@@ -4,12 +4,6 @@ variable "database" {
   default     = "postgres://steampipe@localhost:9193/steampipe"
 }
 
-variable "default_query_trigger_schedule" {
-  type        = string
-  description = "Default schedule for query triggers."
-  default     = "15m"
-}
-
 variable "notifier" {
   type        = string
   description = "The name of the notifier to use for sending notification messages."

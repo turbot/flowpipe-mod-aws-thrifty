@@ -17,8 +17,8 @@ trigger "query" "detect_and_respond_to_ebs_volumes_with_low_iops" {
   title       = "Detect and respond to EBS volumes with low IOPS"
   description = "Detects EBS volumes with low IOPS and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ebs_volumes_with_low_iops_trigger_enabled
+  schedule = var.ebs_volumes_with_low_iops_trigger_schedule
   database = var.database
   sql      = local.ebs_volumes_with_low_iops_query
 

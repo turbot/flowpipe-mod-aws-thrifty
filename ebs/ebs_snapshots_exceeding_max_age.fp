@@ -16,8 +16,8 @@ trigger "query" "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   title       = "Detect and respond to EBS snapshots exceeding max age"
   description = "Detects EBS snapshots exceeding max age and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ebs_snapshots_exceeding_max_age_trigger_enabled
+  schedule = var.ebs_snapshots_exceeding_max_age_trigger_schedule
   database = var.database
   sql      = local.ebs_snapshots_exceeding_max_age_query
 

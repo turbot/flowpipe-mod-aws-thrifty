@@ -17,8 +17,8 @@ trigger "query" "detect_and_respond_to_ebs_volumes_unattached" {
   description = "Detects EBS volumes which are unattached and responds with your chosen action."
   //tags          = merge(local.ebs_common_tags, { class = "unused" })
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ebs_volumes_unattached_trigger_enabled
+  schedule = var.ebs_volumes_unattached_trigger_schedule
   database = var.database
   sql      = local.ebs_volumes_unattached_query
 

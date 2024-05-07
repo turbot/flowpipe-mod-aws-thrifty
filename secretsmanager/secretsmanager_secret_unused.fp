@@ -16,8 +16,8 @@ trigger "query" "detect_and_respond_to_secretsmanager_secrets_unused" {
   title       = "Detect and respond to SecretsManager secrets that are unused"
   description = "Detects SecretsManager secrets that are unused (not access in last n days) and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.secretsmanager_secrets_unused_trigger_enabled
+  schedule = var.secretsmanager_secrets_unused_trigger_schedule
   database = var.database
   sql      = local.secretsmanager_secrets_unused_query
 

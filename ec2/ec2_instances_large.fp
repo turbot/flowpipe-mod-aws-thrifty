@@ -17,8 +17,8 @@ trigger "query" "detect_and_respond_to_ec2_instances_large" {
   title       = "Detect and respond to large EC2 instances"
   description = "Detects large EC2 instances and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_instances_large_trigger_enabled
+  schedule = var.ec2_instances_large_trigger_schedule
   database = var.database
   sql      = local.ec2_instances_large_query
 

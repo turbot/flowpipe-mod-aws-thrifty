@@ -35,8 +35,8 @@ trigger "query" "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances
   title       = "Detect and respond to EBS volumes attached to stopped instances"
   description = "Detects EBS volumes which are attached to stopped instances and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ebs_volumes_attached_to_stopped_instances_trigger_enabled
+  schedule = var.ebs_volumes_attached_to_stopped_instances_trigger_schedule
   database = var.database
   sql      = local.ebs_volumes_attached_to_stopped_instances_query
 

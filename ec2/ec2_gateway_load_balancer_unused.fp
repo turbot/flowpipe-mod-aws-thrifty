@@ -1,25 +1,25 @@
 locals {
   ec2_gateway_load_balancer_unused_query = <<-EOQ
-    with target_resource as (
-      select
-        load_balancer_arn,
-        target_health_descriptions,
-        target_type
-      from
-        aws_ec2_target_group,
-        jsonb_array_elements_text(load_balancer_arns) as load_balancer_arn
-    )
-    select
-      concat(a.name, ' [', a.region, '/', a.account_id, ']') as title,
-      a.name,
-      a.arn,
-      a.region,
-      a._ctx ->> 'connection_name' as cred
-    from
-      aws_ec2_gateway_load_balancer a
-      left join target_resource b on a.arn = b.load_balancer_arn
-    where
-      jsonb_array_length(b.target_health_descriptions) = 0
+with target_resource as (
+  select
+    load_balancer_arn,
+    target_health_descriptions,
+    target_type
+  from
+    aws_ec2_target_group,
+    jsonb_array_elements_text(load_balancer_arns) as load_balancer_arn
+)
+select
+  concat(a.name, ' [', a.region, '/', a.account_id, ']') as title,
+  a.name,
+  a.arn,
+  a.region,
+  a._ctx ->> 'connection_name' as cred
+from
+  aws_ec2_gateway_load_balancer a
+  left join target_resource b on a.arn = b.load_balancer_arn
+where
+  jsonb_array_length(b.target_health_descriptions) = 0
   EOQ
 }
 
@@ -27,8 +27,8 @@ trigger "query" "detect_and_respond_to_ec2_gateway_load_balancer_unused" {
   title       = "Detect and respond to unused EC2 gateway load balancers"
   description = "Detects EC2 gateway load balancers that are unused and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_gateway_load_balancer_unused_trigger_enabled
+  schedule = var.ec2_gateway_load_balancer_unused_trigger_schedule
   database = var.database
   sql      = local.ec2_gateway_load_balancer_unused_query
 

@@ -17,8 +17,8 @@ trigger "query" "detect_and_respond_to_ec2_instances_without_graviton" {
   title       = "Detect and respond to EC2 instances without graviton processor"
   description = "Detects EC2 instances without graviton processor and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_instances_without_graviton_trigger_enabled
+  schedule = var.ec2_instances_without_graviton_trigger_schedule
   database = var.database
   sql      = local.ec2_instances_without_graviton_query
 

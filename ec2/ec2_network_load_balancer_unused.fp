@@ -27,8 +27,8 @@ trigger "query" "detect_and_respond_to_ec2_network_load_balancer_unused" {
   title       = "Detect and respond to unused EC2 network load balancers"
   description = "Detects EC2 network load balancers that are unused."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_network_load_balancer_unused_trigger_enabled
+  schedule = var.ec2_network_load_balancer_unused_trigger_schedule
   database = var.database
   sql      = local.ec2_network_load_balancer_unused_query
 

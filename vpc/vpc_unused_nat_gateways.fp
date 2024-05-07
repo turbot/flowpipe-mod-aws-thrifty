@@ -28,8 +28,8 @@ trigger "query" "detect_and_respond_to_vpc_unused_nat_gateways" {
   description = "Detects unused NAT Gateways and responds with your chosen action."
   //tags       = merge(local.vpc_common_tags, { class = "unused" })
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.vpc_unused_nat_gateways_trigger_enabled
+  schedule = var.vpc_unused_nat_gateways_trigger_schedule
   database = var.database
   sql      = local.vpc_unused_nat_gateways_query
 
