@@ -64,16 +64,16 @@ pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_response_option
+    default     = var.s3_bucket_without_lifecycle_policy_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_response_options
+    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
   }
 
   step "query" "detect" {
@@ -89,8 +89,8 @@ pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -133,16 +133,16 @@ pipeline "respond_to_s3_buckets_without_lifecycle_policy" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_response_option
+    default     = var.s3_bucket_without_lifecycle_policy_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_response_options
+    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -168,8 +168,8 @@ pipeline "respond_to_s3_buckets_without_lifecycle_policy" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -223,16 +223,16 @@ pipeline "respond_to_s3_bucket_without_lifecycle_policy" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_response_option
+    default     = var.s3_bucket_without_lifecycle_policy_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_response_options
+    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -242,9 +242,9 @@ pipeline "respond_to_s3_bucket_without_lifecycle_policy" {
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected S3 Bucket ${param.title} without a lifecycle policy."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"

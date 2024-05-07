@@ -59,16 +59,16 @@ pipeline "detect_and_respond_to_ebs_volumes_with_high_iops" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_high_iops_default_response_option
+    default     = var.ebs_volume_with_high_iops_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_with_high_iops_enabled_response_options
+    default     = var.ebs_volume_with_high_iops_enabled_actions
   }
 
   step "query" "detect" {
@@ -83,8 +83,8 @@ pipeline "detect_and_respond_to_ebs_volumes_with_high_iops" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -121,16 +121,16 @@ pipeline "respond_to_ebs_volumes_with_high_iops" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_high_iops_default_response_option
+    default     = var.ebs_volume_with_high_iops_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_with_high_iops_enabled_response_options
+    default     = var.ebs_volume_with_high_iops_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -155,8 +155,8 @@ pipeline "respond_to_ebs_volumes_with_high_iops" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -204,16 +204,16 @@ pipeline "respond_to_ebs_volume_with_high_iops" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_high_iops_default_response_option
+    default     = var.ebs_volume_with_high_iops_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_with_high_iops_enabled_response_options
+    default     = var.ebs_volume_with_high_iops_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -223,9 +223,9 @@ pipeline "respond_to_ebs_volume_with_high_iops" {
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected EBS Volume ${param.title} with high IOPS."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label        = "Skip"
           value        = "skip"

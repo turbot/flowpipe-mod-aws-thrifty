@@ -62,16 +62,16 @@ pipeline "detect_and_respond_to_ec2_classic_load_balancer_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_age_max_days_default_response_option
+    default     = var.ec2_instance_age_max_days_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_age_max_days_enabled_response_options
+    default     = var.ec2_instance_age_max_days_enabled_actions
   }
 
   step "query" "detect" {
@@ -86,8 +86,8 @@ pipeline "detect_and_respond_to_ec2_classic_load_balancer_unused" {
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response_option           = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
     }
   }
 }
@@ -127,16 +127,16 @@ pipeline "respond_to_ec2_classic_load_balancers_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_classic_load_balancer_unused_default_response_option
+    default     = var.ec2_classic_load_balancer_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_classic_load_balancer_unused_enabled_response_options
+    default     = var.ec2_classic_load_balancer_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -162,8 +162,8 @@ pipeline "respond_to_ec2_classic_load_balancers_unused" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -216,16 +216,16 @@ pipeline "respond_to_ec2_classic_load_balancer_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_classic_load_balancer_unused_default_response_option
+    default     = var.ec2_classic_load_balancer_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_classic_load_balancer_unused_enabled_response_options
+    default     = var.ec2_classic_load_balancer_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -235,9 +235,9 @@ pipeline "respond_to_ec2_classic_load_balancer_unused" {
       notification_level   = param.notification_level
       approvers        = param.approvers
       detect_msg       = "Detected unused EC2 Classic Load Balancer ${param.title}."
-      default_response_option           = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
-      response_options = {
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"

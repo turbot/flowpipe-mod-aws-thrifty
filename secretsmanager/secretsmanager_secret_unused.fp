@@ -58,16 +58,16 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response_option
+    default     = var.secretsmanager_secret_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_response_options
+    default     = var.secretsmanager_secret_unused_enabled_actions
   }
 
   step "query" "detect" {
@@ -82,8 +82,8 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response_option = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
+      default_action = param.default_action
+      enabled_actions        = param.enabled_actions
     }
   }
 }
@@ -120,16 +120,16 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response_option
+    default     = var.secretsmanager_secret_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_response_options
+    default     = var.secretsmanager_secret_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -154,8 +154,8 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -203,16 +203,16 @@ pipeline "respond_to_secretsmanager_secret_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response_option
+    default     = var.secretsmanager_secret_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_response_options
+    default     = var.secretsmanager_secret_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -222,9 +222,9 @@ pipeline "respond_to_secretsmanager_secret_unused" {
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"
