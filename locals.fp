@@ -42,4 +42,5 @@ locals {
   aws_pipeline_detach_ebs_volume                = aws.pipeline.detach_ebs_volume
   aws_pipeline_release_eip                      = aws.pipeline.release_eip
   aws_pipeline_delete_nat_gateway               = aws.pipeline.delete_nat_gateway
+  aws_pipeline_delete_rds_db_instance           = aws.pipeline.delete_rds_db_instance
 }
