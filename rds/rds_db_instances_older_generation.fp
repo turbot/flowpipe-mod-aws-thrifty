@@ -12,12 +12,12 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_to_rds_db_instances_older_generation" {
-  title       = "Detect and correct to older generation RDS DB instances"
+trigger "query" "detect_and_correct_rds_db_instances_older_generation" {
+  title       = "Detect & correct older generation RDS DB instances"
   description = "Detects older generation RDS DB instances and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.rds_db_instances_older_generation_trigger_enabled
+  schedule = var.rds_db_instances_older_generation_trigger_schedule
   database = var.database
   sql      = local.rds_db_instances_older_generation_query
 
@@ -29,8 +29,8 @@ trigger "query" "detect_and_correct_to_rds_db_instances_older_generation" {
   }
 }
 
-pipeline "detect_and_correct_to_rds_db_instances_older_generation" {
-  title       = "Detect and correct to older generation RDS DB instances"
+pipeline "detect_and_correct_rds_db_instances_older_generation" {
+  title       = "Detect & correct older generation RDS DB instances"
   description = "Detects older generation RDS DB instances and runs your chosen action."
 
   param "database" {

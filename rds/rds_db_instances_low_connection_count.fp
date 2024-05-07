@@ -29,12 +29,12 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_to_rds_db_instances_low_connection_count" {
-  title       = "Detect and correct to RDS DB instances with low connection count"
+trigger "query" "detect_and_correct_rds_db_instances_low_connection_count" {
+  title       = "Detect & correct RDS DB instances with low connection count"
   description = "Detects RDS DB instances with low connection count and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.rds_db_instances_low_connection_count_trigger_enabled
+  schedule = var.rds_db_instances_low_connection_count_trigger_schedule
   database = var.database
   sql      = local.rds_db_instances_low_connection_count_query
 
@@ -46,8 +46,8 @@ trigger "query" "detect_and_correct_to_rds_db_instances_low_connection_count" {
   }
 }
 
-pipeline "detect_and_correct_to_rds_db_instances_low_connection_count" {
-  title       = "Detect and correct to RDS DB instances with low connection count"
+pipeline "detect_and_correct_rds_db_instances_low_connection_count" {
+  title       = "Detect & correct RDS DB instances with low connection count"
   description = "Detects RDS DB instances with low connection count and runs your chosen action."
 
   param "database" {

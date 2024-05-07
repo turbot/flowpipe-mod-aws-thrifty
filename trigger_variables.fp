@@ -180,6 +180,47 @@ variable "ec2_network_load_balancer_unused_trigger_schedule" {
   default = "15m"
 }
 
+// RDS
+variable "rds_db_instances_long_running_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "rds_db_instances_long_running_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "rds_db_instances_low_connection_count_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "rds_db_instances_low_connection_count_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "rds_db_instances_older_generation_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "rds_db_instances_older_generation_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "rds_db_instances_without_graviton_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "rds_db_instances_without_graviton_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
 // S3
 variable "s3_buckets_without_lifecycle_policy_trigger_enabled" {
   type    = bool

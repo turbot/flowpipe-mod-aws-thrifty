@@ -12,12 +12,12 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_to_rds_db_instances_without_graviton" {
-  title       = "Detect and correct to RDS DB instances without graviton processor"
+trigger "query" "detect_and_correct_rds_db_instances_without_graviton" {
+  title       = "Detect & correct RDS DB instances without graviton processor"
   description = "Detects RDS DB instances without graviton processor and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.rds_db_instances_without_graviton_trigger_enabled
+  schedule = var.rds_db_instances_without_graviton_trigger_schedule
   database = var.database
   sql      = local.rds_db_instances_without_graviton_query
 
@@ -29,8 +29,8 @@ trigger "query" "detect_and_correct_to_rds_db_instances_without_graviton" {
   }
 }
 
-pipeline "detect_and_correct_to_rds_db_instances_without_graviton" {
-  title       = "Detect and correct to RDS DB instances without graviton processor"
+pipeline "detect_and_correct_rds_db_instances_without_graviton" {
+  title       = "Detect & correct RDS DB instances without graviton processor"
   description = "Detects RDS DB instances without graviton processor and runs your chosen action."
 
   param "database" {
