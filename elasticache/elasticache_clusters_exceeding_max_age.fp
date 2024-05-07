@@ -34,7 +34,7 @@ locals {
     account_id,
     _ctx ->> 'connection_name' as cred
   from
-    filter_clusters;
+    filter_clusters
   where
     date_part('day', now() - cache_cluster_create_time) > ${var.ebs_snapshot_age_max_days};
   EOQ
@@ -270,7 +270,7 @@ pipeline "respond_to_elasticache_cluster_exceeding_max_age" {
           label  = "Delete Cluster"
           value  = "delete_cluster"
           style  = local.StyleAlert
-          pipeline_ref  = local.mock_aws_pipeline_delete_elasticache_cluster
+          pipeline_ref  = local.aws_pipeline_delete_elasticache_cluster
           pipeline_args = {
             cache_cluster_id = param.name
             region           = param.region

@@ -42,4 +42,6 @@ locals {
   aws_pipeline_detach_ebs_volume                = pipeline.mock_aws_pipeline_detach_ebs_volume // aws.pipeline.detach_ebs_volume
   aws_pipeline_release_eip                      = pipeline.mock_aws_pipeline_release_eip // aws.pipeline.release_eip
   aws_pipeline_delete_nat_gateway               = pipeline.mock_aws_pipeline_delete_nat_gateway // aws.pipeline.delete_nat_gateway
+  aws_pipeline_delete_elasticache_cluster       = pipeline.mock_aws_pipeline_delete_elasticache_cluster
+  aws_pipeline_delete_eks_node_group            = pipeline.mock_aws_pipeline_delete_eks_node_group
 }
