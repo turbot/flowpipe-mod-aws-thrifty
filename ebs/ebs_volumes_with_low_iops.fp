@@ -13,26 +13,26 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_volumes_with_low_iops" {
-  title       = "Detect and respond to EBS volumes with low IOPS"
-  description = "Detects EBS volumes with low IOPS and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_with_low_iops" {
+  title       = "Detect & correct EBS volumes with low IOPS"
+  description = "Detects EBS volumes with low IOPS and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ebs_volumes_with_low_iops_trigger_enabled
+  schedule = var.ebs_volumes_with_low_iops_trigger_schedule
   database = var.database
   sql      = local.ebs_volumes_with_low_iops_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_with_low_iops
+    pipeline = pipeline.correct_ebs_volumes_with_low_iops
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_with_low_iops" {
-  title       = "Detect and respond to EBS volumes with low IOPS"
-  description = "Detects EBS volumes with low IOPS and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
+  title       = "Detect & correct EBS volumes with low IOPS"
+  description = "Detects EBS volumes with low IOPS and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "database" {
@@ -59,16 +59,16 @@ pipeline "detect_and_respond_to_ebs_volumes_with_low_iops" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_low_iops_default_response_option
+    default     = var.ebs_volume_with_low_iops_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_with_low_iops_enabled_response_options
+    default     = var.ebs_volume_with_low_iops_enabled_actions
   }
 
   step "query" "detect" {
@@ -77,21 +77,21 @@ pipeline "detect_and_respond_to_ebs_volumes_with_low_iops" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_with_low_iops
+    pipeline = pipeline.correct_ebs_volumes_with_low_iops
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ebs_volumes_with_low_iops" {
-  title       = "Respond to EBS volumes with low IOPS"
-  description = "Responds to a collection of EBS volumes with low IOPS."
+pipeline "correct_ebs_volumes_with_low_iops" {
+  title       = "Corrects EBS volumes with low IOPS"
+  description = "Runs corrective action on a collection of EBS volumes with low IOPS."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "items" {
@@ -121,16 +121,16 @@ pipeline "respond_to_ebs_volumes_with_low_iops" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_low_iops_default_response_option
+    default     = var.ebs_volume_with_low_iops_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_with_low_iops_enabled_response_options
+    default     = var.ebs_volume_with_low_iops_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -143,10 +143,10 @@ pipeline "respond_to_ebs_volumes_with_low_iops" {
     value = { for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_with_low_iops
+    pipeline        = pipeline.correct_ebs_volume_with_low_iops
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -155,15 +155,15 @@ pipeline "respond_to_ebs_volumes_with_low_iops" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ebs_volume_with_low_iops" {
-  title       = "Respond to EBS volume with low IOPS"
-  description = "Responds to an EBS volume with low IOPS."
+pipeline "correct_ebs_volume_with_low_iops" {
+  title       = "Correct one EBS volume with low IOPS"
+  description = "Runs corrective action on an EBS volume with low IOPS."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "title" {
@@ -204,16 +204,16 @@ pipeline "respond_to_ebs_volume_with_low_iops" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_low_iops_default_response_option
+    default     = var.ebs_volume_with_low_iops_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_with_low_iops_enabled_response_options
+    default     = var.ebs_volume_with_low_iops_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -223,9 +223,9 @@ pipeline "respond_to_ebs_volume_with_low_iops" {
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected EBS Volume ${param.title} with low IOPS."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label        = "Skip"
           value        = "skip"

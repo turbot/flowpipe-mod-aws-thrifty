@@ -12,26 +12,26 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_volumes_large" {
-  title       = "Detect and respond to large EBS volumes"
-  description = "Detects large EBS volumes and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_large" {
+  title       = "Detect & correct large EBS volumes"
+  description = "Detects large EBS volumes and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ebs_volumes_large_trigger_enabled
+  schedule = var.ebs_volumes_large_trigger_schedule
   database = var.database
   sql      = local.ebs_volumes_large_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_large
+    pipeline = pipeline.correct_ebs_volumes_large
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_large" {
-  title       = "Detect and respond to large EBS volumes"
-  description = "Detects large EBS volumes and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_large" {
+  title       = "Detect & correct large EBS volumes"
+  description = "Detects large EBS volumes and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
@@ -58,16 +58,16 @@ pipeline "detect_and_respond_to_ebs_volumes_large" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_large_default_response_option
+    default     = var.ebs_volume_large_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_large_enabled_response_options
+    default     = var.ebs_volume_large_enabled_actions
   }
 
   step "query" "detect" {
@@ -76,21 +76,21 @@ pipeline "detect_and_respond_to_ebs_volumes_large" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_large
+    pipeline = pipeline.correct_ebs_volumes_large
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ebs_volumes_large" {
-  title       = "Respond to large EBS volumes"
-  description = "Responds to a collection of large EBS volumes."
+pipeline "correct_ebs_volumes_large" {
+  title       = "Corrects large EBS volumes"
+  description = "Runs corrective action on a collection of large EBS volumes."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
@@ -120,16 +120,16 @@ pipeline "respond_to_ebs_volumes_large" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_large_default_response_option
+    default     = var.ebs_volume_large_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_large_enabled_response_options
+    default     = var.ebs_volume_large_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -142,10 +142,10 @@ pipeline "respond_to_ebs_volumes_large" {
     value = { for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_large
+    pipeline        = pipeline.correct_ebs_volume_large
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -154,15 +154,15 @@ pipeline "respond_to_ebs_volumes_large" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ebs_volume_large" {
-  title       = "Respond to large EBS volume"
-  description = "Responds to a large EBS volume."
+pipeline "correct_ebs_volume_large" {
+  title       = "Correct one large EBS volume"
+  description = "Runs corrective action on a large EBS volume."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
@@ -203,16 +203,16 @@ pipeline "respond_to_ebs_volume_large" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_large_default_response_option
+    default     = var.ebs_volume_large_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_large_enabled_response_options
+    default     = var.ebs_volume_large_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -222,9 +222,9 @@ pipeline "respond_to_ebs_volume_large" {
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected large EBS Volume ${param.title}."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label        = "Skip"
           value        = "skip"

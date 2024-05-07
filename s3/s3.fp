@@ -23,13 +23,13 @@ variable "s3_bucket_default_lifecycle_policy" {
   EOF
 }
 
-variable "s3_bucket_without_lifecycle_policy_default_response_option" {
+variable "s3_bucket_without_lifecycle_policy_default_action" {
   type        = string
   description = "The default response to use for S3 buckets without lifecycle policy."
   default     = "notify"
 }
 
-variable "s3_bucket_without_lifecycle_policy_enabled_response_options" {
+variable "s3_bucket_without_lifecycle_policy_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "apply_policy"]

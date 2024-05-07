@@ -1,6 +1,6 @@
 # AWS Thrifty Mod for Flowpipe
 
-Pipelines to detect and respond to AWS savings opportunities.
+Pipelines to detect & correct misconfigurations leading to AWS savings opportunities.
 
 ## Getting Started
 
@@ -47,14 +47,14 @@ vi thrifty.fpvars
 Alternatively you can pass variables on the command line:
 
 ```sh
-flowpipe pipeline run detect_and_respond_to_ebs_snapshots_exceeding_max_age --var=ebs_snapshot_age_max_days=10
+flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --var=ebs_snapshot_age_max_days=10
 ```
 
 Or through environment variables:
 
 ```sh
 export FP_VAR_ebs_snapshot_age_max_days=10
-flowpipe pipeline run detect_and_respond_to_ebs_snapshots_exceeding_max_age
+flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 ```
 
 For more information, please see [Passing Input Variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables)
@@ -64,7 +64,7 @@ For more information, please see [Passing Input Variables](https://flowpipe.io/d
 Once you've configured your variables, you can get started by simply running one of the available pipelines:
 
 ```sh
-flowpipe pipeline run detect_and_respond_to_ebs_snapshots_exceeding_max_age
+flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 ```
 
 Each detection has a corresponding [Query Trigger](https://flowpipe.io/docs/flowpipe-hcl/trigger/query), by default - these are `Disabled` so that you can customize which you wish to enable and the frequency of their running. <!-- TODO: Get link to .fptriggers docs once available -->

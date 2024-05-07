@@ -23,26 +23,26 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ec2_network_load_balancer_unused" {
-  title       = "Detect and respond to unused EC2 network load balancers"
+trigger "query" "detect_and_correct_ec2_network_load_balancer_unused" {
+  title       = "Detect & correct unused EC2 network load balancers"
   description = "Detects EC2 network load balancers that are unused."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_network_load_balancer_unused_trigger_enabled
+  schedule = var.ec2_network_load_balancer_unused_trigger_schedule
   database = var.database
   sql      = local.ec2_network_load_balancer_unused_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ec2_network_load_balancer_unused
+    pipeline = pipeline.correct_ec2_network_load_balancer_unused
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ec2_network_load_balancer_unused" {
-  title         = "Detect and respond to EC2 unused network load balancers"
-  description   = "Detects unused EC2 network load balancers and responds with your chosen action."
+pipeline "detect_and_correct_ec2_network_load_balancer_unused" {
+  title         = "Detect & correct EC2 unused network load balancers"
+  description   = "Detects unused EC2 network load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
   // })
@@ -71,16 +71,16 @@ pipeline "detect_and_respond_to_ec2_network_load_balancer_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_age_max_days_default_response_option
+    default     = var.ec2_instance_age_max_days_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_age_max_days_enabled_response_options
+    default     = var.ec2_instance_age_max_days_enabled_actions
   }
 
   step "query" "detect" {
@@ -89,21 +89,21 @@ pipeline "detect_and_respond_to_ec2_network_load_balancer_unused" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ec2_network_load_balancers_unused
+    pipeline = pipeline.correct_ec2_network_load_balancers_unused
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response_option           = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ec2_network_load_balancers_unused" {
-  title         = "Respond to unused EC2 network load balancers"
-  description   = "Responds to a collection of unused EC2 network load balancers."
+pipeline "correct_ec2_network_load_balancers_unused" {
+  title         = "Corrects unused EC2 network load balancers"
+  description   = "Runs corrective action on a collection of unused EC2 network load balancers."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 
   // })
@@ -136,16 +136,16 @@ pipeline "respond_to_ec2_network_load_balancers_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_network_load_balancer_unused_default_response_option
+    default     = var.ec2_network_load_balancer_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_network_load_balancer_unused_enabled_response_options
+    default     = var.ec2_network_load_balancer_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -158,10 +158,10 @@ pipeline "respond_to_ec2_network_load_balancers_unused" {
     value = {for row in param.items : row.name => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ec2_network_load_balancer_unused
+    pipeline        = pipeline.correct_ec2_network_load_balancer_unused
     args            = {
       title                     = each.value.title
       arn                       = each.value.arn
@@ -171,15 +171,15 @@ pipeline "respond_to_ec2_network_load_balancers_unused" {
       notifier                  = param.notifier
       notification_level        = param.notification_level
       approvers                 = param.approvers
-      default_response_option   = param.default_response_option
-      enabled_response_options  = param.enabled_response_options
+      default_action   = param.default_action
+      enabled_actions  = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ec2_network_load_balancer_unused" {
-  title         = "Respond to unused EC2 network load balancer"
-  description   = "Responds to an unused EC2 network load balance."
+pipeline "correct_ec2_network_load_balancer_unused" {
+  title         = "Correct one unused EC2 network load balancer"
+  description   = "Runs corrective action on an unused EC2 network load balance."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
@@ -225,16 +225,16 @@ pipeline "respond_to_ec2_network_load_balancer_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_network_load_balancer_unused_default_response_option
+    default     = var.ec2_network_load_balancer_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_network_load_balancer_unused_enabled_response_options
+    default     = var.ec2_network_load_balancer_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -244,9 +244,9 @@ pipeline "respond_to_ec2_network_load_balancer_unused" {
       notification_level   = param.notification_level
       approvers        = param.approvers
       detect_msg       = "Detected unused EC2 Network Load Balancer ${param.title}."
-      default_response_option           = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
-      response_options = {
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"

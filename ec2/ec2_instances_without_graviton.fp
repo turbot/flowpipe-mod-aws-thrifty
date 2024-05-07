@@ -13,26 +13,26 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ec2_instances_without_graviton" {
-  title       = "Detect and respond to EC2 instances without graviton processor"
-  description = "Detects EC2 instances without graviton processor and responds with your chosen action."
+trigger "query" "detect_and_correct_ec2_instances_without_graviton" {
+  title       = "Detect & correct EC2 instances without graviton processor"
+  description = "Detects EC2 instances without graviton processor and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_instances_without_graviton_trigger_enabled
+  schedule = var.ec2_instances_without_graviton_trigger_schedule
   database = var.database
   sql      = local.ec2_instances_without_graviton_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ec2_instances_without_graviton
+    pipeline = pipeline.correct_ec2_instances_without_graviton
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ec2_instances_without_graviton" {
-  title         = "Detect and respond to EC2 instances without graviton processor"
-  description   = "Detects EC2 instances without graviton processor and responds with your chosen action."
+pipeline "detect_and_correct_ec2_instances_without_graviton" {
+  title         = "Detect & correct EC2 instances without graviton processor"
+  description   = "Detects EC2 instances without graviton processor and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
   // })
@@ -61,16 +61,16 @@ pipeline "detect_and_respond_to_ec2_instances_without_graviton" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_without_graviton_default_response_option
+    default     = var.ec2_instance_without_graviton_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_without_graviton_enabled_response_options
+    default     = var.ec2_instance_without_graviton_enabled_actions
   }
 
   step "query" "detect" {
@@ -79,21 +79,21 @@ pipeline "detect_and_respond_to_ec2_instances_without_graviton" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ec2_instances_without_graviton
+    pipeline = pipeline.correct_ec2_instances_without_graviton
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response_option           = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ec2_instances_without_graviton" {
-  title         = "Respond to EC2 instances without graviton processor"
-  description   = "Responds to a collection of EC2 instances without graviton processor."
+pipeline "correct_ec2_instances_without_graviton" {
+  title         = "Corrects EC2 instances without graviton processor"
+  description   = "Runs corrective action on a collection of EC2 instances without graviton processor."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 
   // })
@@ -125,16 +125,16 @@ pipeline "respond_to_ec2_instances_without_graviton" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_without_graviton_default_response_option
+    default     = var.ec2_instance_without_graviton_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_without_graviton_enabled_response_options
+    default     = var.ec2_instance_without_graviton_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -147,10 +147,10 @@ pipeline "respond_to_ec2_instances_without_graviton" {
     value = {for row in param.items : row.instance_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ec2_instance_without_graviton
+    pipeline        = pipeline.correct_ec2_instance_without_graviton
     args            = {
       title                      = each.value.title
       instance_id                = each.value.instance_id
@@ -159,15 +159,15 @@ pipeline "respond_to_ec2_instances_without_graviton" {
       notifier                   = param.notifier
       notification_level         = param.notification_level
       approvers                  = param.approvers
-      default_response_option    = param.default_response_option
-      enabled_response_options   = param.enabled_response_options
+      default_action    = param.default_action
+      enabled_actions   = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ec2_instance_without_graviton" {
-  title         = "Respond to an EC2 instance without graviton processor"
-  description   = "Responds to an EC2 instance without graviton processor."
+pipeline "correct_ec2_instance_without_graviton" {
+  title         = "Correct one an EC2 instance without graviton processor"
+  description   = "Runs corrective action on an EC2 instance without graviton processor."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
@@ -208,16 +208,16 @@ pipeline "respond_to_ec2_instance_without_graviton" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_without_graviton_default_response_option
+    default     = var.ec2_instance_without_graviton_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_without_graviton_enabled_response_options
+    default     = var.ec2_instance_without_graviton_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -227,9 +227,9 @@ pipeline "respond_to_ec2_instance_without_graviton" {
       notification_level   = param.notification_level
       approvers        = param.approvers
       detect_msg       = "Detected EC2 Instance ${param.title} without graviton processor."
-      default_response_option           = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
-      response_options = {
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"

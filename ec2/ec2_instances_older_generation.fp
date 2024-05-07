@@ -12,26 +12,26 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ec2_instances_older_generation" {
-  title       = "Detect and respond to older generation EC2 instances"
-  description = "Detects older generation EC2 instances and responds with your chosen action."
+trigger "query" "detect_and_correct_ec2_instances_older_generation" {
+  title       = "Detect & correct older generation EC2 instances"
+  description = "Detects older generation EC2 instances and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ec2_instances_older_generation_trigger_enabled
+  schedule = var.ec2_instances_older_generation_trigger_schedule
   database = var.database
   sql      = local.ec2_instances_older_generation_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ec2_instances_older_generation
+    pipeline = pipeline.correct_ec2_instances_older_generation
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ec2_instances_older_generation" {
-  title         = "Detect and respond to older generation EC2 instances"
-  description   = "Detects older generation EC2 instances and responds with your chosen action."
+pipeline "detect_and_correct_ec2_instances_older_generation" {
+  title         = "Detect & correct older generation EC2 instances"
+  description   = "Detects older generation EC2 instances and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
   // })
@@ -60,16 +60,16 @@ pipeline "detect_and_respond_to_ec2_instances_older_generation" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_older_generation_default_response_option
+    default     = var.ec2_instance_older_generation_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_older_generation_enabled_response_options
+    default     = var.ec2_instance_older_generation_enabled_actions
   }
 
   step "query" "detect" {
@@ -78,21 +78,21 @@ pipeline "detect_and_respond_to_ec2_instances_older_generation" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ec2_instances_older_generation
+    pipeline = pipeline.correct_ec2_instances_older_generation
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response_option           = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ec2_instances_older_generation" {
-  title         = "Respond to older generation EC2 instances"
-  description   = "Responds to a collection of older generation EC2 instances."
+pipeline "correct_ec2_instances_older_generation" {
+  title         = "Corrects older generation EC2 instances"
+  description   = "Runs corrective action on a collection of older generation EC2 instances."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 
   // })
@@ -124,16 +124,16 @@ pipeline "respond_to_ec2_instances_older_generation" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_older_generation_default_response_option
+    default     = var.ec2_instance_older_generation_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_older_generation_enabled_response_options
+    default     = var.ec2_instance_older_generation_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -146,10 +146,10 @@ pipeline "respond_to_ec2_instances_older_generation" {
     value = {for row in param.items : row.instance_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ec2_instance_older_generation
+    pipeline        = pipeline.correct_ec2_instance_older_generation
     args            = {
       title                      = each.value.title
       instance_id                = each.value.instance_id
@@ -158,15 +158,15 @@ pipeline "respond_to_ec2_instances_older_generation" {
       notifier                   = param.notifier
       notification_level         = param.notification_level
       approvers                  = param.approvers
-      default_response_option    = param.default_response_option
-      enabled_response_options   = param.enabled_response_options
+      default_action    = param.default_action
+      enabled_actions   = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ec2_instance_older_generation" {
-  title         = "Respond to older generation EC2 instance"
-  description   = "Responds to a older generation EC2 instance."
+pipeline "correct_ec2_instance_older_generation" {
+  title         = "Correct one older generation EC2 instance"
+  description   = "Runs corrective action on a older generation EC2 instance."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
@@ -207,16 +207,16 @@ pipeline "respond_to_ec2_instance_older_generation" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ec2_instance_older_generation_default_response_option
+    default     = var.ec2_instance_older_generation_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ec2_instance_older_generation_enabled_response_options
+    default     = var.ec2_instance_older_generation_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -226,9 +226,9 @@ pipeline "respond_to_ec2_instance_older_generation" {
       notification_level   = param.notification_level
       approvers        = param.approvers
       detect_msg       = "Detected older generation EC2 Instance ${param.title}."
-      default_response_option           = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
-      response_options = {
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"

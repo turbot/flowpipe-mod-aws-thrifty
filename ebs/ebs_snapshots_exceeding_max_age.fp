@@ -12,26 +12,26 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
-  title       = "Detect and respond to EBS snapshots exceeding max age"
-  description = "Detects EBS snapshots exceeding max age and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_snapshots_exceeding_max_age" {
+  title       = "Detect & correct EBS snapshots exceeding max age"
+  description = "Detects EBS snapshots exceeding max age and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.ebs_snapshots_exceeding_max_age_trigger_enabled
+  schedule = var.ebs_snapshots_exceeding_max_age_trigger_schedule
   database = var.database
   sql      = local.ebs_snapshots_exceeding_max_age_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_snapshots_exceeding_max_age
+    pipeline = pipeline.correct_ebs_snapshots_exceeding_max_age
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
-  title         = "Detect and respond to EBS snapshots exceeding max age"
-  description   = "Detects EBS snapshots exceeding max age and responds with your chosen action."
+pipeline "detect_and_correct_ebs_snapshots_exceeding_max_age" {
+  title         = "Detect & correct EBS snapshots exceeding max age"
+  description   = "Detects EBS snapshots exceeding max age and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
@@ -58,16 +58,16 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response_option
+    default     = var.ebs_snapshot_age_max_days_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_enabled_response_options
+    default     = var.ebs_snapshot_age_max_days_enabled_actions
   }
 
   step "query" "detect" {
@@ -76,21 +76,21 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_snapshots_exceeding_max_age
+    pipeline = pipeline.correct_ebs_snapshots_exceeding_max_age
     args     = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
-  title         = "Respond to EBS snapshots exceeding max age"
-  description   = "Responds to a collection of EBS snapshots exceeding max age."
+pipeline "correct_ebs_snapshots_exceeding_max_age" {
+  title         = "Corrects EBS snapshots exceeding max age"
+  description   = "Runs corrective action on a collection of EBS snapshots exceeding max age."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
@@ -120,16 +120,16 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response_option
+    default     = var.ebs_snapshot_age_max_days_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_enabled_response_options
+    default     = var.ebs_snapshot_age_max_days_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -142,10 +142,10 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
     value = {for row in param.items : row.snapshot_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_snapshot_exceeding_max_age
+    pipeline        = pipeline.correct_ebs_snapshot_exceeding_max_age
     args            = {
       title                    = each.value.title
       snapshot_id              = each.value.snapshot_id
@@ -154,15 +154,15 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
-  title         = "Respond to EBS snapshot exceeding max age"
-  description   = "Responds to an EBS snapshot exceeding max age."
+pipeline "correct_ebs_snapshot_exceeding_max_age" {
+  title         = "Correct one EBS snapshot exceeding max age"
+  description   = "Runs corrective action on an EBS snapshot exceeding max age."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
@@ -203,16 +203,16 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_snapshot_age_max_days_default_response_option
+    default     = var.ebs_snapshot_age_max_days_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_snapshot_age_max_days_enabled_response_options
+    default     = var.ebs_snapshot_age_max_days_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -222,9 +222,9 @@ pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected EBS Snapshot ${param.title} exceeding maximum age."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"

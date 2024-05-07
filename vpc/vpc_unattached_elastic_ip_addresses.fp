@@ -1,25 +1,38 @@
-trigger "query" "unattached_elastic_ip_addresses" {
-  title       = "Detect and respond to unattached elastic IP addresses(EIPs)"
-  description = "Detects unattached elastic IP addresses and responds with your chosen action."
+locals {
+  vpc_unattached_elastic_ip_addresses_query = <<-EOQ
+select
+  concat(allocation_id, ' [', region, '/', account_id, ']') as title,
+  allocation_id,
+  region,
+  _ctx ->> 'connection_name' as cred
+from
+  aws_vpc_eip
+where
+  association_id is null;
+  EOQ
+}
+
+trigger "query" "detect_and_correct_vpc_unattached_elastic_ip_addresses" {
+  title       = "Detect & correct unattached elastic IP addresses(EIPs)"
+  description = "Detects unattached elastic IP addresses and runs your chosen action."
   //tags          = merge(local.vpc_common_tags, { class = "unused" })
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.vpc_unattached_elastic_ip_addresses_trigger_enabled
+  schedule = var.vpc_unattached_elastic_ip_addresses_trigger_schedule
   database = var.database
-  sql      = file("./vpc/unattached_elastic_ip_addresses.sql")
+  sql      = local.vpc_unattached_elastic_ip_addresses_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_unattached_elastic_ip_addresses
+    pipeline = pipeline.correct_vpc_unattached_elastic_ip_addresses
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_unattached_elastic_ip_addresses" {
-  title       = "Detect and respond to unattached elastic IP addresses(EIPs)"
-  description = "Detects unattached elastic IP addresses and responds with your chosen action."
-  // documentation = file("./vpc/unattached_elastic_ip_addresses.md")
+pipeline "detect_and_correct_vpc_unattached_elastic_ip_addresses" {
+  title       = "Detect & correct unattached elastic IP addresses(EIPs)"
+  description = "Detects unattached elastic IP addresses and runs your chosen action."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "database" {
@@ -46,39 +59,39 @@ pipeline "detect_and_respond_to_unattached_elastic_ip_addresses" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unattached_elastic_ip_addresses_default_response_option
+    default     = var.unattached_elastic_ip_addresses_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unattached_elastic_ip_addresses_enabled_response_options
+    default     = var.unattached_elastic_ip_addresses_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = file("./vpc/unattached_elastic_ip_addresses.sql")
+    sql      = local.vpc_unattached_elastic_ip_addresses_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_unattached_elastic_ip_addresses
+    pipeline = pipeline.correct_vpc_unattached_elastic_ip_addresses
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_unattached_elastic_ip_addresses" {
-  title       = "Respond to unattached elastic IP addresses"
-  description = "Responds to a collection of elastic IP addresses which are unattached."
+pipeline "correct_vpc_unattached_elastic_ip_addresses" {
+  title       = "Corrects unattached elastic IP addresses"
+  description = "Runs corrective action on a collection of elastic IP addresses which are unattached."
   // documentation = file("./vpc/unattached_elastic_ip_addresses.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
@@ -109,16 +122,16 @@ pipeline "respond_to_unattached_elastic_ip_addresses" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unattached_elastic_ip_addresses_default_response_option
+    default     = var.unattached_elastic_ip_addresses_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unattached_elastic_ip_addresses_enabled_response_options
+    default     = var.unattached_elastic_ip_addresses_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -131,10 +144,10 @@ pipeline "respond_to_unattached_elastic_ip_addresses" {
     value = { for row in param.items : row.allocation_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_unattached_elastic_ip_address
+    pipeline        = pipeline.correct_vpc_unattached_elastic_ip_address
     args = {
       title                    = each.value.title
       allocation_id            = each.value.allocation_id
@@ -143,16 +156,15 @@ pipeline "respond_to_unattached_elastic_ip_addresses" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_unattached_elastic_ip_address" {
-  title       = "Respond to elastic IP address unattached"
-  description = "Responds to an elastic IP address unattached."
-  // documentation = file("./vpc/unattached_elastic_ip_addresses.md")
+pipeline "correct_vpc_unattached_elastic_ip_address" {
+  title       = "Correct one elastic IP address unattached"
+  description = "Runs corrective action on an elastic IP address unattached."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
@@ -193,16 +205,16 @@ pipeline "respond_to_unattached_elastic_ip_address" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unattached_elastic_ip_addresses_default_response_option
+    default     = var.unattached_elastic_ip_addresses_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unattached_elastic_ip_addresses_enabled_response_options
+    default     = var.unattached_elastic_ip_addresses_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -212,9 +224,9 @@ pipeline "respond_to_unattached_elastic_ip_address" {
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected elastic IP address ${param.title} unattached."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label        = "Skip"
           value        = "skip"
@@ -243,5 +255,23 @@ pipeline "respond_to_unattached_elastic_ip_address" {
         }
       }
     }
+  }
+}
+
+pipeline "mock_aws_pipeline_release_eip" {
+  param "allocation_id" {
+    type        = string
+  }
+
+  param "region" {
+    type        = string
+  }
+
+  param "cred" {
+    type        = string
+  }
+
+  output "result" {
+    value = "Mocked: Release EIP [Allocation ID: ${param.allocation_id}, Region: ${param.region}, Cred: ${param.cred}]"
   }
 }
