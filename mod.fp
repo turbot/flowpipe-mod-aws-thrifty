@@ -9,8 +9,8 @@ mod "aws_thrifty" {
     mod "github.com/turbot/flowpipe-mod-aws" {
       version = "*"
     }
-    mod "github.com/turbot/flowpipe-mod-approval" {
-      version = "v0.0.1-alpha.4"
+    mod "github.com/turbot/flowpipe-mod-detect-correct" {
+      version = "v0.0.1-alpha.0"
     }
   }
 }

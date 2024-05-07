@@ -1,23 +1,37 @@
-trigger "query" "detect_and_respond_to_ebs_volumes_without_attachments" {
-  title         = "Detect and respond to EBS volumes without attachments"
-  description   = "Detects EBS volumes without attachments and responds with your chosen action."
+locals {
+  ebs_volumes_without_attachments_query = <<-EOQ
+  select
+    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, '/', availability_zone, ']') as title,
+    volume_id,
+    region,
+    _ctx ->> 'connection_name' as cred
+  from
+    aws_ebs_volume
+  where
+    jsonb_array_length(attachments) = 0;
+  EOQ
+}
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+trigger "query" "detect_and_correct_ebs_volumes_without_attachments" {
+  title         = "Detect & correct EBS volumes without attachments"
+  description   = "Detects EBS volumes without attachments and runs your chosen action."
+
+  enabled  = var.ebs_volumes_without_attachments_trigger_enabled
+  schedule = var.ebs_volumes_without_attachments_trigger_schedule
   database = var.database
-  sql      = file("./ebs/ebs_volumes_without_attachments.sql")
+  sql      = local.ebs_volumes_without_attachments_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_without_attachments
+    pipeline = pipeline.correct_ebs_volumes_without_attachments
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_without_attachments" {
-  title         = "Detect and respond to EBS volumes without attachments"
-  description   = "Detects EBS volumes without attachments and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_without_attachments" {
+  title         = "Detect & correct EBS volumes without attachments"
+  description   = "Detects EBS volumes without attachments and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
@@ -44,39 +58,39 @@ pipeline "detect_and_respond_to_ebs_volumes_without_attachments" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_without_attachments_default_response_option
+    default     = var.ebs_volume_without_attachments_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_without_attachments_enabled_response_options
+    default     = var.ebs_volume_without_attachments_enabled_actions
   }
 
   step "query" "detect" {
     database = var.database
-    sql      = file("./ebs/ebs_volumes_without_attachments.sql")
+    sql      = local.ebs_volumes_without_attachments_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_without_attachments
+    pipeline = pipeline.correct_ebs_volumes_without_attachments
     args     = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ebs_volumes_without_attachments" {
-  title         = "Respond to EBS volumes without attachments"
-  description   = "Responds to a collection of EBS volumes without attachments."
+pipeline "correct_ebs_volumes_without_attachments" {
+  title         = "Corrects EBS volumes without attachments"
+  description   = "Runs corrective action on a collection of EBS volumes without attachments."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
@@ -106,16 +120,16 @@ pipeline "respond_to_ebs_volumes_without_attachments" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_without_attachments_default_response_option
+    default     = var.ebs_volume_without_attachments_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_without_attachments_enabled_response_options
+    default     = var.ebs_volume_without_attachments_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -128,10 +142,10 @@ pipeline "respond_to_ebs_volumes_without_attachments" {
     value = {for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_without_attachments
+    pipeline        = pipeline.correct_ebs_volume_without_attachments
     args            = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -140,15 +154,15 @@ pipeline "respond_to_ebs_volumes_without_attachments" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_ebs_volume_without_attachments" {
-  title         = "Respond to EBS volume without attachments"
-  description   = "Responds to an EBS volume without attachments."
+pipeline "correct_ebs_volume_without_attachments" {
+  title         = "Correct one EBS volume without attachments"
+  description   = "Runs corrective action on an EBS volume without attachments."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
@@ -189,33 +203,33 @@ pipeline "respond_to_ebs_volume_without_attachments" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.ebs_volume_without_attachments_default_response_option
+    default     = var.ebs_volume_without_attachments_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.ebs_volume_without_attachments_enabled_response_options
+    default     = var.ebs_volume_without_attachments_enabled_actions
   }
 
   step "pipeline" "respond" {
-    pipeline = approval.pipeline.respond_action_handler
+    pipeline = detect_correct.pipeline.correction_handler
     args     = {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected EBS volume ${param.title} using gp2."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"
           style  = local.StyleInfo
-          pipeline_ref  = local.approval_pipeline_skipped_action_notification
+          pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose

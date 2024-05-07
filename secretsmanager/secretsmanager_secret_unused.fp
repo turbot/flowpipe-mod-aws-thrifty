@@ -12,26 +12,26 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_secretsmanager_secrets_unused" {
-  title       = "Detect and respond to SecretsManager secrets that are unused"
-  description = "Detects SecretsManager secrets that are unused (not access in last n days) and responds with your chosen action."
+trigger "query" "detect_and_correct_secretsmanager_secrets_unused" {
+  title       = "Detect & correct SecretsManager secrets that are unused"
+  description = "Detects SecretsManager secrets that are unused (not access in last n days) and runs your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.secretsmanager_secrets_unused_trigger_enabled
+  schedule = var.secretsmanager_secrets_unused_trigger_schedule
   database = var.database
   sql      = local.secretsmanager_secrets_unused_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_secretsmanager_secrets_unused
+    pipeline = pipeline.correct_secretsmanager_secrets_unused
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
-  title         = "Detect and respond to SecretsManager secrets that are unused"
-  description   = "Detects SecretsManager secrets that are unused (not access in last n days) and responds with your chosen action."
+pipeline "detect_and_correct_secretsmanager_secrets_unused" {
+  title         = "Detect & correct SecretsManager secrets that are unused"
+  description   = "Detects SecretsManager secrets that are unused (not access in last n days) and runs your chosen action."
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "database" {
@@ -58,16 +58,16 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response_option
+    default     = var.secretsmanager_secret_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_response_options
+    default     = var.secretsmanager_secret_unused_enabled_actions
   }
 
   step "query" "detect" {
@@ -76,21 +76,21 @@ pipeline "detect_and_respond_to_secretsmanager_secrets_unused" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_secretsmanager_secrets_unused
+    pipeline = pipeline.correct_secretsmanager_secrets_unused
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
       notification_level   = param.notification_level
       approvers        = param.approvers
-      default_response_option = param.default_response_option
-      enabled_response_options        = param.enabled_response_options
+      default_action = param.default_action
+      enabled_actions        = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_secretsmanager_secrets_unused" {
-  title         = "Respond to SecretsManager secrets that are unused"
-  description   = "Responds to a collection of SecretsManager secrets that are unused (not access in last n days)."
+pipeline "correct_secretsmanager_secrets_unused" {
+  title         = "Corrects SecretsManager secrets that are unused"
+  description   = "Runs corrective action on a collection of SecretsManager secrets that are unused (not access in last n days)."
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "items" {
@@ -120,16 +120,16 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response_option
+    default     = var.secretsmanager_secret_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_response_options
+    default     = var.secretsmanager_secret_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -142,10 +142,10 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
     value = {for row in param.items : row.name => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_secretsmanager_secret_unused
+    pipeline        = pipeline.correct_secretsmanager_secret_unused
     args            = {
       title                    = each.value.title
       name                     = each.value.name
@@ -154,15 +154,15 @@ pipeline "respond_to_secretsmanager_secrets_unused" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_secretsmanager_secret_unused" {
-  title         = "Respond to SecretsManager secret that are unused"
-  description   = "Responds to a SecretsManager secret that are unused (not access in last n days)."
+pipeline "correct_secretsmanager_secret_unused" {
+  title         = "Correct one SecretsManager secret that are unused"
+  description   = "Runs corrective action on a SecretsManager secret that are unused (not access in last n days)."
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "title" {
@@ -203,33 +203,33 @@ pipeline "respond_to_secretsmanager_secret_unused" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_response_option
+    default     = var.secretsmanager_secret_unused_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_response_options
+    default     = var.secretsmanager_secret_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
-    pipeline = approval.pipeline.respond_action_handler
+    pipeline = detect_correct.pipeline.correction_handler
     args     = {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
-      response_options = {
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
+      actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"
           style  = local.StyleInfo
-          pipeline_ref  = local.approval_pipeline_skipped_action_notification
+          pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose
