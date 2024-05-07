@@ -19,8 +19,7 @@ trigger "query" "ebs_volumes_unattached" {
 pipeline "detect_and_respond_to_ebs_volumes_unattached" {
   title         = "Detect and respond to EBS volumes unattached"
   description   = "Detects EBS volumes which are unattached and responds with your chosen action."
-  documentation = file("./ebs/ebs_volumes_unattached.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -79,8 +78,7 @@ pipeline "detect_and_respond_to_ebs_volumes_unattached" {
 pipeline "respond_to_ebs_volumes_unattached" {
   title         = "Respond to EBS volumes unattached"
   description   = "Responds to a collection of EBS volumes which are unattached."
-  documentation = file("./ebs/ebs_volumes_unattached.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -152,8 +150,7 @@ pipeline "respond_to_ebs_volumes_unattached" {
 pipeline "respond_to_ebs_volume_unattached" {
   title         = "Respond to EBS volume unattached"
   description   = "Responds to an EBS volume unattached."
-  documentation = file("./ebs/ebs_volumes_unattached.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
