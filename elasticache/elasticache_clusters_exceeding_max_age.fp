@@ -40,8 +40,8 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_elasticache_clusters_exceeding_max_age" {
-  title       = "Detect and respond to Elasticache clusters exceeding max age"
+trigger "query" "detect_and_correct_elasticache_clusters_exceeding_max_age" {
+  title       = "Detect and Correct Elasticache clusters exceeding max age"
   description = "Detects Elasticache clusters exceeding max age and responds with your chosen action."
 
   enabled  = var.elasticache_clusters_exceeding_max_age_trigger_enabled
@@ -50,15 +50,15 @@ trigger "query" "detect_and_respond_to_elasticache_clusters_exceeding_max_age" {
   sql      = local.elasticache_clusters_exceeding_max_age_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_elasticache_clusters_exceeding_max_age
+    pipeline = pipeline.correct_elasticache_clusters_exceeding_max_age
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_elasticache_clusters_exceeding_max_age" {
-  title         = "Detect and respond to Elasticache clusters exceeding max age"
+pipeline "detect_and_correct_elasticache_clusters_exceeding_max_age" {
+  title         = "Detect and Correct Elasticache clusters exceeding max age"
   description   = "Detects Elasticache clusters exceeding max age and responds with your chosen action."
   // tags          = merge(local.elasticache_common_tags, { class = "unused" })
 
@@ -104,7 +104,7 @@ pipeline "detect_and_respond_to_elasticache_clusters_exceeding_max_age" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_elasticache_clusters_exceeding_max_age
+    pipeline = pipeline.correct_elasticache_clusters_exceeding_max_age
     args     = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -116,9 +116,9 @@ pipeline "detect_and_respond_to_elasticache_clusters_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_elasticache_clusters_exceeding_max_age" {
-  title         = "Respond to Elasticache clusters exceeding max age"
-  description   = "Responds to a collection of Elasticache clusters exceeding max age."
+pipeline "correct_elasticache_clusters_exceeding_max_age" {
+  title         = "Correct Elasticache clusters exceeding max age"
+  description   = "Runs corrective action on a collection of Elasticache clusters exceeding max age."
   // tags          = merge(local.elasticache_common_tags, { class = "unused" })
 
   param "items" {
@@ -170,10 +170,10 @@ pipeline "respond_to_elasticache_clusters_exceeding_max_age" {
     value = {for row in param.items : row.name => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_elasticache_cluster_exceeding_max_age
+    pipeline        = pipeline.correct_elasticache_cluster_exceeding_max_age
     args            = {
       title                    = each.value.title
       name                     = each.value.name
@@ -188,9 +188,9 @@ pipeline "respond_to_elasticache_clusters_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_elasticache_cluster_exceeding_max_age" {
-  title         = "Respond to Elasticache cluster exceeding max age"
-  description   = "Responds to an Elasticache cluster exceeding max age."
+pipeline "correct_elasticache_cluster_exceeding_max_age" {
+  title         = "Correct Elasticache cluster exceeding max age"
+  description   = "Runs corrective action on an Elasticache cluster exceeding max age."
   // tags          = merge(local.elasticache_common_tags, { class = "unused" })
 
   param "title" {
@@ -244,7 +244,7 @@ pipeline "respond_to_elasticache_cluster_exceeding_max_age" {
   }
 
   step "pipeline" "respond" {
-    pipeline = approval.pipeline.respond_action_handler
+    pipeline = detect_correct.pipeline.correction_handler
     args     = {
       notifier                 = param.notifier
       notification_level       = param.notification_level
@@ -257,7 +257,7 @@ pipeline "respond_to_elasticache_cluster_exceeding_max_age" {
           label  = "Skip"
           value  = "skip"
           style  = local.StyleInfo
-          pipeline_ref  = local.approval_pipeline_skipped_action_notification
+          pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose

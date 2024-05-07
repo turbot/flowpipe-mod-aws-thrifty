@@ -33,18 +33,13 @@ locals {
 
 // Pipeline References
 locals {
-  approval_pipeline_skipped_action_notification = approval.pipeline.skipped_action_notification
+  pipeline_optional_message                     = detect_correct.pipeline.optional_message
   aws_pipeline_delete_ebs_snapshot              = aws.pipeline.delete_ebs_snapshot
   aws_pipeline_modify_ebs_volume                = aws.pipeline.modify_ebs_volume
   aws_pipeline_stop_ec2_instances               = aws.pipeline.stop_ec2_instances
   aws_pipeline_terminate_ec2_instances          = aws.pipeline.terminate_ec2_instances
   aws_pipeline_delete_elasticache_cluster       = pipeline.mock_aws_pipeline_delete_elasticache_cluster
   aws_pipeline_delete_eks_node_group            = pipeline.mock_aws_pipeline_delete_eks_node_group
-  pipeline_optional_message                     = detect_correct.pipeline.optional_message
-  aws_pipeline_delete_ebs_snapshot              = aws.pipeline.delete_ebs_snapshot
-  aws_pipeline_modify_ebs_volume                = aws.pipeline.modify_ebs_volume
-  aws_pipeline_stop_ec2_instances               = aws.pipeline.stop_ec2_instances
-  aws_pipeline_terminate_ec2_instances          = aws.pipeline.terminate_ec2_instances
   aws_pipeline_delete_ebs_volume                = pipeline.mock_aws_pipeline_delete_ebs_volume  // aws.pipeline.delete_ebs_volume
   aws_pipeline_detach_ebs_volume                = pipeline.mock_aws_pipeline_detach_ebs_volume  // aws.pipeline.detach_ebs_volume
   aws_pipeline_release_eip                      = pipeline.mock_aws_pipeline_release_eip        // aws.pipeline.release_eip

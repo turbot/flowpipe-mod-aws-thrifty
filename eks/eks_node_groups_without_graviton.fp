@@ -44,8 +44,8 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_eks_node_groups_without_graviton" {
-  title       = "Detect and respond to EKS node groups without graviton processor"
+trigger "query" "detect_and_correct_eks_node_groups_without_graviton" {
+  title       = "Detect and Correct EKS node groups without graviton processor"
   description = "Detects EKS node groups without graviton processor and responds with your chosen action."
 
   enabled  = var.eks_node_groups_without_graviton_trigger_enabled
@@ -54,15 +54,15 @@ trigger "query" "detect_and_respond_to_eks_node_groups_without_graviton" {
   sql      = local.eks_node_groups_without_graviton_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_eks_node_groups_without_graviton
+    pipeline = pipeline.correct_eks_node_groups_without_graviton
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_eks_node_groups_without_graviton" {
-  title         = "Detect and respond to EKS node groups without graviton processor"
+pipeline "detect_and_correct_eks_node_groups_without_graviton" {
+  title         = "Detect and Correct EKS node groups without graviton processor"
   description   = "Detects EKS node groups without graviton processor and responds with your chosen action."
   // tags          = merge(local.eks_common_tags, {
   //   class = "unused" 
@@ -110,7 +110,7 @@ pipeline "detect_and_respond_to_eks_node_groups_without_graviton" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_eks_node_groups_without_graviton
+    pipeline = pipeline.correct_eks_node_groups_without_graviton
     args     = {
       items                     = step.query.detect.rows
       notifier                  = param.notifier
@@ -122,9 +122,9 @@ pipeline "detect_and_respond_to_eks_node_groups_without_graviton" {
   }
 }
 
-pipeline "respond_to_eks_node_groups_without_graviton" {
-  title         = "Respond to EKS node groups without graviton processor"
-  description   = "Responds to a collection of EKS node groups without graviton processor."
+pipeline "correct_eks_node_groups_without_graviton" {
+  title         = "Correct EKS node groups without graviton processor"
+  description   = "Runs corrective action on a collection of EKS node groups without graviton processor."
   // tags          = merge(local.eks_common_tags, { 
   //   class = "deprecated" 
   // })
@@ -179,10 +179,10 @@ pipeline "respond_to_eks_node_groups_without_graviton" {
     value = {for row in param.items : row.instance_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_eks_node_group_without_graviton
+    pipeline        = pipeline.correct_eks_node_group_without_graviton
     args            = {
       title                      = each.value.title
       cluster_name               = each.value.cluster_name
@@ -198,9 +198,9 @@ pipeline "respond_to_eks_node_groups_without_graviton" {
   }
 }
 
-pipeline "respond_to_eks_node_group_without_graviton" {
-  title         = "Respond to an EKS node group without graviton processor"
-  description   = "Responds to an EKS node group without graviton processor."
+pipeline "correct_eks_node_group_without_graviton" {
+  title         = "Correct an EKS node group without graviton processor"
+  description   = "Runs corrective action on an EKS node group without graviton processor."
   // tags          = merge(local.eks_common_tags, { class = "unused" })
 
   param "title" {
@@ -259,7 +259,7 @@ pipeline "respond_to_eks_node_group_without_graviton" {
   }
 
   step "pipeline" "respond" {
-    pipeline = approval.pipeline.respond_action_handler
+    pipeline = detect_correct.pipeline.correction_handler
     args     = {
       notifier         = param.notifier
       notification_level   = param.notification_level
@@ -272,7 +272,7 @@ pipeline "respond_to_eks_node_group_without_graviton" {
           label  = "Skip"
           value  = "skip"
           style  = local.StyleInfo
-          pipeline_ref  = local.approval_pipeline_skipped_action_notification
+          pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose
