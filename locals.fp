@@ -18,6 +18,7 @@ locals {
 }
 
 // Common Texts
+// TODO: Change to snake_case for consistency
 locals {
   DatabaseDescription        = "Database connection string."
   ApproversDescription       = "List of notifiers to be used for obtaining action/approval decisions."

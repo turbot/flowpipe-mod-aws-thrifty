@@ -1,7 +1,7 @@
 locals {
   ebs_volumes_unattached_query = <<-EOQ
   select
-    concat(volume_id, ' [', region, '/', account_id, ']') as title,
+    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, ']') as title,
     volume_id,
     region,
     _ctx ->> 'connection_name' as cred
@@ -79,12 +79,12 @@ pipeline "detect_and_correct_ebs_volumes_unattached" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ebs_volumes_unattached
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -148,15 +148,15 @@ pipeline "correct_ebs_volumes_unattached" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_ebs_volume_unattached
     args = {
-      title                    = each.value.title
-      volume_id                = each.value.volume_id
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      volume_id          = each.value.volume_id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -254,5 +254,23 @@ pipeline "correct_ebs_volume_unattached" {
         }
       }
     }
+  }
+}
+
+pipeline "mock_aws_pipeline_delete_ebs_volume" {
+  param "volume_id" {
+    type = string
+  }
+
+  param "region" {
+    type = string
+  }
+
+  param "cred" {
+    type = string
+  }
+
+  output "result" {
+    value = "Mocked: Delete EBS Volume [Volume_ID: ${param.volume_id}, Region: ${param.region}, Cred: ${param.cred}]"
   }
 }

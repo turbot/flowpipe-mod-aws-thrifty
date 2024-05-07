@@ -1,3 +1,5 @@
+// TODO: PLURALISE THE NAMES OF THE VARIABLES
+
 // EBS
 variable "ebs_snapshots_exceeding_max_age_trigger_enabled" {
   type    = bool
@@ -222,15 +224,7 @@ variable "rds_db_instances_without_graviton_trigger_schedule" {
 }
 
 // S3
-variable "s3_buckets_without_lifecycle_policy_trigger_enabled" {
-  type    = bool
-  default = false
-}
 
-variable "s3_buckets_without_lifecycle_policy_trigger_schedule" {
-  type    = string
-  default = "15m"
-}
 
 // SecretsManager
 variable "secretsmanager_secrets_unused_trigger_enabled" {
