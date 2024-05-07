@@ -229,7 +229,7 @@ pipeline "correct_unused_nat_gateway" {
   }
 
   step "pipeline" "respond" {
-    pipeline = approval.pipeline.respond_action_handler
+    pipeline = detect_correct.pipeline.correction_handler
     args = {
       notifier                 = param.notifier
       notification_level       = param.notification_level
@@ -242,7 +242,7 @@ pipeline "correct_unused_nat_gateway" {
           label        = "Skip"
           value        = "skip"
           style        = local.StyleInfo
-          pipeline_ref = local.approval_pipeline_skipped_action_notification
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose
