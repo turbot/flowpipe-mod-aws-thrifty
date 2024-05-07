@@ -64,7 +64,7 @@ pipeline "detect_and_respond_to_lambda_functions_without_graviton" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.lambda_function_without_graviton_default_response_option
+    default     = var.lambda_function_without_graviton_default_action
   }
 
   param "enabled_response_options" {
@@ -128,7 +128,7 @@ pipeline "respond_to_lambda_functions_without_graviton" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.lambda_function_without_graviton_default_response_option
+    default     = var.lambda_function_without_graviton_default_action
   }
 
   param "enabled_response_options" {
@@ -211,7 +211,7 @@ pipeline "respond_to_lambda_function_without_graviton" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.lambda_function_without_graviton_default_response_option
+    default     = var.lambda_function_without_graviton_default_action
   }
 
   param "enabled_response_options" {

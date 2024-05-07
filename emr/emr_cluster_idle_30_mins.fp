@@ -84,7 +84,7 @@ pipeline "detect_and_respond_to_emr_clusters_idle_30_mins" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.emr_cluster_idle_30_mins_default_response_option
+    default     = var.emr_cluster_idle_30_mins_default_action
   }
 
   param "enabled_response_options" {
@@ -148,7 +148,7 @@ pipeline "respond_to_emr_clusters_idle_30_mins" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.emr_cluster_idle_30_mins_default_response_option
+    default     = var.emr_cluster_idle_30_mins_default_action
   }
 
   param "enabled_response_options" {
@@ -231,7 +231,7 @@ pipeline "respond_to_emr_cluster_idle_30_mins" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.emr_cluster_idle_30_mins_default_response_option
+    default     = var.emr_cluster_idle_30_mins_default_action
   }
 
   param "enabled_response_options" {

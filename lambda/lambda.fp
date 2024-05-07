@@ -4,7 +4,7 @@ locals {
   })
 }
 
-variable "lambda_function_without_graviton_default_response_option" {
+variable "lambda_function_without_graviton_default_action" {
   type        = string
   description = "The default response to use for Lambda functions without graviton."
   default     = "notify"

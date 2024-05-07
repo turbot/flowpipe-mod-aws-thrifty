@@ -4,7 +4,7 @@ locals {
   })
 }
 
-variable "emr_cluster_previous_generation_default_response_option" {
+variable "emr_cluster_previous_generation_default_action" {
   type        = string
   description = "The default response to use for EMR clusters of previous generation instances."
   default     = "notify"
@@ -22,7 +22,7 @@ variable "emr_cluster_previous_generation" {
   default     = ["c1.%", "cc2.%", "cr1.%", "m2.%", "g2.%", "i2.%", "m1.%"]
 }
 
-variable "emr_cluster_idle_30_mins_default_response_option" {
+variable "emr_cluster_idle_30_mins_default_action" {
   type        = string
   description = "The default response to use for EMR clusters of previous generation instances."
   default     = "notify"

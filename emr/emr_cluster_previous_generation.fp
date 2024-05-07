@@ -66,7 +66,7 @@
 //   param "default_response_option" {
 //     type        = string
 //     description = local.DefaultResponseDescription
-//     default     = var.emr_cluster_previous_generation_default_response_option
+//     default     = var.emr_cluster_previous_generation_default_action
 //   }
 
 //   param "enabled_response_options" {
@@ -130,7 +130,7 @@
 //   param "default_response_option" {
 //     type        = string
 //     description = local.DefaultResponseDescription
-//     default     = var.emr_cluster_previous_generation_default_response_option
+//     default     = var.emr_cluster_previous_generation_default_action
 //   }
 
 //   param "enabled_response_options" {
@@ -213,7 +213,7 @@
 //   param "default_response_option" {
 //     type        = string
 //     description = local.DefaultResponseDescription
-//     default     = var.emr_cluster_previous_generation_default_response_option
+//     default     = var.emr_cluster_previous_generation_default_action
 //   }
 
 //   param "enabled_response_options" {
