@@ -1,7 +1,6 @@
 trigger "query" "ebs_volumes_attached_to_stopped_instances" {
   title       = "Detect and respond to EBS volumes attached to stopped instances"
   description = "Detects EBS volumes which are attached to stopped instances and responds with your chosen action."
-  //tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
@@ -19,7 +18,6 @@ trigger "query" "ebs_volumes_attached_to_stopped_instances" {
 pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
   title       = "Detect and respond to EBS volumes attached to stopped instances"
   description = "Detects EBS volumes which are attached to stopped instances and responds with your chosen action."
-  // documentation = file("./ebs/ebs_volumes_attached_to_stopped_instances.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
@@ -79,7 +77,6 @@ pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
 pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
   title       = "Respond to EBS volumes attached to stopped instances"
   description = "Responds to a collection of EBS volumes which are attached to stopped instances."
-  // documentation = file("./ebs/ebs_volumes_attached_to_stopped_instances.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
@@ -152,7 +149,6 @@ pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
 pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
   title       = "Respond to EBS volume attached to stopped instance"
   description = "Responds to an EBS volume attached to stopped instance."
-  // documentation = file("./ebs/ebs_volumes_attached_to_stopped_instances.md")
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
