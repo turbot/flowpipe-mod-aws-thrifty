@@ -13,8 +13,8 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_lambda_functions_without_graviton" {
-  title       = "Detect and respond to Lambda functions without graviton processor"
+trigger "query" "detect_and_correct_lambda_functions_without_graviton" {
+  title       = "Detect & correct Lambda functions without graviton processor"
   description = "Detects Lambda functions without graviton processor and responds with your chosen action."
 
   enabled  = false
@@ -23,15 +23,15 @@ trigger "query" "detect_and_respond_to_lambda_functions_without_graviton" {
   sql      = local.lambda_functions_without_graviton_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_lambda_functions_without_graviton
+    pipeline = pipeline.correct_lambda_functions_without_graviton
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_lambda_functions_without_graviton" {
-  title         = "Detect and respond to Lambda functions without graviton processor"
+pipeline "detect_and_correct_lambda_functions_without_graviton" {
+  title         = "Detect & correct Lambda functions without graviton processor"
   description   = "Detects Lambda functions without graviton processor and responds with your chosen action."
   // tags          = merge(local.lambda_common_tags, {
   //   class = "unused" 
@@ -79,7 +79,7 @@ pipeline "detect_and_respond_to_lambda_functions_without_graviton" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_lambda_functions_without_graviton
+    pipeline = pipeline.correct_lambda_functions_without_graviton
     args     = {
       items                     = step.query.detect.rows
       notifier                  = param.notifier
@@ -91,7 +91,7 @@ pipeline "detect_and_respond_to_lambda_functions_without_graviton" {
   }
 }
 
-pipeline "respond_to_lambda_functions_without_graviton" {
+pipeline "correct_lambda_functions_without_graviton" {
   title         = "Respond to Lambda functions without graviton processor"
   description   = "Responds to a collection of Lambda functions without graviton processor."
   // tags          = merge(local.lambda_common_tags, { 
@@ -147,10 +147,10 @@ pipeline "respond_to_lambda_functions_without_graviton" {
     value = {for row in param.items : row.name => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_lambda_function_without_graviton
+    pipeline        = pipeline.correct_lambda_function_without_graviton
     args            = {
       title                      = each.value.title
       name                       = each.value.name
@@ -165,7 +165,7 @@ pipeline "respond_to_lambda_functions_without_graviton" {
   }
 }
 
-pipeline "respond_to_lambda_function_without_graviton" {
+pipeline "correct_lambda_function_without_graviton" {
   title         = "Respond to an Lambda function without graviton processor"
   description   = "Responds to an Lambda function without graviton processor."
   // tags          = merge(local.lambda_common_tags, { class = "unused" })

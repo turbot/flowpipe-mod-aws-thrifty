@@ -15,7 +15,7 @@
 //   EOQ
 // }
 
-// trigger "query" "detect_and_respond_to_emr_clusters_older_generation" {
+// trigger "query" "detect_and_correct_emr_clusters_older_generation" {
 //   title       = "Detect and respond EMR clusters of previous generation instances"
 //   description = "Detects EMR clusters of previous generation instances and responds with your chosen action."
 
@@ -25,15 +25,15 @@
 //   sql      = local.emr_clusters_older_generation_query
 
 //   capture "insert" {
-//     pipeline = pipeline.respond_to_emr_clusters_older_generation
+//     pipeline = pipeline.correct_emr_clusters_older_generation
 //     args     = {
 //       items = self.inserted_rows
 //     }
 //   }
 // }
 
-// pipeline "detect_and_respond_to_emr_clusters_older_generation" {
-//   title         = "Detect and respond to older generation EC2 instances"
+// pipeline "detect_and_correct_emr_clusters_older_generation" {
+//   title         = "Detect & correct older generation EC2 instances"
 //   description   = "Detects older generation EC2 instances and responds with your chosen action."
 //   // tags          = merge(local.ec2_common_tags, {
 //   //   class = "deprecated" 
@@ -81,7 +81,7 @@
 //   }
 
 //   step "pipeline" "respond" {
-//     pipeline = pipeline.respond_to_emr_clusters_older_generation
+//     pipeline = pipeline.correct_emr_clusters_older_generation
 //     args     = {
 //       items                     = step.query.detect.rows
 //       notifier                  = param.notifier
@@ -93,7 +93,7 @@
 //   }
 // }
 
-// pipeline "respond_to_emr_clusters_older_generation" {
+// pipeline "correct_emr_clusters_older_generation" {
 //   title         = "Respond to EMR clusters of previous generation instances"
 //   description   = "Responds to a collection of EMR clusters of previous generation instances."
 //   // tags          = merge(local.ec2_common_tags, { 
@@ -149,10 +149,10 @@
 //     value = {for row in param.items : row.instance_id => row }
 //   }
 
-//   step "pipeline" "respond_to_item" {
+//   step "pipeline" "correct_item" {
 //     for_each        = step.transform.items_by_id.value
 //     max_concurrency = var.max_concurrency
-//     pipeline        = pipeline.respond_to_ec2_instance_older_generation
+//     pipeline        = pipeline.correct_ec2_instance_older_generation
 //     args            = {
 //       title                      = each.value.title
 //       instance_id                = each.value.instance_id
@@ -167,7 +167,7 @@
 //   }
 // }
 
-// pipeline "respond_to_ec2_instance_older_generation" {
+// pipeline "correct_ec2_instance_older_generation" {
 //   title         = "Respond to older generation EC2 instance"
 //   description   = "Responds to a older generation EC2 instance."
 //   // tags          = merge(local.ec2_common_tags, { class = "deprecated" })

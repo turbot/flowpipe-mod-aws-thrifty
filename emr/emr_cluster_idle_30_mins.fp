@@ -33,7 +33,7 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_emr_clusters_idle_30_mins" {
+trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
   title       = "Detect and respond EMR clusters idle for more than 30 mins"
   description = "Detects EMR clusters idle for more than 30 mins and responds with your chosen action."
 
@@ -43,14 +43,14 @@ trigger "query" "detect_and_respond_to_emr_clusters_idle_30_mins" {
   sql      = local.emr_clusters_idle_30_mins_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_emr_clusters_idle_30_mins
+    pipeline = pipeline.correct_emr_clusters_idle_30_mins
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_emr_clusters_idle_30_mins" {
+pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
   title         = "Detect and respond EMR clusters idle for more than 30 mins"
   description   = "Detects EMR clusters idle for more than 30 mins and responds with your chosen action."
   // tags          = merge(local.emr_common_tags, {
@@ -99,7 +99,7 @@ pipeline "detect_and_respond_to_emr_clusters_idle_30_mins" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_emr_clusters_idle_30_mins
+    pipeline = pipeline.correct_emr_clusters_idle_30_mins
     args     = {
       items                     = step.query.detect.rows
       notifier                  = param.notifier
@@ -111,7 +111,7 @@ pipeline "detect_and_respond_to_emr_clusters_idle_30_mins" {
   }
 }
 
-pipeline "respond_to_emr_clusters_idle_30_mins" {
+pipeline "correct_emr_clusters_idle_30_mins" {
   title         = "Respond to EMR clusters of previous generation instances"
   description   = "Responds to a collection of EMR clusters of previous generation instances."
   // tags          = merge(local.emr_common_tags, { 
@@ -167,10 +167,10 @@ pipeline "respond_to_emr_clusters_idle_30_mins" {
     value = {for row in param.items : row.id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_emr_cluster_idle_30_mins
+    pipeline        = pipeline.correct_emr_cluster_idle_30_mins
     args            = {
       title                      = each.value.title
       id                         = each.value.id
@@ -185,7 +185,7 @@ pipeline "respond_to_emr_clusters_idle_30_mins" {
   }
 }
 
-pipeline "respond_to_emr_cluster_idle_30_mins" {
+pipeline "correct_emr_cluster_idle_30_mins" {
   title         = "Respond to EMR cluster idle for more than 30 mins"
   description   = "Responds to an EMR cluster idle for more than 30 mins."
   // tags          = merge(local.emr_common_tags, { class = "unused" })
