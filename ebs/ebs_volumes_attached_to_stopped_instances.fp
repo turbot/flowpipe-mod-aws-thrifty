@@ -232,7 +232,7 @@ pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
           label        = "Detach Volume"
           value        = "detach_volume"
           style        = local.StyleOk
-          pipeline_ref = local.aws_pipeline_detach_ebs_volume
+          pipeline_ref = pipeline.mock_aws_pipeline_detach_ebs_volume // TODO: Swap to local.aws_pipeline_detach_ebs_volume when added to library mod
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
@@ -245,7 +245,7 @@ pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
           label        = "Delete_volume"
           value        = "delete_volume"
           style        = local.StyleAlert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+          pipeline_ref = pipeline.mock_aws_pipeline_delete_ebs_volume // TODO: Swap to local.aws_pipeline_delete_ebs_volume when added to library mod
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
@@ -256,5 +256,23 @@ pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
         }
       }
     }
+  }
+}
+
+pipeline "mock_aws_pipeline_detach_ebs_volume" {
+  param "volume_id" {
+    type        = string
+  }
+
+  param "region" {
+    type        = string
+  }
+
+  param "cred" {
+    type        = string
+  }
+
+  output "result" {
+    value = "Mocked: Detach EBS Volume [VolumeID: ${param.volume_id}, Region: ${param.region}, Cred: ${param.cred}]"
   }
 }

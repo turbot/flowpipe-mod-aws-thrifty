@@ -100,13 +100,13 @@ variable "ebs_volumes_attached_to_stopped_instances_enabled_response_options" {
   default     = ["skip", "detach_volume", "delete_volume"]
 }
 
-variable "ec2_volume_large_default_response_option" {
+variable "ebs_volume_large_default_response_option" {
   type        = string
   description = "The default response to use when EBS volumes are larger than the specified size."
   default     = "notify"
 }
 
-variable "ec2_volume_large_enabled_response_options" {
+variable "ebs_volume_large_enabled_response_options" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_volume"]
