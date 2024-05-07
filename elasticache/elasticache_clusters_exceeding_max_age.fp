@@ -89,13 +89,13 @@ pipeline "detect_and_respond_to_elasticache_clusters_exceeding_max_age" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.elasticache_cluster_age_max_days_default_response_option
+    default     = var.elasticache_cluster_age_max_days_default_action
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.elasticache_cluster_age_max_days_enabled_response_options
+    default     = var.elasticache_cluster_age_max_days_enabled_actions
   }
 
   step "query" "detect" {
@@ -151,13 +151,13 @@ pipeline "respond_to_elasticache_clusters_exceeding_max_age" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.elasticache_cluster_age_max_days_default_response_option
+    default     = var.elasticache_cluster_age_max_days_default_action
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.elasticache_cluster_age_max_days_enabled_response_options
+    default     = var.elasticache_cluster_age_max_days_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -234,13 +234,13 @@ pipeline "respond_to_elasticache_cluster_exceeding_max_age" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.elasticache_cluster_age_max_days_default_response_option
+    default     = var.elasticache_cluster_age_max_days_default_action
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.elasticache_cluster_age_max_days_enabled_response_options
+    default     = var.elasticache_cluster_age_max_days_enabled_actions
   }
 
   step "pipeline" "respond" {

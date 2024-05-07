@@ -95,13 +95,13 @@ pipeline "detect_and_respond_to_eks_node_groups_without_graviton" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.eks_node_group_without_graviton_default_response_option
+    default     = var.eks_node_group_without_graviton_default_action
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.eks_node_group_without_graviton_enabled_response_options
+    default     = var.eks_node_group_without_graviton_enabled_actions
   }
 
   step "query" "detect" {
@@ -160,13 +160,13 @@ pipeline "respond_to_eks_node_groups_without_graviton" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.eks_node_group_without_graviton_default_response_option
+    default     = var.eks_node_group_without_graviton_default_action
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.eks_node_group_without_graviton_enabled_response_options
+    default     = var.eks_node_group_without_graviton_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -249,13 +249,13 @@ pipeline "respond_to_eks_node_group_without_graviton" {
   param "default_response_option" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.eks_node_group_without_graviton_default_response_option
+    default     = var.eks_node_group_without_graviton_default_action
   }
 
   param "enabled_response_options" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.eks_node_group_without_graviton_enabled_response_options
+    default     = var.eks_node_group_without_graviton_enabled_actions
   }
 
   step "pipeline" "respond" {
