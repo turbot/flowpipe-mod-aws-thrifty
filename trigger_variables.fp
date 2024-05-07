@@ -263,3 +263,25 @@ variable "vpc_unused_nat_gateways_trigger_schedule" {
   type    = string
   default = "15m"
 }
+
+// EKS
+variable "eks_node_groups_without_graviton_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "eks_node_groups_without_graviton_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+// Elasticache
+variable "elasticache_clusters_exceeding_max_age_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "elasticache_clusters_exceeding_max_age_trigger_schedule" {
+  type    = string
+  default = "15m"
+}

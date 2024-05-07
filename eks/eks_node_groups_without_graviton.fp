@@ -48,8 +48,8 @@ trigger "query" "detect_and_respond_to_eks_node_groups_without_graviton" {
   title       = "Detect and respond to EKS node groups without graviton processor"
   description = "Detects EKS node groups without graviton processor and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.eks_node_groups_without_graviton_trigger_enabled
+  schedule = var.eks_node_groups_without_graviton_trigger_schedule
   database = var.database
   sql      = local.eks_node_groups_without_graviton_query
 
