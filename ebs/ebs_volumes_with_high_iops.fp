@@ -13,9 +13,9 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_volumes_with_high_iops" {
-  title       = "Detect and respond to EBS volumes with high IOPS"
-  description = "Detects EBS volumes with high IOPS and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_with_high_iops" {
+  title       = "Detect & correct EBS volumes with high IOPS"
+  description = "Detects EBS volumes with high IOPS and runs your chosen action."
 
   enabled  = var.ebs_volumes_with_high_iops_trigger_enabled
   schedule = var.ebs_volumes_with_high_iops_trigger_schedule
@@ -23,16 +23,16 @@ trigger "query" "detect_and_respond_to_ebs_volumes_with_high_iops" {
   sql      = local.ebs_volumes_with_high_iops_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_with_high_iops
+    pipeline = pipeline.correct_ebs_volumes_with_high_iops
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_with_high_iops" {
-  title       = "Detect and respond to EBS volumes with high IOPS"
-  description = "Detects EBS volumes with high IOPS and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
+  title       = "Detect & correct EBS volumes with high IOPS"
+  description = "Detects EBS volumes with high IOPS and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "database" {
@@ -77,7 +77,7 @@ pipeline "detect_and_respond_to_ebs_volumes_with_high_iops" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_with_high_iops
+    pipeline = pipeline.correct_ebs_volumes_with_high_iops
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -89,9 +89,9 @@ pipeline "detect_and_respond_to_ebs_volumes_with_high_iops" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_with_high_iops" {
-  title       = "Respond to EBS volumes with high IOPS"
-  description = "Responds to a collection of EBS volumes with high IOPS."
+pipeline "correct_ebs_volumes_with_high_iops" {
+  title       = "Corrects EBS volumes with high IOPS"
+  description = "Runs corrective action on a collection of EBS volumes with high IOPS."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "items" {
@@ -143,10 +143,10 @@ pipeline "respond_to_ebs_volumes_with_high_iops" {
     value = { for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_with_high_iops
+    pipeline        = pipeline.correct_ebs_volume_with_high_iops
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -161,9 +161,9 @@ pipeline "respond_to_ebs_volumes_with_high_iops" {
   }
 }
 
-pipeline "respond_to_ebs_volume_with_high_iops" {
-  title       = "Respond to EBS volume with high IOPS"
-  description = "Responds to an EBS volume with high IOPS."
+pipeline "correct_ebs_volume_with_high_iops" {
+  title       = "Correct one EBS volume with high IOPS"
+  description = "Runs corrective action on an EBS volume with high IOPS."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "title" {

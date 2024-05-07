@@ -12,9 +12,9 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
-  title       = "Detect and respond to S3 buckets without lifecycle policy"
-  description = "Detects S3 buckets which do not have a lifecycle policy and responds with your chosen action."
+trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
+  title       = "Detect & correct S3 buckets without lifecycle policy"
+  description = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
 
   enabled  = var.s3_buckets_without_lifecycle_policy_trigger_enabled
   schedule = var.s3_buckets_without_lifecycle_policy_trigger_schedule
@@ -22,16 +22,16 @@ trigger "query" "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
   sql      = local.s3_buckets_without_lifecycle_policy_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_s3_buckets_without_lifecycle_policy
+    pipeline = pipeline.correct_s3_buckets_without_lifecycle_policy
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
-  title         = "Detect and respond to S3 buckets without lifecycle policy"
-  description   = "Detects S3 buckets which do not have a lifecycle policy and responds with your chosen action."
+pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
+  title         = "Detect & correct S3 buckets without lifecycle policy"
+  description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "database" {
@@ -82,7 +82,7 @@ pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_s3_buckets_without_lifecycle_policy
+    pipeline = pipeline.correct_s3_buckets_without_lifecycle_policy
     args     = {
       items                    = step.query.detect.rows
       policy                   = param.policy
@@ -95,9 +95,9 @@ pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
   }
 }
 
-pipeline "respond_to_s3_buckets_without_lifecycle_policy" {
-  title         = "Respond to S3 buckets without lifecycle policy"
-  description   = "Responds to a collection of S3 buckets which do not have a lifecycle policy."
+pipeline "correct_s3_buckets_without_lifecycle_policy" {
+  title         = "Corrects S3 buckets without lifecycle policy"
+  description   = "Runs corrective action on a collection of S3 buckets which do not have a lifecycle policy."
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "items" {
@@ -155,10 +155,10 @@ pipeline "respond_to_s3_buckets_without_lifecycle_policy" {
     value = {for row in param.items : row.name => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_s3_bucket_without_lifecycle_policy
+    pipeline        = pipeline.correct_s3_bucket_without_lifecycle_policy
     args            = {
       title                    = each.value.title
       name                     = each.value.name
@@ -174,9 +174,9 @@ pipeline "respond_to_s3_buckets_without_lifecycle_policy" {
   }
 }
 
-pipeline "respond_to_s3_bucket_without_lifecycle_policy" {
-  title         = "Respond to S3 bucket without lifecycle policy"
-  description   = "Responds to an individual S3 bucket which does not have a lifecycle policy."
+pipeline "correct_s3_bucket_without_lifecycle_policy" {
+  title         = "Correct one S3 bucket without lifecycle policy"
+  description   = "Runs corrective action on an individual S3 bucket which does not have a lifecycle policy."
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "title" {

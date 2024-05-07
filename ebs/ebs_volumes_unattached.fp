@@ -12,9 +12,9 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_volumes_unattached" {
-  title       = "Detect and respond to EBS volumes unattached"
-  description = "Detects EBS volumes which are unattached and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_unattached" {
+  title       = "Detect & correct EBS volumes unattached"
+  description = "Detects EBS volumes which are unattached and runs your chosen action."
   //tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   enabled  = var.ebs_volumes_unattached_trigger_enabled
@@ -23,16 +23,16 @@ trigger "query" "detect_and_respond_to_ebs_volumes_unattached" {
   sql      = local.ebs_volumes_unattached_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_unattached
+    pipeline = pipeline.correct_ebs_volumes_unattached
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_unattached" {
-  title         = "Detect and respond to EBS volumes unattached"
-  description   = "Detects EBS volumes which are unattached and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_unattached" {
+  title         = "Detect & correct EBS volumes unattached"
+  description   = "Detects EBS volumes which are unattached and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
@@ -77,7 +77,7 @@ pipeline "detect_and_respond_to_ebs_volumes_unattached" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_unattached
+    pipeline = pipeline.correct_ebs_volumes_unattached
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -89,9 +89,9 @@ pipeline "detect_and_respond_to_ebs_volumes_unattached" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_unattached" {
-  title         = "Respond to EBS volumes unattached"
-  description   = "Responds to a collection of EBS volumes which are unattached."
+pipeline "correct_ebs_volumes_unattached" {
+  title         = "Corrects EBS volumes unattached"
+  description   = "Runs corrective action on a collection of EBS volumes which are unattached."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
@@ -143,10 +143,10 @@ pipeline "respond_to_ebs_volumes_unattached" {
     value = { for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_unattached
+    pipeline        = pipeline.correct_ebs_volume_unattached
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -161,9 +161,9 @@ pipeline "respond_to_ebs_volumes_unattached" {
   }
 }
 
-pipeline "respond_to_ebs_volume_unattached" {
-  title         = "Respond to EBS volume unattached"
-  description   = "Responds to an EBS volume unattached."
+pipeline "correct_ebs_volume_unattached" {
+  title         = "Correct one EBS volume unattached"
+  description   = "Runs corrective action on an EBS volume unattached."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {

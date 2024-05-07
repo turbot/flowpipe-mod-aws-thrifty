@@ -12,9 +12,9 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_volumes_large" {
-  title       = "Detect and respond to large EBS volumes"
-  description = "Detects large EBS volumes and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_large" {
+  title       = "Detect & correct large EBS volumes"
+  description = "Detects large EBS volumes and runs your chosen action."
 
   enabled  = var.ebs_volumes_large_trigger_enabled
   schedule = var.ebs_volumes_large_trigger_schedule
@@ -22,16 +22,16 @@ trigger "query" "detect_and_respond_to_ebs_volumes_large" {
   sql      = local.ebs_volumes_large_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_large
+    pipeline = pipeline.correct_ebs_volumes_large
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_large" {
-  title       = "Detect and respond to large EBS volumes"
-  description = "Detects large EBS volumes and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_large" {
+  title       = "Detect & correct large EBS volumes"
+  description = "Detects large EBS volumes and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
@@ -76,7 +76,7 @@ pipeline "detect_and_respond_to_ebs_volumes_large" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_large
+    pipeline = pipeline.correct_ebs_volumes_large
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -88,9 +88,9 @@ pipeline "detect_and_respond_to_ebs_volumes_large" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_large" {
-  title       = "Respond to large EBS volumes"
-  description = "Responds to a collection of large EBS volumes."
+pipeline "correct_ebs_volumes_large" {
+  title       = "Corrects large EBS volumes"
+  description = "Runs corrective action on a collection of large EBS volumes."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
@@ -142,10 +142,10 @@ pipeline "respond_to_ebs_volumes_large" {
     value = { for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_large
+    pipeline        = pipeline.correct_ebs_volume_large
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -160,9 +160,9 @@ pipeline "respond_to_ebs_volumes_large" {
   }
 }
 
-pipeline "respond_to_ebs_volume_large" {
-  title       = "Respond to large EBS volume"
-  description = "Responds to a large EBS volume."
+pipeline "correct_ebs_volume_large" {
+  title       = "Correct one large EBS volume"
+  description = "Runs corrective action on a large EBS volume."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {

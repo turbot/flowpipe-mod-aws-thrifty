@@ -23,9 +23,9 @@ where
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ec2_gateway_load_balancer_unused" {
-  title       = "Detect and respond to unused EC2 gateway load balancers"
-  description = "Detects EC2 gateway load balancers that are unused and responds with your chosen action."
+trigger "query" "detect_and_correct_ec2_gateway_load_balancer_unused" {
+  title       = "Detect & correct unused EC2 gateway load balancers"
+  description = "Detects EC2 gateway load balancers that are unused and runs your chosen action."
 
   enabled  = var.ec2_gateway_load_balancer_unused_trigger_enabled
   schedule = var.ec2_gateway_load_balancer_unused_trigger_schedule
@@ -33,16 +33,16 @@ trigger "query" "detect_and_respond_to_ec2_gateway_load_balancer_unused" {
   sql      = local.ec2_gateway_load_balancer_unused_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ec2_gateway_load_balancer_unused
+    pipeline = pipeline.correct_ec2_gateway_load_balancer_unused
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ec2_gateway_load_balancer_unused" {
-  title         = "Detect and respond to EC2 unused gateway load balancers"
-  description   = "Detects unused EC2 gateway load balancers and responds with your chosen action."
+pipeline "detect_and_correct_ec2_gateway_load_balancer_unused" {
+  title         = "Detect & correct EC2 unused gateway load balancers"
+  description   = "Detects unused EC2 gateway load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
   // })
@@ -89,7 +89,7 @@ pipeline "detect_and_respond_to_ec2_gateway_load_balancer_unused" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ec2_gateway_load_balancers_unused
+    pipeline = pipeline.correct_ec2_gateway_load_balancers_unused
     args     = {
       items            = step.query.detect.rows
       notifier         = param.notifier
@@ -101,9 +101,9 @@ pipeline "detect_and_respond_to_ec2_gateway_load_balancer_unused" {
   }
 }
 
-pipeline "respond_to_ec2_gateway_load_balancers_unused" {
-  title         = "Respond to EC2 gateway load balancers exceeding max age"
-  description   = "Responds to a collection of EC2 gateway load balancers exceeding max age."
+pipeline "correct_ec2_gateway_load_balancers_unused" {
+  title         = "Corrects EC2 gateway load balancers exceeding max age"
+  description   = "Runs corrective action on a collection of EC2 gateway load balancers exceeding max age."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 
   // })
@@ -158,10 +158,10 @@ pipeline "respond_to_ec2_gateway_load_balancers_unused" {
     value = {for row in param.items : row.name => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ec2_gateway_load_balancer_unused
+    pipeline        = pipeline.correct_ec2_gateway_load_balancer_unused
     args            = {
       title                    = each.value.title
       arn                      = each.value.arn
@@ -177,9 +177,9 @@ pipeline "respond_to_ec2_gateway_load_balancers_unused" {
   }
 }
 
-pipeline "respond_to_ec2_gateway_load_balancer_unused" {
-  title         = "Respond to unused EC2 gateway load balancer"
-  description   = "Responds to an unused EC2 gateway load balance."
+pipeline "correct_ec2_gateway_load_balancer_unused" {
+  title         = "Correct one unused EC2 gateway load balancer"
+  description   = "Runs corrective action on an unused EC2 gateway load balance."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {

@@ -12,9 +12,9 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
-  title       = "Detect and respond to EBS snapshots exceeding max age"
-  description = "Detects EBS snapshots exceeding max age and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_snapshots_exceeding_max_age" {
+  title       = "Detect & correct EBS snapshots exceeding max age"
+  description = "Detects EBS snapshots exceeding max age and runs your chosen action."
 
   enabled  = var.ebs_snapshots_exceeding_max_age_trigger_enabled
   schedule = var.ebs_snapshots_exceeding_max_age_trigger_schedule
@@ -22,16 +22,16 @@ trigger "query" "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   sql      = local.ebs_snapshots_exceeding_max_age_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_snapshots_exceeding_max_age
+    pipeline = pipeline.correct_ebs_snapshots_exceeding_max_age
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
-  title         = "Detect and respond to EBS snapshots exceeding max age"
-  description   = "Detects EBS snapshots exceeding max age and responds with your chosen action."
+pipeline "detect_and_correct_ebs_snapshots_exceeding_max_age" {
+  title         = "Detect & correct EBS snapshots exceeding max age"
+  description   = "Detects EBS snapshots exceeding max age and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
@@ -76,7 +76,7 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_snapshots_exceeding_max_age
+    pipeline = pipeline.correct_ebs_snapshots_exceeding_max_age
     args     = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -88,9 +88,9 @@ pipeline "detect_and_respond_to_ebs_snapshots_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
-  title         = "Respond to EBS snapshots exceeding max age"
-  description   = "Responds to a collection of EBS snapshots exceeding max age."
+pipeline "correct_ebs_snapshots_exceeding_max_age" {
+  title         = "Corrects EBS snapshots exceeding max age"
+  description   = "Runs corrective action on a collection of EBS snapshots exceeding max age."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
@@ -142,10 +142,10 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
     value = {for row in param.items : row.snapshot_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_snapshot_exceeding_max_age
+    pipeline        = pipeline.correct_ebs_snapshot_exceeding_max_age
     args            = {
       title                    = each.value.title
       snapshot_id              = each.value.snapshot_id
@@ -160,9 +160,9 @@ pipeline "respond_to_ebs_snapshots_exceeding_max_age" {
   }
 }
 
-pipeline "respond_to_ebs_snapshot_exceeding_max_age" {
-  title         = "Respond to EBS snapshot exceeding max age"
-  description   = "Responds to an EBS snapshot exceeding max age."
+pipeline "correct_ebs_snapshot_exceeding_max_age" {
+  title         = "Correct one EBS snapshot exceeding max age"
+  description   = "Runs corrective action on an EBS snapshot exceeding max age."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {

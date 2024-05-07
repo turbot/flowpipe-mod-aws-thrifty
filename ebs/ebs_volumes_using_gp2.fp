@@ -12,9 +12,9 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_volumes_using_gp2" {
-  title         = "Detect and respond to EBS volumes using gp2"
-  description   = "Detects EBS volumes using gp2 and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_using_gp2" {
+  title         = "Detect & correct EBS volumes using gp2"
+  description   = "Detects EBS volumes using gp2 and runs your chosen action."
 
   enabled  = var.ebs_volumes_using_gp2_trigger_enabled
   schedule = var.ebs_volumes_using_gp2_trigger_schedule
@@ -22,16 +22,16 @@ trigger "query" "detect_and_respond_to_ebs_volumes_using_gp2" {
   sql      = local.ebs_volumes_using_gp2_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_using_gp2
+    pipeline = pipeline.correct_ebs_volumes_using_gp2
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
-  title         = "Detect and respond to EBS volumes using gp2"
-  description   = "Detects EBS volumes using gp2 and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_using_gp2" {
+  title         = "Detect & correct EBS volumes using gp2"
+  description   = "Detects EBS volumes using gp2 and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
@@ -76,7 +76,7 @@ pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_using_gp2
+    pipeline = pipeline.correct_ebs_volumes_using_gp2
     args     = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -88,9 +88,9 @@ pipeline "detect_and_respond_to_ebs_volumes_using_gp2" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_using_gp2" {
-  title         = "Respond to EBS volumes using gp2"
-  description   = "Responds to a collection of EBS volumes using gp2."
+pipeline "correct_ebs_volumes_using_gp2" {
+  title         = "Corrects EBS volumes using gp2"
+  description   = "Runs corrective action on a collection of EBS volumes using gp2."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
@@ -142,10 +142,10 @@ pipeline "respond_to_ebs_volumes_using_gp2" {
     value = {for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_using_gp2
+    pipeline        = pipeline.correct_ebs_volume_using_gp2
     args            = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -160,9 +160,9 @@ pipeline "respond_to_ebs_volumes_using_gp2" {
   }
 }
 
-pipeline "respond_to_ebs_volume_using_gp2" {
-  title         = "Respond to EBS volume using gp2"
-  description   = "Responds to an EBS volume using gp2."
+pipeline "correct_ebs_volume_using_gp2" {
+  title         = "Correct one EBS volume using gp2"
+  description   = "Runs corrective action on an EBS volume using gp2."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {

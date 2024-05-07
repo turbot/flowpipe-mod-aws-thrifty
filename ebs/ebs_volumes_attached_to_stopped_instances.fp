@@ -31,9 +31,9 @@ where
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Detect and respond to EBS volumes attached to stopped instances"
-  description = "Detects EBS volumes which are attached to stopped instances and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
+  title       = "Detect & correct EBS volumes attached to stopped instances"
+  description = "Detects EBS volumes which are attached to stopped instances and runs your chosen action."
 
   enabled  = var.ebs_volumes_attached_to_stopped_instances_trigger_enabled
   schedule = var.ebs_volumes_attached_to_stopped_instances_trigger_schedule
@@ -41,16 +41,16 @@ trigger "query" "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances
   sql      = local.ebs_volumes_attached_to_stopped_instances_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_attached_to_stopped_instances
+    pipeline = pipeline.correct_ebs_volumes_attached_to_stopped_instances
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Detect and respond to EBS volumes attached to stopped instances"
-  description = "Detects EBS volumes which are attached to stopped instances and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
+  title       = "Detect & correct EBS volumes attached to stopped instances"
+  description = "Detects EBS volumes which are attached to stopped instances and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
@@ -95,7 +95,7 @@ pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_attached_to_stopped_instances
+    pipeline = pipeline.correct_ebs_volumes_attached_to_stopped_instances
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -107,9 +107,9 @@ pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Respond to EBS volumes attached to stopped instances"
-  description = "Responds to a collection of EBS volumes which are attached to stopped instances."
+pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
+  title       = "Corrects EBS volumes attached to stopped instances"
+  description = "Runs corrective action on a collection of EBS volumes which are attached to stopped instances."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
@@ -161,10 +161,10 @@ pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
     value = { for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_attached_to_stopped_instance
+    pipeline        = pipeline.correct_ebs_volume_attached_to_stopped_instance
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -179,9 +179,9 @@ pipeline "respond_to_ebs_volumes_attached_to_stopped_instances" {
   }
 }
 
-pipeline "respond_to_ebs_volume_attached_to_stopped_instance" {
-  title       = "Respond to EBS volume attached to stopped instance"
-  description = "Responds to an EBS volume attached to stopped instance."
+pipeline "correct_ebs_volume_attached_to_stopped_instance" {
+  title       = "Correct one EBS volume attached to stopped instance"
+  description = "Runs corrective action on an EBS volume attached to stopped instance."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {

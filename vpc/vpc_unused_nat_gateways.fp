@@ -23,9 +23,9 @@ having
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_vpc_unused_nat_gateways" {
-  title       = "Detect and respond to unused NAT Gateways"
-  description = "Detects unused NAT Gateways and responds with your chosen action."
+trigger "query" "detect_and_correct_vpc_unused_nat_gateways" {
+  title       = "Detect & correct unused NAT Gateways"
+  description = "Detects unused NAT Gateways and runs your chosen action."
   //tags       = merge(local.vpc_common_tags, { class = "unused" })
 
   enabled  = var.vpc_unused_nat_gateways_trigger_enabled
@@ -34,16 +34,16 @@ trigger "query" "detect_and_respond_to_vpc_unused_nat_gateways" {
   sql      = local.vpc_unused_nat_gateways_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_vpc_unused_nat_gateways
+    pipeline = pipeline.correct_vpc_unused_nat_gateways
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_vpc_unused_nat_gateways" {
-  title       = "Detect and respond to unused NAT Gateways"
-  description = "Detects unused NAT Gateways and responds with your chosen action."
+pipeline "detect_and_correct_vpc_unused_nat_gateways" {
+  title       = "Detect & correct unused NAT Gateways"
+  description = "Detects unused NAT Gateways and runs your chosen action."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "database" {
@@ -88,7 +88,7 @@ pipeline "detect_and_respond_to_vpc_unused_nat_gateways" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_vpc_unused_nat_gateways
+    pipeline = pipeline.correct_vpc_unused_nat_gateways
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -100,9 +100,9 @@ pipeline "detect_and_respond_to_vpc_unused_nat_gateways" {
   }
 }
 
-pipeline "respond_to_vpc_unused_nat_gateways" {
-  title       = "Respond to unused NAT Gateways"
-  description = "Responds to a collection of NAT Gateways which are unused."
+pipeline "correct_vpc_unused_nat_gateways" {
+  title       = "Corrects unused NAT Gateways"
+  description = "Runs corrective action on a collection of NAT Gateways which are unused."
   // documentation = file("./vpc/unused_nat_gateways.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
@@ -155,10 +155,10 @@ pipeline "respond_to_vpc_unused_nat_gateways" {
     value = { for row in param.items : row.nat_gateway_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_unused_nat_gateway
+    pipeline        = pipeline.correct_unused_nat_gateway
     args = {
       title                    = each.value.title
       nat_gateway_id           = each.value.nat_gateway_id
@@ -173,9 +173,9 @@ pipeline "respond_to_vpc_unused_nat_gateways" {
   }
 }
 
-pipeline "respond_to_unused_nat_gateway" {
-  title       = "Respond to unused NAT Gateway"
-  description = "Responds to an unused NAT Gateway."
+pipeline "correct_unused_nat_gateway" {
+  title       = "Correct one unused NAT Gateway"
+  description = "Runs corrective action on an unused NAT Gateway."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {

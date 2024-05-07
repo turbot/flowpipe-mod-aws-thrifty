@@ -56,9 +56,9 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_ebs_volumes_with_low_usage" {
-  title       = "Detect and respond to EBS volumes with low usage"
-  description = "Detects EBS volumes with low usage and responds with your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_with_low_usage" {
+  title       = "Detect & correct EBS volumes with low usage"
+  description = "Detects EBS volumes with low usage and runs your chosen action."
 
   enabled  = var.ebs_volumes_with_low_usage_trigger_enabled
   schedule = var.ebs_volumes_with_low_usage_trigger_schedule
@@ -66,16 +66,16 @@ trigger "query" "detect_and_respond_to_ebs_volumes_with_low_usage" {
   sql      = local.ebs_volumes_with_low_usage_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_ebs_volumes_with_low_usage
+    pipeline = pipeline.correct_ebs_volumes_with_low_usage
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_ebs_volumes_with_low_usage" {
-  title       = "Detect and respond to EBS volumes with low usage"
-  description = "Detects EBS volumes with low usage and responds with your chosen action."
+pipeline "detect_and_correct_ebs_volumes_with_low_usage" {
+  title       = "Detect & correct EBS volumes with low usage"
+  description = "Detects EBS volumes with low usage and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
@@ -120,7 +120,7 @@ pipeline "detect_and_respond_to_ebs_volumes_with_low_usage" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_ebs_volumes_with_low_usage
+    pipeline = pipeline.correct_ebs_volumes_with_low_usage
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -132,9 +132,9 @@ pipeline "detect_and_respond_to_ebs_volumes_with_low_usage" {
   }
 }
 
-pipeline "respond_to_ebs_volumes_with_low_usage" {
-  title       = "Respond to EBS volumes with low usage"
-  description = "Responds to a collection of EBS volumes with low usage."
+pipeline "correct_ebs_volumes_with_low_usage" {
+  title       = "Corrects EBS volumes with low usage"
+  description = "Runs corrective action on a collection of EBS volumes with low usage."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
@@ -186,10 +186,10 @@ pipeline "respond_to_ebs_volumes_with_low_usage" {
     value = { for row in param.items : row.volume_id => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_ebs_volume_with_low_usage
+    pipeline        = pipeline.correct_ebs_volume_with_low_usage
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -204,9 +204,9 @@ pipeline "respond_to_ebs_volumes_with_low_usage" {
   }
 }
 
-pipeline "respond_to_ebs_volume_with_low_usage" {
-  title       = "Respond to EBS volume with low usage"
-  description = "Responds to an EBS volume with low usage."
+pipeline "correct_ebs_volume_with_low_usage" {
+  title       = "Correct one EBS volume with low usage"
+  description = "Runs corrective action on an EBS volume with low usage."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
