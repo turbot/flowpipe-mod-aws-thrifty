@@ -10,49 +10,49 @@ variable "rds_running_db_instance_age_max_days" {
   default     = 90
 }
 
-variable "rds_db_instance_log_running_default_response_option" {
+variable "rds_db_instance_log_running_default_action" {
   type        = string
   description = "The default response to use when RDS DB instances are long running."
   default     = "notify"
 }
 
-variable "rds_db_instance_log_running_enabled_response_options" {
+variable "rds_db_instance_log_running_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_instance"]
 }
 
-variable "rds_db_instance_without_graviton_default_response_option" {
+variable "rds_db_instance_without_graviton_default_action" {
   type        = string
   description = "The default response to use when there are RDS DB instances without graviton processor."
   default     = "notify"
 }
 
-variable "rds_db_instance_without_graviton_enabled_response_options" {
+variable "rds_db_instance_without_graviton_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_instance"]
 }
 
-variable "rds_db_instance_older_generation_default_response_option" {
+variable "rds_db_instance_older_generation_default_action" {
   type        = string
   description = "The default response to use when there are older generation RDS DB instances."
   default     = "notify"
 }
 
-variable "rds_db_instance_older_generation_enabled_response_options" {
+variable "rds_db_instance_older_generation_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_instance"]
 }
 
-variable "rds_db_instance_low_connection_count_default_response_option" {
+variable "rds_db_instance_low_connection_count_default_action" {
   type        = string
   description = "The default response to use when there are RDS DB instances with low connection count."
   default     = "notify"
 }
 
-variable "rds_db_instance_low_connection_count_enabled_response_options" {
+variable "rds_db_instance_low_connection_count_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_instance"]

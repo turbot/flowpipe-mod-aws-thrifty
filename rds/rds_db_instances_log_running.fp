@@ -12,9 +12,9 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_respond_to_rds_db_instances_log_running" {
-  title       = "Detect and respond to long running RDS DB instances"
-  description = "Detects long running RDS DB instances and responds with your chosen action."
+trigger "query" "detect_and_correct_to_rds_db_instances_log_running" {
+  title       = "Detect and correct to long running RDS DB instances"
+  description = "Detects long running RDS DB instances and runs your chosen action."
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
@@ -22,16 +22,16 @@ trigger "query" "detect_and_respond_to_rds_db_instances_log_running" {
   sql      = local.rds_db_instances_log_running_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_rds_db_instances_log_running
+    pipeline = pipeline.correct_to_rds_db_instances_log_running
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_rds_db_instances_log_running" {
-  title       = "Detect and respond to long running RDS DB instances"
-  description = "Detects long running RDS DB instances and responds with your chosen action."
+pipeline "detect_and_correct_to_rds_db_instances_log_running" {
+  title       = "Detect and correct to long running RDS DB instances"
+  description = "Detects long running RDS DB instances and runs your chosen action."
 
   param "database" {
     type        = string
@@ -57,16 +57,16 @@ pipeline "detect_and_respond_to_rds_db_instances_log_running" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_log_running_default_response_option
+    default     = var.rds_db_instance_log_running_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_log_running_enabled_response_options
+    default     = var.rds_db_instance_log_running_enabled_actions
   }
 
   step "query" "detect" {
@@ -75,21 +75,21 @@ pipeline "detect_and_respond_to_rds_db_instances_log_running" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_rds_db_instances_log_running
+    pipeline = pipeline.correct_to_rds_db_instances_log_running
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_rds_db_instances_log_running" {
-  title       = "Respond to long running RDS DB instances"
-  description = "Responds to a collection of long running RDS DB instances."
+pipeline "correct_to_rds_db_instances_log_running" {
+  title       = "Corrects long running RDS DB instances"
+  description = "Runs corrective action on a collection of long running RDS DB instances."
 
   param "items" {
     type = list(object({
@@ -118,16 +118,16 @@ pipeline "respond_to_rds_db_instances_log_running" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_log_running_default_response_option
+    default     = var.rds_db_instance_log_running_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_log_running_enabled_response_options
+    default     = var.rds_db_instance_log_running_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -140,27 +140,27 @@ pipeline "respond_to_rds_db_instances_log_running" {
     value = { for row in param.items : row.db_instance_identifier => row }
   }
 
-  step "pipeline" "respond_to_item" {
+  step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_rds_db_instance_log_running
+    pipeline        = pipeline.correct_to_rds_db_instance_log_running
     args = {
-      title                    = each.value.title
-      db_instance_identifier   = each.value.db_instance_identifier
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      title                  = each.value.title
+      db_instance_identifier = each.value.db_instance_identifier
+      region                 = each.value.region
+      cred                   = each.value.cred
+      notifier               = param.notifier
+      notification_level     = param.notification_level
+      approvers              = param.approvers
+      default_action         = param.default_action
+      enabled_actions        = param.enabled_actions
     }
   }
 }
 
-pipeline "respond_to_rds_db_instance_log_running" {
-  title       = "Respond to long running RDS DB instance"
-  description = "Responds to a long running RDS DB instance."
+pipeline "correct_to_rds_db_instance_log_running" {
+  title       = "Correct one long running RDS DB instance"
+  description = "Runs corrective action on a long running RDS DB instance."
 
   param "title" {
     type        = string
@@ -200,27 +200,27 @@ pipeline "respond_to_rds_db_instance_log_running" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_log_running_default_response_option
+    default     = var.rds_db_instance_log_running_default_action
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_log_running_enabled_response_options
+    default     = var.rds_db_instance_log_running_enabled_actions
   }
 
   step "pipeline" "respond" {
     pipeline = approval.pipeline.respond_action_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected long running RDS DB Instance ${param.title}."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected long running RDS DB Instance ${param.title}."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       response_options = {
         "skip" = {
           label        = "Skip"
