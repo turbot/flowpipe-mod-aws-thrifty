@@ -1,3 +1,17 @@
+locals {
+  s3_buckets_without_lifecycle_policy_query = <<-EOQ
+  select
+    concat(name, ' [', account_id, ']') as title,
+    name,
+    region,
+    _ctx ->> 'connection_name' as cred
+  from
+    aws_s3_bucket
+  where
+    lifecycle_rules is null;
+  EOQ
+}
+
 trigger "query" "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
   title       = "Detect and respond to S3 buckets without lifecycle policy"
   description = "Detects S3 buckets which do not have a lifecycle policy and responds with your chosen action."
@@ -5,7 +19,7 @@ trigger "query" "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = file("./s3/s3_buckets_without_lifecycle_policy.sql")
+  sql      = local.s3_buckets_without_lifecycle_policy_query
 
   capture "insert" {
     pipeline = pipeline.respond_to_s3_buckets_without_lifecycle_policy
@@ -64,7 +78,7 @@ pipeline "detect_and_respond_to_s3_buckets_without_lifecycle_policy" {
 
   step "query" "detect" {
     database = param.database
-    sql      = file("./s3/s3_buckets_without_lifecycle_policy.sql")
+    sql      = local.s3_buckets_without_lifecycle_policy_query
   }
 
   step "pipeline" "respond" {

@@ -1,4 +1,18 @@
-trigger "query" "ebs_volumes_unattached" {
+locals {
+  ebs_volumes_unattached_query = <<-EOQ
+  select
+    concat(volume_id, ' [', region, '/', account_id, ']') as title,
+    volume_id,
+    region,
+    _ctx ->> 'connection_name' as cred
+  from
+    aws_ebs_volume
+  where
+    jsonb_array_length(attachments) = 0;
+  EOQ
+}
+
+trigger "query" "detect_and_respond_to_ebs_volumes_unattached" {
   title       = "Detect and respond to EBS volumes unattached"
   description = "Detects EBS volumes which are unattached and responds with your chosen action."
   //tags          = merge(local.ebs_common_tags, { class = "unused" })
@@ -6,7 +20,7 @@ trigger "query" "ebs_volumes_unattached" {
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = file("./ebs/ebs_volumes_unattached.sql")
+  sql      = local.ebs_volumes_unattached_query
 
   capture "insert" {
     pipeline = pipeline.respond_to_ebs_volumes_unattached
@@ -59,7 +73,7 @@ pipeline "detect_and_respond_to_ebs_volumes_unattached" {
 
   step "query" "detect" {
     database = param.database
-    sql      = file("./ebs/ebs_volumes_unattached.sql")
+    sql      = local.ebs_volumes_unattached_query
   }
 
   step "pipeline" "respond" {

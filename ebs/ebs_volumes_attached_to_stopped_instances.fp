@@ -1,11 +1,44 @@
-trigger "query" "ebs_volumes_attached_to_stopped_instances" {
+locals {
+  ebs_volumes_attached_to_stopped_instances_query = <<-EOQ
+with vols_and_instances as (
+  select
+    v.volume_id,
+    i.instance_id,
+    v.region,
+    v.account_id,
+    v._ctx,
+    bool_or(i.instance_state = 'stopped') as has_stopped_instances
+  from
+    aws_ebs_volume as v
+    left join jsonb_array_elements(v.attachments) as va on true
+    left join aws_ec2_instance as i on va ->> 'InstanceId' = i.instance_id
+  group by
+    v.volume_id,
+    i.instance_id,
+    v.region,
+    v.account_id,
+    v._ctx
+)
+select
+  concat(volume_id, ' [', region, '/', account_id, ']') as title,
+  volume_id,
+  region,
+  _ctx ->> 'connection_name' as cred
+from
+  vols_and_instances
+where
+  has_stopped_instances = true;
+  EOQ
+}
+
+trigger "query" "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
   title       = "Detect and respond to EBS volumes attached to stopped instances"
   description = "Detects EBS volumes which are attached to stopped instances and responds with your chosen action."
 
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = file("./ebs/ebs_volumes_attached_to_stopped_instances.sql")
+  sql      = local.ebs_volumes_attached_to_stopped_instances_query
 
   capture "insert" {
     pipeline = pipeline.respond_to_ebs_volumes_attached_to_stopped_instances
@@ -58,7 +91,7 @@ pipeline "detect_and_respond_to_ebs_volumes_attached_to_stopped_instances" {
 
   step "query" "detect" {
     database = param.database
-    sql      = file("./ebs/ebs_volumes_attached_to_stopped_instances.sql")
+    sql      = local.ebs_volumes_attached_to_stopped_instances_query
   }
 
   step "pipeline" "respond" {

@@ -1,3 +1,17 @@
+locals {
+  ebs_volumes_using_io1_query = <<-EOQ
+  select
+    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, '/', availability_zone, ']') as title,
+    volume_id,
+    region,
+    _ctx ->> 'connection_name' as cred
+  from
+    aws_ebs_volume
+  where
+    volume_type = 'io1';
+  EOQ
+}
+
 trigger "query" "detect_and_respond_to_ebs_volumes_using_io1" {
   title         = "Detect and respond to EBS volumes using io1"
   description   = "Detects EBS volumes using io1 and responds with your chosen action."
@@ -5,7 +19,7 @@ trigger "query" "detect_and_respond_to_ebs_volumes_using_io1" {
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = file("./ebs/ebs_volumes_using_io1.sql")
+  sql      = local.ebs_volumes_using_io1_query
 
   capture "insert" {
     pipeline = pipeline.respond_to_ebs_volumes_using_io1
@@ -58,7 +72,7 @@ pipeline "detect_and_respond_to_ebs_volumes_using_io1" {
 
   step "query" "detect" {
     database = param.database
-    sql      = file("./ebs/ebs_volumes_using_io1.sql")
+    sql      = local.ebs_volumes_using_io1_query
   }
 
   step "pipeline" "respond" {

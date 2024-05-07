@@ -1,4 +1,18 @@
-trigger "query" "unattached_elastic_ip_addresses" {
+locals {
+  vpc_unattached_elastic_ip_addresses_query = <<-EOQ
+select
+  concat(allocation_id, ' [', region, '/', account_id, ']') as title,
+  allocation_id,
+  region,
+  _ctx ->> 'connection_name' as cred
+from
+  aws_vpc_eip
+where
+  association_id is null;
+  EOQ
+}
+
+trigger "query" "detect_and_respond_to_vpc_unattached_elastic_ip_addresses" {
   title       = "Detect and respond to unattached elastic IP addresses(EIPs)"
   description = "Detects unattached elastic IP addresses and responds with your chosen action."
   //tags          = merge(local.vpc_common_tags, { class = "unused" })
@@ -6,20 +20,19 @@ trigger "query" "unattached_elastic_ip_addresses" {
   enabled  = false
   schedule = var.default_query_trigger_schedule
   database = var.database
-  sql      = file("./vpc/unattached_elastic_ip_addresses.sql")
+  sql      = local.vpc_unattached_elastic_ip_addresses_query
 
   capture "insert" {
-    pipeline = pipeline.respond_to_unattached_elastic_ip_addresses
+    pipeline = pipeline.respond_to_vpc_unattached_elastic_ip_addresses
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_respond_to_unattached_elastic_ip_addresses" {
+pipeline "detect_and_respond_to_vpc_unattached_elastic_ip_addresses" {
   title       = "Detect and respond to unattached elastic IP addresses(EIPs)"
   description = "Detects unattached elastic IP addresses and responds with your chosen action."
-  // documentation = file("./vpc/unattached_elastic_ip_addresses.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "database" {
@@ -60,11 +73,11 @@ pipeline "detect_and_respond_to_unattached_elastic_ip_addresses" {
 
   step "query" "detect" {
     database = param.database
-    sql      = file("./vpc/unattached_elastic_ip_addresses.sql")
+    sql      = local.vpc_unattached_elastic_ip_addresses_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.respond_to_unattached_elastic_ip_addresses
+    pipeline = pipeline.respond_to_vpc_unattached_elastic_ip_addresses
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -76,7 +89,7 @@ pipeline "detect_and_respond_to_unattached_elastic_ip_addresses" {
   }
 }
 
-pipeline "respond_to_unattached_elastic_ip_addresses" {
+pipeline "respond_to_vpc_unattached_elastic_ip_addresses" {
   title       = "Respond to unattached elastic IP addresses"
   description = "Responds to a collection of elastic IP addresses which are unattached."
   // documentation = file("./vpc/unattached_elastic_ip_addresses.md")
@@ -134,7 +147,7 @@ pipeline "respond_to_unattached_elastic_ip_addresses" {
   step "pipeline" "respond_to_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.respond_to_unattached_elastic_ip_address
+    pipeline        = pipeline.respond_to_vpc_unattached_elastic_ip_address
     args = {
       title                    = each.value.title
       allocation_id            = each.value.allocation_id
@@ -149,10 +162,9 @@ pipeline "respond_to_unattached_elastic_ip_addresses" {
   }
 }
 
-pipeline "respond_to_unattached_elastic_ip_address" {
+pipeline "respond_to_vpc_unattached_elastic_ip_address" {
   title       = "Respond to elastic IP address unattached"
   description = "Responds to an elastic IP address unattached."
-  // documentation = file("./vpc/unattached_elastic_ip_addresses.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
