@@ -17,8 +17,8 @@ trigger "query" "detect_and_correct_lambda_functions_without_graviton" {
   title       = "Detect & correct Lambda functions without graviton processor"
   description = "Detects Lambda functions without graviton processor and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.lambda_functions_without_graviton_trigger_enabled
+  schedule = var.lambda_functions_without_graviton_trigger_schedule
   database = var.database
   sql      = local.lambda_functions_without_graviton_query
 
@@ -221,7 +221,7 @@ pipeline "correct_lambda_function_without_graviton" {
   }
 
   step "pipeline" "respond" {
-    pipeline = approval.pipeline.respond_action_handler
+    pipeline = detect_correct.pipeline.correction_handler
     args     = {
       notifier                  = param.notifier
       notification_level        = param.notification_level
@@ -234,7 +234,7 @@ pipeline "correct_lambda_function_without_graviton" {
           label  = "Skip"
           value  = "skip"
           style  = local.StyleInfo
-          pipeline_ref  = local.approval_pipeline_skipped_action_notification
+          pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose

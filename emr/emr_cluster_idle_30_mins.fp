@@ -37,8 +37,8 @@ trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
   title       = "Detect and respond EMR clusters idle for more than 30 mins"
   description = "Detects EMR clusters idle for more than 30 mins and responds with your chosen action."
 
-  enabled  = false
-  schedule = var.default_query_trigger_schedule
+  enabled  = var.emr_clusters_idle_30_mins_trigger_enabled
+  schedule = var.emr_clusters_idle_30_mins_trigger_schedule
   database = var.database
   sql      = local.emr_clusters_idle_30_mins_query
 
@@ -241,7 +241,7 @@ pipeline "correct_emr_cluster_idle_30_mins" {
   }
 
   step "pipeline" "respond" {
-    pipeline = approval.pipeline.respond_action_handler
+    pipeline = detect_correct.pipeline.correction_handler
     args     = {
       notifier                  = param.notifier
       notification_level        = param.notification_level
@@ -254,7 +254,7 @@ pipeline "correct_emr_cluster_idle_30_mins" {
           label  = "Skip"
           value  = "skip"
           style  = local.StyleInfo
-          pipeline_ref  = local.approval_pipeline_skipped_action_notification
+          pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose

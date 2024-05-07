@@ -257,3 +257,25 @@ variable "vpc_unused_nat_gateways_trigger_schedule" {
   type    = string
   default = "15m"
 }
+
+// EMR
+variable "emr_clusters_idle_30_mins_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "emr_clusters_idle_30_mins_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+// Lambda
+variable "lambda_functions_without_graviton_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "lambda_functions_without_graviton_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
