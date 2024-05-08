@@ -1,38 +1,49 @@
 locals {
-  vpc_unattached_elastic_ip_addresses_query = <<-EOQ
+  vpc_nat_gateways_unused_query = <<-EOQ
 select
-  concat(allocation_id, ' [', region, '/', account_id, ']') as title,
-  allocation_id,
-  region,
-  _ctx ->> 'connection_name' as cred
+  concat(nat.nat_gateway_id, ' [', nat.region, '/', nat.account_id, ']') as title,
+  nat.nat_gateway_id,
+  nat.region,
+  nat._ctx ->> 'connection_name' as cred
 from
-  aws_vpc_eip
+  aws_vpc_nat_gateway as nat
+left join
+  aws_vpc_nat_gateway_metric_bytes_out_to_destination as dest
+on
+  nat.nat_gateway_id = dest.nat_gateway_id
 where
-  association_id is null;
+  nat.state = 'available'
+group by
+  nat.nat_gateway_id,
+  nat.region,
+  nat.account_id,
+  nat._ctx ->> 'connection_name'
+having
+  sum(coalesce(dest.average, 0)) = 0;
   EOQ
 }
 
-trigger "query" "detect_and_correct_vpc_unattached_elastic_ip_addresses" {
-  title       = "Detect & correct unattached elastic IP addresses(EIPs)"
-  description = "Detects unattached elastic IP addresses and runs your chosen action."
-  //tags          = merge(local.vpc_common_tags, { class = "unused" })
+trigger "query" "detect_and_correct_vpc_nat_gateways_unused" {
+  title       = "Detect & correct unused NAT Gateways"
+  description = "Detects unused NAT Gateways and runs your chosen action."
+  //tags       = merge(local.vpc_common_tags, { class = "unused" })
 
-  enabled  = var.vpc_unattached_elastic_ip_addresses_trigger_enabled
-  schedule = var.vpc_unattached_elastic_ip_addresses_trigger_schedule
+  enabled  = var.vpc_nat_gateways_unused_trigger_enabled
+  schedule = var.vpc_nat_gateways_unused_trigger_schedule
   database = var.database
-  sql      = local.vpc_unattached_elastic_ip_addresses_query
+  sql      = local.vpc_nat_gateways_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_vpc_unattached_elastic_ip_addresses
+    pipeline = pipeline.correct_vpc_nat_gateways_unused
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_vpc_unattached_elastic_ip_addresses" {
-  title       = "Detect & correct unattached elastic IP addresses(EIPs)"
-  description = "Detects unattached elastic IP addresses and runs your chosen action."
+pipeline "detect_and_correct_vpc_nat_gateways_unused" {
+  title       = "Detect & correct unused NAT Gateways"
+  description = "Detects unused NAT Gateways and runs your chosen action."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "database" {
@@ -62,22 +73,22 @@ pipeline "detect_and_correct_vpc_unattached_elastic_ip_addresses" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unattached_elastic_ip_addresses_default_action
+    default     = var.vpc_nat_gateways_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unattached_elastic_ip_addresses_enabled_actions
+    default     = var.vpc_nat_gateways_unused_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.vpc_unattached_elastic_ip_addresses_query
+    sql      = local.vpc_nat_gateways_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_vpc_unattached_elastic_ip_addresses
+    pipeline = pipeline.correct_vpc_nat_gateways_unused
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
@@ -89,18 +100,18 @@ pipeline "detect_and_correct_vpc_unattached_elastic_ip_addresses" {
   }
 }
 
-pipeline "correct_vpc_unattached_elastic_ip_addresses" {
-  title       = "Corrects unattached elastic IP addresses"
-  description = "Runs corrective action on a collection of elastic IP addresses which are unattached."
-  // documentation = file("./vpc/unattached_elastic_ip_addresses.md")
+pipeline "correct_vpc_nat_gateways_unused" {
+  title       = "Corrects unused NAT Gateways"
+  description = "Runs corrective action on a collection of NAT Gateways which are unused."
+  // documentation = file("./vpc/unused_nat_gateways.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
-      title         = string
-      allocation_id = string
-      region        = string
-      cred          = string
+      title          = string
+      nat_gateway_id = string
+      region         = string
+      cred           = string
     }))
   }
 
@@ -125,32 +136,32 @@ pipeline "correct_vpc_unattached_elastic_ip_addresses" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unattached_elastic_ip_addresses_default_action
+    default     = var.vpc_nat_gateways_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unattached_elastic_ip_addresses_enabled_actions
+    default     = var.vpc_nat_gateways_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} elastic IP addresses unattached."
+    text     = "Detected ${length(param.items)} unused NAT Gateways."
   }
 
   step "transform" "items_by_id" {
-    value = { for row in param.items : row.allocation_id => row }
+    value = { for row in param.items : row.nat_gateway_id => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_vpc_unattached_elastic_ip_address
+    pipeline        = pipeline.correct_one_vpc_nat_gateway_unused
     args = {
       title                    = each.value.title
-      allocation_id            = each.value.allocation_id
+      nat_gateway_id           = each.value.nat_gateway_id
       region                   = each.value.region
       cred                     = each.value.cred
       notifier                 = param.notifier
@@ -162,9 +173,9 @@ pipeline "correct_vpc_unattached_elastic_ip_addresses" {
   }
 }
 
-pipeline "correct_vpc_unattached_elastic_ip_address" {
-  title       = "Correct one elastic IP address unattached"
-  description = "Runs corrective action on an elastic IP address unattached."
+pipeline "correct_one_vpc_nat_gateway_unused" {
+  title       = "Correct one unused NAT Gateway"
+  description = "Runs corrective action on an unused NAT Gateway."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
@@ -172,9 +183,9 @@ pipeline "correct_vpc_unattached_elastic_ip_address" {
     description = local.TitleDescription
   }
 
-  param "allocation_id" {
+  param "nat_gateway_id" {
     type        = string
-    description = "The ID representing the allocation of the address for use with EC2-VPC."
+    description = "The ID representing the NAT Gateway in the VPC."
   }
 
   param "region" {
@@ -208,13 +219,13 @@ pipeline "correct_vpc_unattached_elastic_ip_address" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.unattached_elastic_ip_addresses_default_action
+    default     = var.vpc_nat_gateways_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.unattached_elastic_ip_addresses_enabled_actions
+    default     = var.vpc_nat_gateways_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -223,7 +234,7 @@ pipeline "correct_vpc_unattached_elastic_ip_address" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      detect_msg               = "Detected elastic IP address ${param.title} unattached."
+      detect_msg               = "Detected unused NAT Gateway ${param.title}."
       default_action  = param.default_action
       enabled_actions = param.enabled_actions
       actions = {
@@ -235,31 +246,31 @@ pipeline "correct_vpc_unattached_elastic_ip_address" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose
-            text     = "Skipped elastic IP address ${param.title} unattached."
+            text     = "Skipped unused NAT Gateway ${param.title}."
           }
           success_msg = ""
           error_msg   = ""
         },
-        "release" = {
-          label        = "Release"
-          value        = "release"
-          style        = local.StyleOk
-          pipeline_ref = local.aws_pipeline_release_eip
+        "delete" = {
+          label        = "Delete"
+          value        = "delete"
+          style        = local.StyleAlert
+          pipeline_ref = local.aws_pipeline_delete_nat_gateway
           pipeline_args = {
-            allocation_id = param.allocation_id
-            region        = param.region
-            cred          = param.cred
+            nat_gateway_id = param.nat_gateway_id
+            region         = param.region
+            cred           = param.cred
           }
-          success_msg = "Released elastic IP address ${param.title}."
-          error_msg   = "Error releasing elastic IP address ${param.title}."
+          success_msg = "Deleted NAT Gateway ${param.title}."
+          error_msg   = "Error deleting NAT Gateway ${param.title}."
         }
       }
     }
   }
 }
 
-pipeline "mock_aws_pipeline_release_eip" {
-  param "allocation_id" {
+pipeline "mock_aws_pipeline_delete_nat_gateway" {
+  param "nat_gateway_id" {
     type        = string
   }
 
@@ -272,6 +283,6 @@ pipeline "mock_aws_pipeline_release_eip" {
   }
 
   output "result" {
-    value = "Mocked: Release EIP [Allocation ID: ${param.allocation_id}, Region: ${param.region}, Cred: ${param.cred}]"
+    value = "Mocked: Delete NAT Gateway [GatewayID: ${param.nat_gateway_id}, Region: ${param.region}, Cred: ${param.cred}]"
   }
 }

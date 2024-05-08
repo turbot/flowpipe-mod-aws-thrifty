@@ -146,7 +146,7 @@ pipeline "correct_ebs_volumes_unattached" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ebs_volume_unattached
+    pipeline        = pipeline.correct_one_ebs_volume_unattached
     args = {
       title              = each.value.title
       volume_id          = each.value.volume_id
@@ -161,7 +161,7 @@ pipeline "correct_ebs_volumes_unattached" {
   }
 }
 
-pipeline "correct_ebs_volume_unattached" {
+pipeline "correct_one_ebs_volume_unattached" {
   title         = "Correct one EBS volume unattached"
   description   = "Runs corrective action on an EBS volume unattached."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })

@@ -150,7 +150,7 @@ pipeline "correct_ec2_instances_exceeding_max_age" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ec2_instance_exceeding_max_age
+    pipeline        = pipeline.correct_one_ec2_instance_exceeding_max_age
     args            = {
       title            = each.value.title
       instance_id      = each.value.instance_id
@@ -165,7 +165,7 @@ pipeline "correct_ec2_instances_exceeding_max_age" {
   }
 }
 
-pipeline "correct_ec2_instance_exceeding_max_age" {
+pipeline "correct_one_ec2_instance_exceeding_max_age" {
   title         = "Correct one EC2 instance exceeding max age"
   description   = "Runs corrective action on an EC2 instance exceeding max age."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })

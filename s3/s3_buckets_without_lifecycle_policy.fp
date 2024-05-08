@@ -158,7 +158,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_s3_bucket_without_lifecycle_policy
+    pipeline        = pipeline.correct_one_s3_bucket_without_lifecycle_policy
     args            = {
       title                    = each.value.title
       name                     = each.value.name
@@ -174,7 +174,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   }
 }
 
-pipeline "correct_s3_bucket_without_lifecycle_policy" {
+pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   title         = "Correct one S3 bucket without lifecycle policy"
   description   = "Runs corrective action on an individual S3 bucket which does not have a lifecycle policy."
   tags          = merge(local.s3_common_tags, { class = "managed" })

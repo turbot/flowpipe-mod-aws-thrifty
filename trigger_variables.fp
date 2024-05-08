@@ -238,22 +238,22 @@ variable "secretsmanager_secrets_unused_trigger_schedule" {
 }
 
 // VPC
-variable "vpc_unattached_elastic_ip_addresses_trigger_enabled" {
+variable "vpc_unattached_eips_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "vpc_unattached_elastic_ip_addresses_trigger_schedule" {
+variable "vpc_unattached_eips_trigger_scheduled" {
   type    = string
   default = "15m"
 }
 
-variable "vpc_unused_nat_gateways_trigger_enabled" {
+variable "vpc_nat_gateways_unused_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "vpc_unused_nat_gateways_trigger_schedule" {
+variable "vpc_nat_gateways_unused_trigger_schedule" {
   type    = string
   default = "15m"
 }

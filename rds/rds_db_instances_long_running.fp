@@ -22,7 +22,7 @@ trigger "query" "detect_and_correct_rds_db_instances_long_running" {
   sql      = local.rds_db_instances_long_running_query
 
   capture "insert" {
-    pipeline = pipeline.correct_to_rds_db_instances_long_running
+    pipeline = pipeline.correct_rds_db_instances_long_running
     args = {
       items = self.inserted_rows
     }
@@ -75,7 +75,7 @@ pipeline "detect_and_correct_rds_db_instances_long_running" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_to_rds_db_instances_long_running
+    pipeline = pipeline.correct_rds_db_instances_long_running
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -87,7 +87,7 @@ pipeline "detect_and_correct_rds_db_instances_long_running" {
   }
 }
 
-pipeline "correct_to_rds_db_instances_long_running" {
+pipeline "correct_rds_db_instances_long_running" {
   title       = "Corrects long running RDS DB instances"
   description = "Runs corrective action on a collection of long running RDS DB instances."
 
@@ -143,7 +143,7 @@ pipeline "correct_to_rds_db_instances_long_running" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_to_rds_db_instance_long_running
+    pipeline        = pipeline.correct_one_rds_db_instance_long_running
     args = {
       title                  = each.value.title
       db_instance_identifier = each.value.db_instance_identifier
@@ -158,7 +158,7 @@ pipeline "correct_to_rds_db_instances_long_running" {
   }
 }
 
-pipeline "correct_to_rds_db_instance_long_running" {
+pipeline "correct_one_rds_db_instance_long_running" {
   title       = "Correct one long running RDS DB instance"
   description = "Runs corrective action on a long running RDS DB instance."
 

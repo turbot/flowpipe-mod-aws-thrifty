@@ -149,7 +149,7 @@ pipeline "correct_ec2_instances_older_generation" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ec2_instance_older_generation
+    pipeline        = pipeline.correct_one_ec2_instance_older_generation
     args            = {
       title                      = each.value.title
       instance_id                = each.value.instance_id
@@ -164,7 +164,7 @@ pipeline "correct_ec2_instances_older_generation" {
   }
 }
 
-pipeline "correct_ec2_instance_older_generation" {
+pipeline "correct_one_ec2_instance_older_generation" {
   title         = "Correct one older generation EC2 instance"
   description   = "Runs corrective action on a older generation EC2 instance."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })

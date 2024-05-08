@@ -1,5 +1,5 @@
 locals {
-  ec2_network_load_balancer_unused_query = <<-EOQ
+  ec2_network_load_balancers_unused_query = <<-EOQ
     with target_resource as (
       select
         load_balancer_arn,
@@ -23,24 +23,24 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_ec2_network_load_balancer_unused" {
+trigger "query" "detect_and_correct_ec2_network_load_balancers_unused" {
   title       = "Detect & correct unused EC2 network load balancers"
   description = "Detects EC2 network load balancers that are unused."
 
   enabled  = var.ec2_network_load_balancer_unused_trigger_enabled
   schedule = var.ec2_network_load_balancer_unused_trigger_schedule
   database = var.database
-  sql      = local.ec2_network_load_balancer_unused_query
+  sql      = local.ec2_network_load_balancers_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ec2_network_load_balancer_unused
+    pipeline = pipeline.correct_ec2_network_load_balancers_unused
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ec2_network_load_balancer_unused" {
+pipeline "detect_and_correct_ec2_network_load_balancers_unused" {
   title         = "Detect & correct EC2 unused network load balancers"
   description   = "Detects unused EC2 network load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
@@ -85,7 +85,7 @@ pipeline "detect_and_correct_ec2_network_load_balancer_unused" {
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ec2_network_load_balancer_unused_query
+    sql      = local.ec2_network_load_balancers_unused_query
   }
 
   step "pipeline" "respond" {
@@ -161,7 +161,7 @@ pipeline "correct_ec2_network_load_balancers_unused" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ec2_network_load_balancer_unused
+    pipeline        = pipeline.correct_one_ec2_network_load_balancer_unused
     args            = {
       title                     = each.value.title
       arn                       = each.value.arn
@@ -177,7 +177,7 @@ pipeline "correct_ec2_network_load_balancers_unused" {
   }
 }
 
-pipeline "correct_ec2_network_load_balancer_unused" {
+pipeline "correct_one_ec2_network_load_balancer_unused" {
   title         = "Correct one unused EC2 network load balancer"
   description   = "Runs corrective action on an unused EC2 network load balance."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })

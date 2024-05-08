@@ -150,7 +150,7 @@ pipeline "correct_ec2_instances_without_graviton" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ec2_instance_without_graviton
+    pipeline        = pipeline.correct_one_ec2_instance_without_graviton
     args            = {
       title                      = each.value.title
       instance_id                = each.value.instance_id
@@ -165,8 +165,8 @@ pipeline "correct_ec2_instances_without_graviton" {
   }
 }
 
-pipeline "correct_ec2_instance_without_graviton" {
-  title         = "Correct one an EC2 instance without graviton processor"
+pipeline "correct_one_ec2_instance_without_graviton" {
+  title         = "Correct one EC2 instance without graviton"
   description   = "Runs corrective action on an EC2 instance without graviton processor."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 

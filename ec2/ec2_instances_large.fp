@@ -150,7 +150,7 @@ pipeline "correct_ec2_instances_large" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ec2_instance_large
+    pipeline        = pipeline.correct_one_ec2_instance_large
     args            = {
       title                     = each.value.title
       instance_id               = each.value.instance_id
@@ -165,7 +165,7 @@ pipeline "correct_ec2_instances_large" {
   }
 }
 
-pipeline "correct_ec2_instance_large" {
+pipeline "correct_one_ec2_instance_large" {
   title         = "Correct one large EC2 instance"
   description   = "Runs corrective action on a large EC2 instance."
   // tags          = merge(local.ec2_common_tags, { class = "deprecated" })

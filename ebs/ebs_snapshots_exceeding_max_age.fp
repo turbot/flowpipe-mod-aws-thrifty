@@ -145,7 +145,7 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ebs_snapshot_exceeding_max_age
+    pipeline        = pipeline.correct_one_ebs_snapshot_exceeding_max_age
     args            = {
       title                    = each.value.title
       snapshot_id              = each.value.snapshot_id
@@ -160,7 +160,7 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
   }
 }
 
-pipeline "correct_ebs_snapshot_exceeding_max_age" {
+pipeline "correct_one_ebs_snapshot_exceeding_max_age" {
   title         = "Correct one EBS snapshot exceeding max age"
   description   = "Runs corrective action on an EBS snapshot exceeding max age."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })

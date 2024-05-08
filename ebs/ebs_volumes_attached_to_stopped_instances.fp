@@ -164,7 +164,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ebs_volume_attached_to_stopped_instance
+    pipeline        = pipeline.correct_one_ebs_volume_attached_to_stopped_instance
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -179,7 +179,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
   }
 }
 
-pipeline "correct_ebs_volume_attached_to_stopped_instance" {
+pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
   title       = "Correct one EBS volume attached to stopped instance"
   description = "Runs corrective action on an EBS volume attached to stopped instance."
   // tags          = merge(local.ebs_common_tags, { class = "deprecated" })

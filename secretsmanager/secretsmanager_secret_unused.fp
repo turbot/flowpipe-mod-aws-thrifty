@@ -145,7 +145,7 @@ pipeline "correct_secretsmanager_secrets_unused" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_secretsmanager_secret_unused
+    pipeline        = pipeline.correct_one_secretsmanager_secret_unused
     args            = {
       title                    = each.value.title
       name                     = each.value.name
@@ -160,7 +160,7 @@ pipeline "correct_secretsmanager_secrets_unused" {
   }
 }
 
-pipeline "correct_secretsmanager_secret_unused" {
+pipeline "correct_one_secretsmanager_secret_unused" {
   title         = "Correct one SecretsManager secret that are unused"
   description   = "Runs corrective action on a SecretsManager secret that are unused (not access in last n days)."
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })

@@ -39,7 +39,7 @@ trigger "query" "detect_and_correct_rds_db_instances_low_connection_count" {
   sql      = local.rds_db_instances_low_connection_count_query
 
   capture "insert" {
-    pipeline = pipeline.correct_to_rds_db_instances_low_connection_count
+    pipeline = pipeline.correct_rds_db_instances_low_connection_count
     args = {
       items = self.inserted_rows
     }
@@ -92,7 +92,7 @@ pipeline "detect_and_correct_rds_db_instances_low_connection_count" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_to_rds_db_instances_low_connection_count
+    pipeline = pipeline.correct_rds_db_instances_low_connection_count
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -104,7 +104,7 @@ pipeline "detect_and_correct_rds_db_instances_low_connection_count" {
   }
 }
 
-pipeline "correct_to_rds_db_instances_low_connection_count" {
+pipeline "correct_rds_db_instances_low_connection_count" {
   title       = "Corrects RDS DB instances with low connection count"
   description = "Runs corrective action on a collection of RDS DB instances with low connection count."
 
@@ -160,7 +160,7 @@ pipeline "correct_to_rds_db_instances_low_connection_count" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_to_rds_db_instance_low_connection_count
+    pipeline        = pipeline.correct_one_rds_db_instance_low_connection_count
     args = {
       title                  = each.value.title
       db_instance_identifier = each.value.db_instance_identifier
@@ -175,7 +175,7 @@ pipeline "correct_to_rds_db_instances_low_connection_count" {
   }
 }
 
-pipeline "correct_to_rds_db_instance_low_connection_count" {
+pipeline "correct_one_rds_db_instance_low_connection_count" {
   title       = "Correct an RDS DB instance with low connection count"
   description = "Runs corrective action on an RDS DB instance with low connection count."
 

@@ -189,7 +189,7 @@ pipeline "correct_ebs_volumes_with_low_usage" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ebs_volume_with_low_usage
+    pipeline        = pipeline.correct_one_ebs_volume_with_low_usage
     args = {
       title                    = each.value.title
       volume_id                = each.value.volume_id
@@ -204,7 +204,7 @@ pipeline "correct_ebs_volumes_with_low_usage" {
   }
 }
 
-pipeline "correct_ebs_volume_with_low_usage" {
+pipeline "correct_one_ebs_volume_with_low_usage" {
   title       = "Correct one EBS volume with low usage"
   description = "Runs corrective action on an EBS volume with low usage."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
