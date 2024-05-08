@@ -258,24 +258,6 @@ pipeline "correct_one_vpc_eip_unattached" {
   }
 }
 
-pipeline "mock_aws_pipeline_release_eip" {
-  param "allocation_id" {
-    type        = string
-  }
-
-  param "region" {
-    type        = string
-  }
-
-  param "cred" {
-    type        = string
-  }
-
-  output "result" {
-    value = "Mocked: Release EIP [Allocation ID: ${param.allocation_id}, Region: ${param.region}, Cred: ${param.cred}]"
-  }
-}
-
 variable "vpc_unattached_eips_trigger_enabled" {
   type    = bool
   default = false
