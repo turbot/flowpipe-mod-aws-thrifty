@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_vpc_eips_unattached" {
-  title       = "Detect & correct unattached EIPs"
+  title       = "Detect & correct VPC EIPs unattached"
   description = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
   //tags          = merge(local.vpc_common_tags, { class = "unused" })
 
@@ -31,7 +31,7 @@ trigger "query" "detect_and_correct_vpc_eips_unattached" {
 }
 
 pipeline "detect_and_correct_vpc_eips_unattached" {
-  title       = "Detect & correct unattached EIPs"
+  title       = "Detect & correct VPC EIPs unattached"
   description = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
@@ -90,8 +90,8 @@ pipeline "detect_and_correct_vpc_eips_unattached" {
 }
 
 pipeline "correct_vpc_eips_unattached" {
-  title       = "Corrects unattached EIPs"
-  description = "Runs corrective action on a collection of EIPs (Elastic IP addresses) which are unattached."
+  title       = "Correct VPC EIPs unattached"
+  description = "Runs corrective action on a collection of EIPs (Elastic IP addresses) which is unattached."
   // documentation = file("./vpc/unattached_elastic_ip_addresses.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
@@ -163,8 +163,8 @@ pipeline "correct_vpc_eips_unattached" {
 }
 
 pipeline "correct_one_vpc_eip_unattached" {
-  title       = "Correct one EIPs unattached"
-  description = "Runs corrective action on an EIPs (Elastic IP addresses) unattached."
+  title       = "Correct one VPC EIP unattached"
+  description = "Runs corrective action on one EIP (Elastic IP addresses) which is unattached."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
