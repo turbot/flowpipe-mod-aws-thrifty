@@ -133,7 +133,7 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} EBS Snapshots exceeding maximum age."
   }
@@ -228,11 +228,11 @@ pipeline "correct_one_ebs_snapshot_exceeding_max_age" {
         "skip" = {
           label  = "Skip"
           value  = "skip"
-          style  = local.StyleInfo
+          style  = local.style_info
           pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped EBS Snapshot ${param.title} exceeding maximum age."
           }
           success_msg = ""
@@ -241,7 +241,7 @@ pipeline "correct_one_ebs_snapshot_exceeding_max_age" {
         "delete_snapshot" = {
           label  = "Delete Snapshot"
           value  = "delete_snapshot"
-          style  = local.StyleAlert
+          style  = local.style_alert
           pipeline_ref  = local.aws_pipeline_delete_ebs_snapshot
           pipeline_args = {
             snapshot_id = param.snapshot_id

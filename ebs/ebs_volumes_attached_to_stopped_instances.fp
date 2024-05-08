@@ -152,7 +152,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} EBS volumes attached to stopped instances."
   }
@@ -247,11 +247,11 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
         "skip" = {
           label        = "Skip"
           value        = "skip"
-          style        = local.StyleInfo
+          style        = local.style_info
           pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped EBS volume ${param.title} attached to stopped instance."
           }
           success_msg = ""
@@ -260,7 +260,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
         "detach_volume" = {
           label        = "Detach Volume"
           value        = "detach_volume"
-          style        = local.StyleOk
+          style        = local.style_ok
           pipeline_ref = pipeline.mock_aws_pipeline_detach_ebs_volume // TODO: Swap to local.aws_pipeline_detach_ebs_volume when added to library mod
           pipeline_args = {
             volume_id = param.volume_id
@@ -273,7 +273,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
         "delete_volume" = {
           label        = "Delete_volume"
           value        = "delete_volume"
-          style        = local.StyleAlert
+          style        = local.style_alert
           pipeline_ref = pipeline.mock_aws_pipeline_delete_ebs_volume // TODO: Swap to local.aws_pipeline_delete_ebs_volume when added to library mod
           pipeline_args = {
             volume_id = param.volume_id

@@ -133,7 +133,7 @@ pipeline "correct_ebs_volumes_using_io1" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} EBS volumes using io1."
   }
@@ -228,11 +228,11 @@ pipeline "correct_one_ebs_volume_using_io1" {
         "skip" = {
           label  = "Skip"
           value  = "skip"
-          style  = local.StyleInfo
+          style  = local.style_info
           pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped EBS volume ${param.title} using io1."
           }
           success_msg = ""
@@ -241,7 +241,7 @@ pipeline "correct_one_ebs_volume_using_io1" {
         "update_to_io2" = {
           label  = "Update to io2"
           value  = "update_to_io2"
-          style  = local.StyleOk
+          style  = local.style_ok
           pipeline_ref  = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {
             volume_id   = param.volume_id

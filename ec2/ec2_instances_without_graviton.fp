@@ -138,7 +138,7 @@ pipeline "correct_ec2_instances_without_graviton" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} EC2 instances without graviton processor."
   }
@@ -233,11 +233,11 @@ pipeline "correct_one_ec2_instance_without_graviton" {
         "skip" = {
           label  = "Skip"
           value  = "skip"
-          style  = local.StyleInfo
+          style  = local.style_info
           pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped EC2 Instance ${param.title} without graviton processor."
           }
           success_msg = "Skipped EC2 Instance ${param.title}."
@@ -246,7 +246,7 @@ pipeline "correct_one_ec2_instance_without_graviton" {
         "stop_instance" = {
           label  = "Stop Instance"
           value  = "stop_instance"
-          style  = local.StyleAlert
+          style  = local.style_alert
           pipeline_ref  = local.aws_pipeline_stop_ec2_instances
           pipeline_args = {
             instance_ids = [param.instance_id]
@@ -259,7 +259,7 @@ pipeline "correct_one_ec2_instance_without_graviton" {
         "terminate_instance" = {
           label  = "Terminate Instance"
           value  = "terminate_instance"
-          style  = local.StyleAlert
+          style  = local.style_alert
           pipeline_ref  = local.aws_pipeline_terminate_ec2_instances
           pipeline_args = {
             instance_ids = [param.instance_id]

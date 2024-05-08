@@ -146,7 +146,7 @@ pipeline "correct_vpc_nat_gateways_unused" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} unused NAT Gateways."
   }
@@ -241,11 +241,11 @@ pipeline "correct_one_vpc_nat_gateway_unused" {
         "skip" = {
           label        = "Skip"
           value        = "skip"
-          style        = local.StyleInfo
+          style        = local.style_info
           pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped unused NAT Gateway ${param.title}."
           }
           success_msg = ""
@@ -254,7 +254,7 @@ pipeline "correct_one_vpc_nat_gateway_unused" {
         "delete" = {
           label        = "Delete"
           value        = "delete"
-          style        = local.StyleAlert
+          style        = local.style_alert
           pipeline_ref = local.aws_pipeline_delete_nat_gateway
           pipeline_args = {
             nat_gateway_id = param.nat_gateway_id

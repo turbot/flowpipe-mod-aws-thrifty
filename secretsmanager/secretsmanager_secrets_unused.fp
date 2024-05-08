@@ -133,7 +133,7 @@ pipeline "correct_secretsmanager_secrets_unused" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} SecretsManager secrets unused for ${var.secretsmanager_secrets_unused_days} days."
   }
@@ -228,11 +228,11 @@ pipeline "correct_one_secretsmanager_secret_unused" {
         "skip" = {
           label  = "Skip"
           value  = "skip"
-          style  = local.StyleInfo
+          style  = local.style_info
           pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_unused_days} days."
           }
           success_msg = ""
@@ -241,7 +241,7 @@ pipeline "correct_one_secretsmanager_secret_unused" {
         "delete_secret" = {
           label  = "Delete Secret"
           value  = "delete_secret"
-          style  = local.StyleAlert
+          style  = local.style_alert
           pipeline_ref  = pipeline.mock_aws_pipeline_delete_secretsmanager_secret // TODO: Replace with real pipeline when added to aws library mod.
           pipeline_args = {
             name   = param.name

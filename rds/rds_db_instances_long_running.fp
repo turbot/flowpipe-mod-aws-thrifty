@@ -131,7 +131,7 @@ pipeline "correct_rds_db_instances_long_running" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected long running RDS DB instances ${length(param.items)}."
   }
@@ -225,11 +225,11 @@ pipeline "correct_one_rds_db_instance_long_running" {
         "skip" = {
           label        = "Skip"
           value        = "skip"
-          style        = local.StyleInfo
+          style        = local.style_info
           pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped long running RDS DB Instance ${param.title}."
           }
           success_msg = ""
@@ -238,7 +238,7 @@ pipeline "correct_one_rds_db_instance_long_running" {
         "delete_instance" = {
           label        = "Delete Instance"
           value        = "delete_instance"
-          style        = local.StyleAlert
+          style        = local.style_alert
           pipeline_ref = local.aws_pipeline_delete_rds_db_instance
           pipeline_args = {
             db_instance_identifier = param.db_instance_identifier

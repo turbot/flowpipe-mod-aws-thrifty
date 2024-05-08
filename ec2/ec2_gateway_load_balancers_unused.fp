@@ -149,7 +149,7 @@ pipeline "correct_ec2_gateway_load_balancers_unused" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} unused EC2 gateway load balancers."
   }
@@ -250,11 +250,11 @@ pipeline "correct_one_ec2_gateway_load_balancer_unused" {
         "skip" = {
           label  = "Skip"
           value  = "skip"
-          style  = local.StyleInfo
+          style  = local.style_info
           pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped unused EC2 Gateway Load Balancer ${param.title}."
           }
           success_msg = "Skipped EC2 Gateway Load Balancer ${param.title}."
@@ -263,7 +263,7 @@ pipeline "correct_one_ec2_gateway_load_balancer_unused" {
         "delete_gateway_load_balancer" = {
           label  = "Delete Gateway Load Balancer"
           value  = "delete_gateway_load_balancer"
-          style  = local.StyleAlert
+          style  = local.style_alert
           // pipeline_ref  = local.aws_pipeline_delete_ec2_gateway_load_balancer // TODO: update it when you develop the pipeline
           pipeline_ref = pipeline.mock_aws_lib_delete_gateway_load_balancer
           pipeline_args = {

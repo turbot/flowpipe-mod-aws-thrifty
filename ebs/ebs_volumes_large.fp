@@ -133,7 +133,7 @@ pipeline "correct_ebs_volumes_large" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} large EBS volumes."
   }
@@ -228,11 +228,11 @@ pipeline "correct_one_ebs_volume_large" {
         "skip" = {
           label        = "Skip"
           value        = "skip"
-          style        = local.StyleInfo
+          style        = local.style_info
           pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped large EBS Volume ${param.title}."
           }
           success_msg = "Skipped EBS Volume ${param.title}."
@@ -241,7 +241,7 @@ pipeline "correct_one_ebs_volume_large" {
         "delete_volume" = {
           label        = "Delete_volume"
           value        = "delete_volume"
-          style        = local.StyleAlert
+          style        = local.style_alert
           pipeline_ref = local.aws_pipeline_delete_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id

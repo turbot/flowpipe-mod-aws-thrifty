@@ -146,7 +146,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} S3 Buckets without a lifecycle policy."
   }
@@ -248,11 +248,11 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
         "skip" = {
           label  = "Skip"
           value  = "skip"
-          style  = local.StyleInfo
+          style  = local.style_info
           pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped S3 Bucket ${param.title} without a lifecycle policy."
           }
           success_msg = ""
@@ -261,7 +261,7 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
         "apply_policy" = {
           label  = "Apply Policy"
           value  = "apply_policy"
-          style  = local.StyleOk
+          style  = local.style_ok
           pipeline_ref  = pipeline.mock_aws_pipeline_put_s3_lifecycle_policy // TODO: Replace with real pipeline when added to aws library mod.
           pipeline_args = {
             bucket_name = param.name

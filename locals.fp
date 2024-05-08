@@ -9,12 +9,12 @@ locals {
 
 // Consts
 locals {
-  NotifierLevelVerbose = "verbose"
-  NotifierLevelInfo    = "info"
-  NotifierLevelError   = "error"
-  StyleOk              = "ok"
-  StyleInfo            = "info"
-  StyleAlert           = "alert"
+  level_verbose = "verbose"
+  level_info    = "info"
+  level_error   = "error"
+  style_ok      = "ok"
+  style_info    = "info"
+  style_alert   = "alert"
 }
 
 // Common Texts

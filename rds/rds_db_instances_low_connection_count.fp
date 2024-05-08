@@ -148,7 +148,7 @@ pipeline "correct_rds_db_instances_low_connection_count" {
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} RDS DB instances with low connection count."
   }
@@ -242,11 +242,11 @@ pipeline "correct_one_rds_db_instance_low_connection_count" {
         "skip" = {
           label        = "Skip"
           value        = "skip"
-          style        = local.StyleInfo
+          style        = local.style_info
           pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped RDS DB Instance ${param.title} with low connection count."
           }
           success_msg = "Skipped RDS DB Instance ${param.title}."
@@ -255,7 +255,7 @@ pipeline "correct_one_rds_db_instance_low_connection_count" {
         "delete_instance" = {
           label        = "Delete Instance"
           value        = "delete_instance"
-          style        = local.StyleAlert
+          style        = local.style_alert
           pipeline_ref = local.aws_pipeline_delete_rds_db_instance
           pipeline_args = {
             db_instance_identifier = param.db_instance_identifier
