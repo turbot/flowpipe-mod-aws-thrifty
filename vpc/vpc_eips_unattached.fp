@@ -79,12 +79,12 @@ pipeline "detect_and_correct_vpc_eips_unattached" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_vpc_eips_unattached
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -149,15 +149,15 @@ pipeline "correct_vpc_eips_unattached" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_vpc_eip_unattached
     args = {
-      title                    = each.value.title
-      allocation_id            = each.value.allocation_id
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      allocation_id      = each.value.allocation_id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -220,18 +220,18 @@ pipeline "correct_one_vpc_eip_unattached" {
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected elastic IP address ${param.title} unattached."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected elastic IP address ${param.title} unattached."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
-          label        = "Skip"
-          value        = "skip"
-          style        = local.StyleInfo
-          pipeline_ref = local.pipeline_optional_message
+          label         = "Skip"
+          value         = "skip"
+          style         = local.StyleInfo
+          pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose
@@ -241,10 +241,10 @@ pipeline "correct_one_vpc_eip_unattached" {
           error_msg   = ""
         },
         "release" = {
-          label        = "Release"
-          value        = "release"
-          style        = local.StyleOk
-          pipeline_ref = local.aws_pipeline_release_eip
+          label         = "Release"
+          value         = "release"
+          style         = local.StyleOk
+          pipeline_ref  = local.aws_pipeline_release_eip
           pipeline_args = {
             allocation_id = param.allocation_id
             region        = param.region
