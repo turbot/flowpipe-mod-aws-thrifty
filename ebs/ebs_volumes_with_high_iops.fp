@@ -37,37 +37,37 @@ pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
 
   param "database" {
     type        = string
-    description = local.DatabaseDescription
+    description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
+    description = local.description_default_action
     default     = var.ebs_volume_with_high_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
+    description = local.description_enabled_actions
     default     = var.ebs_volume_with_high_iops_enabled_actions
   }
 
@@ -105,31 +105,31 @@ pipeline "correct_ebs_volumes_with_high_iops" {
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
+    description = local.description_default_action
     default     = var.ebs_volume_with_high_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
+    description = local.description_enabled_actions
     default     = var.ebs_volume_with_high_iops_enabled_actions
   }
 
@@ -168,7 +168,7 @@ pipeline "correct_one_ebs_volume_with_high_iops" {
 
   param "title" {
     type        = string
-    description = local.TitleDescription
+    description = local.description_title
   }
 
   param "volume_id" {
@@ -178,41 +178,41 @@ pipeline "correct_one_ebs_volume_with_high_iops" {
 
   param "region" {
     type        = string
-    description = local.RegionDescription
+    description = local.description_region
   }
 
   param "cred" {
     type        = string
-    description = local.CredentialDescription
+    description = local.description_credential
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
+    description = local.description_default_action
     default     = var.ebs_volume_with_high_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
+    description = local.description_enabled_actions
     default     = var.ebs_volume_with_high_iops_enabled_actions
   }
 

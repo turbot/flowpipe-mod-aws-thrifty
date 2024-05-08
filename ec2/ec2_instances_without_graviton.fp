@@ -39,37 +39,37 @@ pipeline "detect_and_correct_ec2_instances_without_graviton" {
 
   param "database" {
     type        = string
-    description = local.DatabaseDescription
+    description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
+    description = local.description_default_action
     default     = var.ec2_instance_without_graviton_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
+    description = local.description_enabled_actions
     default     = var.ec2_instance_without_graviton_enabled_actions
   }
 
@@ -109,31 +109,31 @@ pipeline "correct_ec2_instances_without_graviton" {
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
+    description = local.description_default_action
     default     = var.ec2_instance_without_graviton_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
+    description = local.description_enabled_actions
     default     = var.ec2_instance_without_graviton_enabled_actions
   }
 
@@ -172,7 +172,7 @@ pipeline "correct_one_ec2_instance_without_graviton" {
 
   param "title" {
     type        = string
-    description = local.TitleDescription
+    description = local.description_title
   }
 
   param "instance_id" {
@@ -182,41 +182,41 @@ pipeline "correct_one_ec2_instance_without_graviton" {
 
   param "region" {
     type        = string
-    description = local.RegionDescription
+    description = local.description_region
   }
 
   param "cred" {
     type        = string
-    description = local.CredentialDescription
+    description = local.description_credential
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
+    description = local.description_default_action
     default     = var.ec2_instance_without_graviton_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
+    description = local.description_enabled_actions
     default     = var.ec2_instance_without_graviton_enabled_actions
   }
 
