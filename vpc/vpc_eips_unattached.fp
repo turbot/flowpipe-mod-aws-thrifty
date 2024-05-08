@@ -1,14 +1,14 @@
 locals {
   vpc_eips_unattached_query = <<-EOQ
-select
-  concat(allocation_id, ' [', region, '/', account_id, ']') as title,
-  allocation_id,
-  region,
-  _ctx ->> 'connection_name' as cred
-from
-  aws_vpc_eip
-where
-  association_id is null;
+  select
+    concat(allocation_id, ' [', region, '/', account_id, ']') as title,
+    allocation_id,
+    region,
+    _ctx ->> 'connection_name' as cred
+  from
+    aws_vpc_eip
+  where
+    association_id is null;
   EOQ
 }
 
@@ -17,8 +17,8 @@ trigger "query" "detect_and_correct_vpc_eips_unattached" {
   description = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
   //tags          = merge(local.vpc_common_tags, { class = "unused" })
 
-  enabled  = var.vpc_unattached_eips_trigger_enabled
-  schedule = var.vpc_unattached_eips_trigger_scheduled
+  enabled  = var.vpc_eips_unattached_trigger_enabled
+  schedule = var.vpc_eips_unattached_trigger_schedule
   database = var.database
   sql      = local.vpc_eips_unattached_query
 
@@ -258,12 +258,12 @@ pipeline "correct_one_vpc_eip_unattached" {
   }
 }
 
-variable "vpc_unattached_eips_trigger_enabled" {
+variable "vpc_eips_unattached_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "vpc_unattached_eips_trigger_scheduled" {
+variable "vpc_eips_unattached_trigger_schedule" {
   type    = string
   default = "15m"
 }
