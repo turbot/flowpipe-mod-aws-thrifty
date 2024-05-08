@@ -8,7 +8,7 @@ locals {
   from
     aws_rds_db_instance
   where
-    (current_timestamp - (${var.rds_running_db_instance_age_max_days}::int || ' days')::interval) > create_time
+    (current_timestamp - (${var.rds_db_instances_long_running_days}::int || ' days')::interval) > create_time
   EOQ
 }
 
@@ -60,13 +60,13 @@ pipeline "detect_and_correct_rds_db_instances_long_running" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_long_running_default_action
+    default     = var.rds_db_instances_long_running_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_long_running_enabled_actions
+    default     = var.rds_db_instances_long_running_enabled_actions
   }
 
   step "query" "detect" {
@@ -121,13 +121,13 @@ pipeline "correct_rds_db_instances_long_running" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_long_running_default_action
+    default     = var.rds_db_instances_long_running_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_long_running_enabled_actions
+    default     = var.rds_db_instances_long_running_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -203,13 +203,13 @@ pipeline "correct_one_rds_db_instance_long_running" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_long_running_default_action
+    default     = var.rds_db_instances_long_running_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_long_running_enabled_actions
+    default     = var.rds_db_instances_long_running_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -272,4 +272,32 @@ pipeline "mock_aws_pipeline_delete_rds_instance" {
   output "result" {
     value = "Mocked: Delete RDS Instance [ID: ${param.db_instance_identifier}, Region: ${param.region}, Cred: ${param.cred}]"
   }
+}
+
+variable "rds_db_instances_long_running_days" {
+  type        = number
+  description = "The maximum number of days DB instances are allowed to run."
+  default     = 90
+}
+
+variable "rds_db_instances_long_running_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "rds_db_instances_long_running_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "rds_db_instances_long_running_default_action" {
+  type        = string
+  description = "The default response to use when RDS DB instances are long running."
+  default     = "notify"
+}
+
+variable "rds_db_instances_long_running_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_instance"]
 }

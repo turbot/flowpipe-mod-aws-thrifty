@@ -8,7 +8,7 @@ locals {
   from
     aws_secretsmanager_secret
   where
-    date_part('day', now()-last_accessed_date) > ${var.secretsmanager_secret_unused_days}::int
+    date_part('day', now()-last_accessed_date) > ${var.secretsmanager_secrets_unused_days}::int
   EOQ
 }
 
@@ -61,13 +61,13 @@ pipeline "detect_and_correct_secretsmanager_secrets_unused" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_action
+    default     = var.secretsmanager_secrets_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_actions
+    default     = var.secretsmanager_secrets_unused_enabled_actions
   }
 
   step "query" "detect" {
@@ -123,19 +123,19 @@ pipeline "correct_secretsmanager_secrets_unused" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_action
+    default     = var.secretsmanager_secrets_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_actions
+    default     = var.secretsmanager_secrets_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.NotifierLevelVerbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} SecretsManager secrets unused for ${var.secretsmanager_secret_unused_days} days."
+    text     = "Detected ${length(param.items)} SecretsManager secrets unused for ${var.secretsmanager_secrets_unused_days} days."
   }
 
   step "transform" "items_by_id" {
@@ -206,13 +206,13 @@ pipeline "correct_one_secretsmanager_secret_unused" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.secretsmanager_secret_unused_default_action
+    default     = var.secretsmanager_secrets_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.secretsmanager_secret_unused_enabled_actions
+    default     = var.secretsmanager_secrets_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -221,7 +221,7 @@ pipeline "correct_one_secretsmanager_secret_unused" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      detect_msg               = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
+      detect_msg               = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_unused_days} days."
       default_action  = param.default_action
       enabled_actions = param.enabled_actions
       actions = {
@@ -233,7 +233,7 @@ pipeline "correct_one_secretsmanager_secret_unused" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.NotifierLevelVerbose
-            text     = "Skipped SecretsManager secret ${param.title} unused for ${var.secretsmanager_secret_unused_days} days."
+            text     = "Skipped SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_unused_days} days."
           }
           success_msg = ""
           error_msg   = ""
@@ -273,4 +273,32 @@ pipeline "mock_aws_pipeline_delete_secretsmanager_secret" {
   output "result" {
     value = "Mocked: Delete SecretsManager secret [Name: ${param.name}, Region: ${param.region}, Cred: ${param.cred}]"
   }
+}
+
+variable "secretsmanager_secrets_unused_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "secretsmanager_secrets_unused_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "secretsmanager_secrets_unused_default_action" {
+  type        = string
+  description = "The default response to use when secrets manager secrets are unused."
+  default     = "notify"
+}
+
+variable "secretsmanager_secrets_unused_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_secret"]
+}
+
+variable "secretsmanager_secrets_unused_days" {
+  type        = number
+  description = "The default number of days secrets manager secrets to be considered in-use."
+  default     = 90
 }

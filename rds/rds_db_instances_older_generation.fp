@@ -60,13 +60,13 @@ pipeline "detect_and_correct_rds_db_instances_older_generation" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_older_generation_default_action
+    default     = var.rds_db_instances_older_generation_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_older_generation_enabled_actions
+    default     = var.rds_db_instances_older_generation_enabled_actions
   }
 
   step "query" "detect" {
@@ -121,13 +121,13 @@ pipeline "correct_rds_db_instances_older_generation" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_older_generation_default_action
+    default     = var.rds_db_instances_older_generation_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_older_generation_enabled_actions
+    default     = var.rds_db_instances_older_generation_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -203,13 +203,13 @@ pipeline "correct_one_rds_db_instance_older_generation" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_older_generation_default_action
+    default     = var.rds_db_instances_older_generation_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.rds_db_instance_older_generation_enabled_actions
+    default     = var.rds_db_instances_older_generation_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -251,4 +251,26 @@ pipeline "correct_one_rds_db_instance_older_generation" {
       }
     }
   }
+}
+
+variable "rds_db_instances_older_generation_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "rds_db_instances_older_generation_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "rds_db_instances_older_generation_default_action" {
+  type        = string
+  description = "The default response to use when there are older generation RDS DB instances."
+  default     = "notify"
+}
+
+variable "rds_db_instances_older_generation_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_instance"]
 }

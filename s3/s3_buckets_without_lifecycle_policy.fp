@@ -43,7 +43,7 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   param "policy" {
     type        = string
     description = "Lifecycle policy to apply to the S3 bucket, if 'apply' is the chosen response."
-    default     = var.s3_bucket_default_lifecycle_policy
+    default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
   param "notifier" {
@@ -67,13 +67,13 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_action
+    default     = var.s3_buckets_without_lifecycle_policy_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
+    default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
   }
 
   step "query" "detect" {
@@ -112,7 +112,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   param "policy" {
     type        = string
     description = "Lifecycle policy to apply to the S3 bucket, if 'apply' is the chosen response."
-    default     = var.s3_bucket_default_lifecycle_policy
+    default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
   param "notifier" {
@@ -136,13 +136,13 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_action
+    default     = var.s3_buckets_without_lifecycle_policy_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
+    default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -202,7 +202,7 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   param "policy" {
     type        = string
     description = "Lifecycle policy to apply to the S3 Bucket."
-    default     = var.s3_bucket_default_lifecycle_policy
+    default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
   param "notifier" {
@@ -226,13 +226,13 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   param "default_action" {
     type        = string
     description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_action
+    default     = var.s3_buckets_without_lifecycle_policy_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
+    default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -298,4 +298,46 @@ pipeline "mock_aws_pipeline_put_s3_lifecycle_policy" {
   output "result" {
     value = "Mocked: Put S3 Lifecycle Policy [Name: ${param.bucket_name}, Region: ${param.region}, Cred: ${param.cred}]\n${param.policy}"
   }
+}
+
+variable "s3_buckets_without_lifecycle_policy_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "s3_buckets_without_lifecycle_policy_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "s3_buckets_without_lifecycle_policy_default_action" {
+  type        = string
+  description = "The default response to use for S3 buckets without lifecycle policy."
+  default     = "notify"
+}
+
+variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "apply_policy"]
+}
+
+// TODO: Change to an array of objects (contents of 'Rules') - let lib mod wrap it; no JSONified strings!
+// TODO: Safer default (no deletion) - check other variables!
+variable "s3_buckets_without_lifecycle_policy_default_policy" {
+  type        = string
+  description = "The default S3 bucket lifecycle policy to apply"
+  default     = <<-EOF
+{
+  "Rules": [
+    {
+      "ID": "Expire all objects after one year",
+      "Status": "Enabled",
+      "Expiration": {
+        "Days": 365
+      }
+    }
+  ]
+}
+  EOF
 }

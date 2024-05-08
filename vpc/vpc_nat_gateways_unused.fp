@@ -286,3 +286,25 @@ pipeline "mock_aws_pipeline_delete_nat_gateway" {
     value = "Mocked: Delete NAT Gateway [GatewayID: ${param.nat_gateway_id}, Region: ${param.region}, Cred: ${param.cred}]"
   }
 }
+
+variable "vpc_nat_gateways_unused_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "vpc_nat_gateways_unused_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "vpc_nat_gateways_unused_default_action" {
+  type        = string
+  description = "The default response to use when NAT gateways are unused."
+  default     = "notify"
+}
+
+variable "vpc_nat_gateways_unused_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete"]
+}
