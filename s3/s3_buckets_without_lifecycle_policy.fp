@@ -13,8 +13,9 @@ locals {
 }
 
 trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
-  title       = "Detect & correct S3 buckets without lifecycle policy"
-  description = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
+  title         = "Detect & correct S3 buckets without lifecycle policy"
+  description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
+  // documentation = file("./s3/docs/detect_and_correct_s3_buckets_without_lifecycle_policy_trigger.md")
 
   enabled  = var.s3_buckets_without_lifecycle_policy_trigger_enabled
   schedule = var.s3_buckets_without_lifecycle_policy_trigger_schedule
@@ -32,7 +33,7 @@ trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   title         = "Detect & correct S3 buckets without lifecycle policy"
   description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
-  documentation = file("./s3/docs/s3_buckets_without_lifecycle_policy.md")
+  documentation = file("./s3/docs/detect_and_correct_s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "database" {
@@ -99,7 +100,7 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 pipeline "correct_s3_buckets_without_lifecycle_policy" {
   title         = "Corrects S3 buckets without lifecycle policy"
   description   = "Runs corrective action on a collection of S3 buckets which do not have a lifecycle policy."
-  documentation = file("./s3/docs/s3_buckets_without_lifecycle_policy.md")
+  documentation = file("./s3/docs/correct_s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "items" {
@@ -179,7 +180,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
 pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   title         = "Correct one S3 bucket without lifecycle policy"
   description   = "Runs corrective action on an individual S3 bucket which does not have a lifecycle policy."
-  documentation = file("./s3/docs/s3_buckets_without_lifecycle_policy.md")
+  documentation = file("./s3/docs/correct_one_s3_bucket_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "title" {
@@ -326,7 +327,6 @@ variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
 }
 
 // TODO: Change to an array of objects (contents of 'Rules') - let lib mod wrap it; no JSONified strings!
-// TODO: Safer default (no deletion) - check other variables!
 variable "s3_buckets_without_lifecycle_policy_default_policy" {
   type        = string
   description = "The default S3 bucket lifecycle policy to apply"
