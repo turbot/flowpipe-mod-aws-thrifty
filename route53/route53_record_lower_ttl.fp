@@ -19,8 +19,8 @@ trigger "query" "detect_and_correct_route53_record_lower_ttl" {
   title       = "Detect & correct Route53 records with lower TTL settings"
   description = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
 
-  enabled  = var.route53_record_lower_ttl_trigger_enabled
-  schedule = var.route53_record_lower_ttl_trigger_schedule
+  enabled  = var.route53_records_lower_ttl_trigger_enabled
+  schedule = var.route53_records_lower_ttl_trigger_schedule
   database = var.database
   sql      = local.route53_record_lower_ttl_query
 
@@ -64,13 +64,13 @@ pipeline "detect_and_correct_route53_record_lower_ttl" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_record_lower_ttl_default_action
+    default     = var.route53_records_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_record_lower_ttl_enabled_actions
+    default     = var.route53_records_lower_ttl_enabled_actions
   }
 
   step "query" "detect" {
@@ -129,13 +129,13 @@ pipeline "correct_route53_records_lower_ttl" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_record_lower_ttl_default_action
+    default     = var.route53_records_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_record_lower_ttl_enabled_actions
+    default     = var.route53_records_lower_ttl_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -230,13 +230,13 @@ pipeline "correct_one_route53_record_lower_ttl" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_record_lower_ttl_default_action
+    default     = var.route53_records_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_record_lower_ttl_enabled_actions
+    default     = var.route53_records_lower_ttl_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -284,23 +284,23 @@ pipeline "correct_one_route53_record_lower_ttl" {
   }
 }
 
-variable "route53_record_lower_ttl_trigger_enabled" {
+variable "route53_records_lower_ttl_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "route53_record_lower_ttl_trigger_schedule" {
+variable "route53_records_lower_ttl_trigger_schedule" {
   type    = string
   default = "1h"
 }
 
-variable "route53_record_lower_ttl_default_action" {
+variable "route53_records_lower_ttl_default_action" {
   type        = string
   description = "The default response to use when Route53 records have a TTL lower than expected."
   default     = "notify"
 }
 
-variable "route53_record_lower_ttl_enabled_actions" {
+variable "route53_records_lower_ttl_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "update"]
