@@ -8,14 +8,13 @@ locals {
   from
     aws_ebs_volume
   where
-    jsonb_array_length(attachments) = 0;
+    jsonb_array_length(attachments) = 0
   EOQ
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_unattached" {
   title       = "Detect & correct EBS volumes unattached"
   description = "Detects EBS volumes which are unattached and runs your chosen action."
-  //tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   enabled  = var.ebs_volumes_unattached_trigger_enabled
   schedule = var.ebs_volumes_unattached_trigger_schedule
@@ -31,9 +30,8 @@ trigger "query" "detect_and_correct_ebs_volumes_unattached" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_unattached" {
-  title         = "Detect & correct EBS volumes unattached"
-  description   = "Detects EBS volumes which are unattached and runs your chosen action."
-  // tags          = merge(local.ebs_common_tags, { class = "unused" })
+  title       = "Detect & correct EBS volumes unattached"
+  description = "Detects EBS volumes which are unattached and runs your chosen action."
 
   param "database" {
     type        = string
@@ -62,13 +60,13 @@ pipeline "detect_and_correct_ebs_volumes_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_unattached_default_action
+    default     = var.ebs_volumes_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_unattached_enabled_actions
+    default     = var.ebs_volumes_unattached_enabled_actions
   }
 
   step "query" "detect" {
@@ -90,9 +88,8 @@ pipeline "detect_and_correct_ebs_volumes_unattached" {
 }
 
 pipeline "correct_ebs_volumes_unattached" {
-  title         = "Corrects EBS volumes unattached"
-  description   = "Runs corrective action on a collection of EBS volumes which are unattached."
-  // tags          = merge(local.ebs_common_tags, { class = "unused" })
+  title       = "Corrects EBS volumes unattached"
+  description = "Runs corrective action on a collection of EBS volumes which are unattached."
 
   param "items" {
     type = list(object({
@@ -124,13 +121,13 @@ pipeline "correct_ebs_volumes_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_unattached_default_action
+    default     = var.ebs_volumes_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_unattached_enabled_actions
+    default     = var.ebs_volumes_unattached_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -162,9 +159,8 @@ pipeline "correct_ebs_volumes_unattached" {
 }
 
 pipeline "correct_one_ebs_volume_unattached" {
-  title         = "Correct one EBS volume unattached"
-  description   = "Runs corrective action on an EBS volume unattached."
-  // tags          = merge(local.ebs_common_tags, { class = "unused" })
+  title       = "Correct one EBS volume unattached"
+  description = "Runs corrective action on an EBS volume unattached."
 
   param "title" {
     type        = string
@@ -207,24 +203,24 @@ pipeline "correct_one_ebs_volume_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_unattached_default_action
+    default     = var.ebs_volumes_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_unattached_enabled_actions
+    default     = var.ebs_volumes_unattached_enabled_actions
   }
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected EBS volume ${param.title} unattached."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected EBS volume ${param.title} unattached."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
@@ -236,8 +232,8 @@ pipeline "correct_one_ebs_volume_unattached" {
             send     = param.notification_level == local.level_verbose
             text     = "Skipped EBS volume ${param.title} unattached."
           }
-          success_msg = ""
-          error_msg   = ""
+          success_msg = "Skipped EBS volume ${param.title}."
+          error_msg   = "Error skipping EBS volume ${param.title}."
         },
         "delete_volume" = {
           label        = "Delete Volume"
@@ -249,28 +245,32 @@ pipeline "correct_one_ebs_volume_unattached" {
             region    = param.region
             cred      = param.cred
           }
-          success_msg = "Deleted EBS Volume ${param.title}."
-          error_msg   = "Error deleting EBS Volume ${param.title}."
+          success_msg = "Deleted EBS volume ${param.title}."
+          error_msg   = "Error deleting EBS volume ${param.title}."
         }
       }
     }
   }
 }
 
-pipeline "mock_aws_pipeline_delete_ebs_volume" {
-  param "volume_id" {
-    type = string
-  }
+variable "ebs_volumes_unattached_trigger_enabled" {
+  type    = bool
+  default = false
+}
 
-  param "region" {
-    type = string
-  }
+variable "ebs_volumes_unattached_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
 
-  param "cred" {
-    type = string
-  }
+variable "ebs_volumes_unattached_default_action" {
+  type        = string
+  description = "The default action to take for unattached EBS volumes."
+  default     = "notify"
+}
 
-  output "result" {
-    value = "Mocked: Delete EBS Volume [Volume_ID: ${param.volume_id}, Region: ${param.region}, Cred: ${param.cred}]"
-  }
+variable "ebs_volumes_unattached_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
 }

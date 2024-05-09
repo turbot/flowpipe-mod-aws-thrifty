@@ -13,8 +13,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
-  title         = "Detect & correct EBS volumes using io1"
-  description   = "Detects EBS volumes using io1 and runs your chosen action."
+  title       = "Detect & correct EBS volumes using io1"
+  description = "Detects EBS volumes using io1 and runs the chosen corrective action."
 
   enabled  = var.ebs_volumes_using_io1_trigger_enabled
   schedule = var.ebs_volumes_using_io1_trigger_schedule
@@ -23,16 +23,15 @@ trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
 
   capture "insert" {
     pipeline = pipeline.correct_ebs_volumes_using_io1
-    args     = {
+    args = {
       items = self.inserted_rows
     }
   }
 }
 
 pipeline "detect_and_correct_ebs_volumes_using_io1" {
-  title         = "Detect & correct EBS volumes using io1"
-  description   = "Detects EBS volumes using io1 and runs your chosen action."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  title       = "Detect & correct EBS volumes using io1"
+  description = "Detects EBS volumes using io1 and runs the chosen corrective action."
 
   param "database" {
     type        = string
@@ -61,13 +60,13 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_using_io1_default_action
+    default     = var.ebs_volumes_using_io1_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_using_io1_enabled_actions
+    default     = var.ebs_volumes_using_io1_enabled_actions
   }
 
   step "query" "detect" {
@@ -77,28 +76,27 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
 
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ebs_volumes_using_io1
-    args     = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+    args = {
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_ebs_volumes_using_io1" {
-  title         = "Corrects EBS volumes using io1"
-  description   = "Runs corrective action on a collection of EBS volumes using io1."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  title       = "Correct EBS volumes using io1"
+  description = "Executes corrective action on a collection of EBS volumes using io1."
 
   param "items" {
     type = list(object({
-      title      = string
-      volume_id  = string
-      region     = string
-      cred       = string
+      title     = string
+      volume_id = string
+      region    = string
+      cred      = string
     }))
   }
 
@@ -123,13 +121,13 @@ pipeline "correct_ebs_volumes_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_using_io1_default_action
+    default     = var.ebs_volumes_using_io1_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_using_io1_enabled_actions
+    default     = var.ebs_volumes_using_io1_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -139,31 +137,30 @@ pipeline "correct_ebs_volumes_using_io1" {
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.volume_id => row }
+    value = { for row in param.items : row.volume_id => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_ebs_volume_using_io1
-    args            = {
-      title                    = each.value.title
-      volume_id                = each.value.volume_id
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+    args = {
+      title              = each.value.title
+      volume_id          = each.value.volume_id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_one_ebs_volume_using_io1" {
-  title         = "Correct one EBS volume using io1"
-  description   = "Runs corrective action on an EBS volume using io1."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  title       = "Correct one EBS volume using io1"
+  description = "Executes corrective action on a single EBS volume using io1."
 
   param "title" {
     type        = string
@@ -206,30 +203,30 @@ pipeline "correct_one_ebs_volume_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_using_io1_default_action
+    default     = var.ebs_volumes_using_io1_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_using_io1_enabled_actions
+    default     = var.ebs_volumes_using_io1_enabled_actions
   }
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
-    args     = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected EBS volume ${param.title} using io1."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+    args = {
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected EBS volume ${param.title} using io1."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
-          label  = "Skip"
-          value  = "skip"
-          style  = local.style_info
-          pipeline_ref  = local.pipeline_optional_message
+          label        = "Skip"
+          value        = "skip"
+          style        = local.style_info
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -239,10 +236,10 @@ pipeline "correct_one_ebs_volume_using_io1" {
           error_msg   = ""
         },
         "update_to_io2" = {
-          label  = "Update to io2"
-          value  = "update_to_io2"
-          style  = local.style_ok
-          pipeline_ref  = local.aws_pipeline_modify_ebs_volume
+          label        = "Update to io2"
+          value        = "update_to_io2"
+          style        = local.style_ok
+          pipeline_ref = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {
             volume_id   = param.volume_id
             volume_type = "io2"
@@ -250,9 +247,31 @@ pipeline "correct_one_ebs_volume_using_io1" {
             cred        = param.cred
           }
           success_msg = "Updated EBS volume ${param.title} to io2."
-          error_msg   = "Error updating EBS volume ${param.title} to io2"
+          error_msg   = "Error updating EBS volume ${param.title} to io2."
         }
       }
     }
   }
+}
+
+variable "ebs_volumes_using_io1_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ebs_volumes_using_io1_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "ebs_volumes_using_io1_default_action" {
+  type        = string
+  description = "The default response to use when EBS volumes are using io1."
+  default     = "notify"
+}
+
+variable "ebs_volumes_using_io1_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "update_to_io2"]
 }

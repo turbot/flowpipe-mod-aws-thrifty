@@ -13,8 +13,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_using_gp2" {
-  title         = "Detect & correct EBS volumes using gp2"
-  description   = "Detects EBS volumes using gp2 and runs your chosen action."
+  title       = "Detect & correct EBS volumes using gp2"
+  description = "Detects EBS volumes using gp2 and executes the chosen action."
 
   enabled  = var.ebs_volumes_using_gp2_trigger_enabled
   schedule = var.ebs_volumes_using_gp2_trigger_schedule
@@ -23,16 +23,15 @@ trigger "query" "detect_and_correct_ebs_volumes_using_gp2" {
 
   capture "insert" {
     pipeline = pipeline.correct_ebs_volumes_using_gp2
-    args     = {
+    args = {
       items = self.inserted_rows
     }
   }
 }
 
 pipeline "detect_and_correct_ebs_volumes_using_gp2" {
-  title         = "Detect & correct EBS volumes using gp2"
-  description   = "Detects EBS volumes using gp2 and runs your chosen action."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  title       = "Detect & correct EBS volumes using gp2"
+  description = "Detects EBS volumes using gp2 and performs the chosen action."
 
   param "database" {
     type        = string
@@ -61,13 +60,13 @@ pipeline "detect_and_correct_ebs_volumes_using_gp2" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_using_gp2_default_action
+    default     = var.ebs_volumes_using_gp2_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_using_gp2_enabled_actions
+    default     = var.ebs_volumes_using_gp2_enabled_actions
   }
 
   step "query" "detect" {
@@ -77,28 +76,27 @@ pipeline "detect_and_correct_ebs_volumes_using_gp2" {
 
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ebs_volumes_using_gp2
-    args     = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+    args = {
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_ebs_volumes_using_gp2" {
-  title         = "Corrects EBS volumes using gp2"
-  description   = "Runs corrective action on a collection of EBS volumes using gp2."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  title       = "Correct EBS volumes using gp2"
+  description = "Executes corrective actions on EBS volumes using gp2."
 
   param "items" {
     type = list(object({
-      title      = string
-      volume_id  = string
-      region     = string
-      cred       = string
+      title     = string
+      volume_id = string
+      region    = string
+      cred      = string
     }))
   }
 
@@ -123,13 +121,13 @@ pipeline "correct_ebs_volumes_using_gp2" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_using_gp2_default_action
+    default     = var.ebs_volumes_using_gp2_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_using_gp2_enabled_actions
+    default     = var.ebs_volumes_using_gp2_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -139,31 +137,30 @@ pipeline "correct_ebs_volumes_using_gp2" {
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.volume_id => row }
+    value = { for row in param.items : row.volume_id => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_ebs_volume_using_gp2
-    args            = {
-      title                    = each.value.title
-      volume_id                = each.value.volume_id
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+    args = {
+      title              = each.value.title
+      volume_id          = each.value.volume_id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_one_ebs_volume_using_gp2" {
-  title         = "Correct one EBS volume using gp2"
-  description   = "Runs corrective action on an EBS volume using gp2."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  title       = "Correct one EBS volume using gp2"
+  description = "Executes corrective action on an EBS volume using gp2."
 
   param "title" {
     type        = string
@@ -206,18 +203,18 @@ pipeline "correct_one_ebs_volume_using_gp2" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_using_gp2_default_action
+    default     = var.ebs_volumes_using_gp2_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_using_gp2_enabled_actions
+    default     = var.ebs_volumes_using_gp2_enabled_actions
   }
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
-    args     = {
+    args = {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
@@ -226,10 +223,10 @@ pipeline "correct_one_ebs_volume_using_gp2" {
       enabled_actions = param.enabled_actions
       actions = {
         "skip" = {
-          label  = "Skip"
-          value  = "skip"
-          style  = local.style_info
-          pipeline_ref  = local.pipeline_optional_message
+          label        = "Skip"
+          value        = "skip"
+          style        = local.style_info
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -239,10 +236,10 @@ pipeline "correct_one_ebs_volume_using_gp2" {
           error_msg   = ""
         },
         "update_to_gp3" = {
-          label  = "Update to gp3"
-          value  = "update_to_gp3"
-          style  = local.style_ok
-          pipeline_ref  = local.aws_pipeline_modify_ebs_volume
+          label        = "Update to gp3"
+          value        = "update_to_gp3"
+          style        = local.style_ok
+          pipeline_ref = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {
             volume_id   = param.volume_id
             volume_type = "gp3"
@@ -250,9 +247,31 @@ pipeline "correct_one_ebs_volume_using_gp2" {
             cred        = param.cred
           }
           success_msg = "Updated EBS volume ${param.title} to gp3."
-          error_msg   = "Error updating EBS volume ${param.title} to gp3"
+          error_msg   = "Error updating EBS volume ${param.title} to gp3."
         }
       }
     }
   }
+}
+
+variable "ebs_volumes_using_gp2_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ebs_volumes_using_gp2_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "ebs_volumes_using_gp2_default_action" {
+  type        = string
+  description = "The default response to use when EBS volumes are using gp2."
+  default     = "notify"
+}
+
+variable "ebs_volumes_using_gp2_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "update_to_gp3"]
 }

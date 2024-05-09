@@ -1,5 +1,5 @@
 locals {
-  ebs_volumes_large_query = <<-EOQ
+  ebs_volumes_exceeding_max_size_query = <<-EOQ
   select
     concat(volume_id, ' [', region, '/', account_id, ']') as title,
     volume_id,
@@ -8,31 +8,30 @@ locals {
   from
     aws_ebs_volume
   where
-    size > ${var.ebs_volume_max_size_gb}::int
+    size > ${var.ebs_volumes_exceeding_max_size}::int
   EOQ
 }
 
-trigger "query" "detect_and_correct_ebs_volumes_large" {
-  title       = "Detect & correct large EBS volumes"
-  description = "Detects large EBS volumes and runs your chosen action."
+trigger "query" "detect_and_correct_ebs_volumes_exceeding_max_size" {
+  title       = "Detect & correct EBS volumes exceeding max size"
+  description = "Detects EBS volumes exceeding maximum size and runs your chosen action."
 
-  enabled  = var.ebs_volumes_large_trigger_enabled
-  schedule = var.ebs_volumes_large_trigger_schedule
+  enabled  = var.ebs_volumes_exceeding_max_size_trigger_enabled
+  schedule = var.ebs_volumes_exceeding_max_size_trigger_schedule
   database = var.database
-  sql      = local.ebs_volumes_large_query
+  sql      = local.ebs_volumes_exceeding_max_size_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ebs_volumes_large
+    pipeline = pipeline.correct_ebs_volumes_exceeding_max_size
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ebs_volumes_large" {
-  title       = "Detect & correct large EBS volumes"
-  description = "Detects large EBS volumes and runs your chosen action."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
+  title       = "Detect & correct EBS volumes exceeding max size"
+  description = "Detects EBS volumes exceeding maximum size and runs your chosen action."
 
   param "database" {
     type        = string
@@ -61,37 +60,36 @@ pipeline "detect_and_correct_ebs_volumes_large" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_large_default_action
+    default     = var.ebs_volumes_exceeding_max_size_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_large_enabled_actions
+    default     = var.ebs_volumes_exceeding_max_size_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ebs_volumes_large_query
+    sql      = local.ebs_volumes_exceeding_max_size_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ebs_volumes_large
+    pipeline = pipeline.correct_ebs_volumes_exceeding_max_size
     args = {
       items                    = step.query.detect.rows
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      default_action           = param.default_action
+      enabled_actions          = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_ebs_volumes_large" {
-  title       = "Corrects large EBS volumes"
-  description = "Runs corrective action on a collection of large EBS volumes."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_ebs_volumes_exceeding_max_size" {
+  title       = "Corrects EBS volumes exceeding max size"
+  description = "Runs corrective action on a collection of EBS volumes exceeding maximum size."
 
   param "items" {
     type = list(object({
@@ -123,19 +121,19 @@ pipeline "correct_ebs_volumes_large" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_large_default_action
+    default     = var.ebs_volumes_exceeding_max_size_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_large_enabled_actions
+    default     = var.ebs_volumes_exceeding_max_size_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} large EBS volumes."
+    text     = "Detected ${length(param.items)} EBS volumes exceeding maximum size."
   }
 
   step "transform" "items_by_id" {
@@ -145,7 +143,7 @@ pipeline "correct_ebs_volumes_large" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ebs_volume_large
+    pipeline        = pipeline.correct_one_ebs_volume_exceeding_max_size
     args = {
       title              = each.value.title
       volume_id          = each.value.volume_id
@@ -160,10 +158,9 @@ pipeline "correct_ebs_volumes_large" {
   }
 }
 
-pipeline "correct_one_ebs_volume_large" {
-  title       = "Correct one large EBS volume"
-  description = "Runs corrective action on a large EBS volume."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_one_ebs_volume_exceeding_max_size" {
+  title       = "Correct one EBS volume exceeding max size"
+  description = "Runs corrective action on an EBS volume exceeding maximum size."
 
   param "title" {
     type        = string
@@ -206,13 +203,13 @@ pipeline "correct_one_ebs_volume_large" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_large_default_action
+    default     = var.ebs_volumes_exceeding_max_size_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_large_enabled_actions
+    default     = var.ebs_volumes_exceeding_max_size_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -221,9 +218,9 @@ pipeline "correct_one_ebs_volume_large" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      detect_msg               = "Detected large EBS Volume ${param.title}."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      detect_msg               = "Detected EBS volume ${param.title} exceeding maximum size."
+      default_action           = param.default_action
+      enabled_actions          = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
@@ -233,13 +230,13 @@ pipeline "correct_one_ebs_volume_large" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped large EBS Volume ${param.title}."
+            text     = "Skipped EBS volume ${param.title} exceeding maximum size."
           }
-          success_msg = "Skipped EBS Volume ${param.title}."
-          error_msg   = "Error skipping EBS Volume ${param.title}."
+          success_msg = "Skipped EBS volume ${param.title}."
+          error_msg   = "Error skipping EBS volume ${param.title}."
         },
         "delete_volume" = {
-          label        = "Delete_volume"
+          label        = "Delete Volume"
           value        = "delete_volume"
           style        = local.style_alert
           pipeline_ref = local.aws_pipeline_delete_ebs_volume
@@ -248,10 +245,38 @@ pipeline "correct_one_ebs_volume_large" {
             region    = param.region
             cred      = param.cred
           }
-          success_msg = "Deleted EBS Volume ${param.title}."
-          error_msg   = "Error deleting EBS Volume ${param.title}."
+          success_msg = "Deleted EBS volume ${param.title}."
+          error_msg   = "Error deleting EBS volume ${param.title}."
         }
       }
     }
   }
+}
+
+variable "ebs_volumes_exceeding_max_size_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ebs_volumes_exceeding_max_size_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "ebs_volumes_exceeding_max_size_default_action" {
+  type        = string
+  description = "The default action to take for EBS volumes exceeding maximum size."
+  default     = "notify"
+}
+
+variable "ebs_volumes_exceeding_max_size_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
+}
+
+variable "ebs_volumes_exceeding_max_size" {
+  type        = number
+  description = "The maximum size (GB) allowed for volumes."
+  default     = 100
 }

@@ -1,39 +1,39 @@
 locals {
   ebs_volumes_attached_to_stopped_instances_query = <<-EOQ
-with vols_and_instances as (
+  with vols_and_instances as (
+    select
+      v.volume_id,
+      i.instance_id,
+      v.region,
+      v.account_id,
+      v._ctx,
+      bool_or(i.instance_state = 'stopped') as has_stopped_instances
+    from
+      aws_ebs_volume as v
+      left join jsonb_array_elements(v.attachments) as va on true
+      left join aws_ec2_instance as i on va ->> 'InstanceId' = i.instance_id
+    group by
+      v.volume_id,
+      i.instance_id,
+      v.region,
+      v.account_id,
+      v._ctx
+  )
   select
-    v.volume_id,
-    i.instance_id,
-    v.region,
-    v.account_id,
-    v._ctx,
-    bool_or(i.instance_state = 'stopped') as has_stopped_instances
+    concat(volume_id, ' [', region, '/', account_id, ']') as title,
+    volume_id,
+    region,
+    _ctx ->> 'connection_name' as cred
   from
-    aws_ebs_volume as v
-    left join jsonb_array_elements(v.attachments) as va on true
-    left join aws_ec2_instance as i on va ->> 'InstanceId' = i.instance_id
-  group by
-    v.volume_id,
-    i.instance_id,
-    v.region,
-    v.account_id,
-    v._ctx
-)
-select
-  concat(volume_id, ' [', region, '/', account_id, ']') as title,
-  volume_id,
-  region,
-  _ctx ->> 'connection_name' as cred
-from
-  vols_and_instances
-where
-  has_stopped_instances = true;
+    vols_and_instances
+  where
+    has_stopped_instances = true;
   EOQ
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
   title       = "Detect & correct EBS volumes attached to stopped instances"
-  description = "Detects EBS volumes which are attached to stopped instances and runs your chosen action."
+  description = "Detects EBS volumes attached to stopped instances and runs your chosen action."
 
   enabled  = var.ebs_volumes_attached_to_stopped_instances_trigger_enabled
   schedule = var.ebs_volumes_attached_to_stopped_instances_trigger_schedule
@@ -50,8 +50,7 @@ trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
 
 pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
   title       = "Detect & correct EBS volumes attached to stopped instances"
-  description = "Detects EBS volumes which are attached to stopped instances and runs your chosen action."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  description = "Detects EBS volumes attached to stopped instances and runs your chosen action."
 
   param "database" {
     type        = string
@@ -97,20 +96,19 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ebs_volumes_attached_to_stopped_instances
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
   title       = "Corrects EBS volumes attached to stopped instances"
-  description = "Runs corrective action on a collection of EBS volumes which are attached to stopped instances."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  description = "Runs corrective action on a collection of EBS volumes attached to stopped instances."
 
   param "items" {
     type = list(object({
@@ -166,23 +164,22 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_ebs_volume_attached_to_stopped_instance
     args = {
-      title                    = each.value.title
-      volume_id                = each.value.volume_id
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      volume_id          = each.value.volume_id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
   title       = "Correct one EBS volume attached to stopped instance"
-  description = "Runs corrective action on an EBS volume attached to stopped instance."
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  description = "Runs corrective action on an EBS volume attached to a stopped instance."
 
   param "title" {
     type        = string
@@ -237,12 +234,12 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected EBS volume ${param.title} attached to stopped instance."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected EBS volume ${param.title} attached to stopped instance."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
@@ -261,7 +258,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           label        = "Detach Volume"
           value        = "detach_volume"
           style        = local.style_ok
-          pipeline_ref = pipeline.mock_aws_pipeline_detach_ebs_volume // TODO: Swap to local.aws_pipeline_detach_ebs_volume when added to library mod
+          pipeline_ref = local.aws_pipeline_detach_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
@@ -269,12 +266,12 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           }
           success_msg = "Detached EBS volume ${param.title} from the instance."
           error_msg   = "Error detaching EBS volume ${param.title} from the instance."
-        }
+        },
         "delete_volume" = {
-          label        = "Delete_volume"
+          label        = "Delete Volume"
           value        = "delete_volume"
           style        = local.style_alert
-          pipeline_ref = pipeline.mock_aws_pipeline_delete_ebs_volume // TODO: Swap to local.aws_pipeline_delete_ebs_volume when added to library mod
+          pipeline_ref = local.aws_pipeline_delete_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
@@ -288,20 +285,24 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
   }
 }
 
-pipeline "mock_aws_pipeline_detach_ebs_volume" {
-  param "volume_id" {
-    type        = string
-  }
+variable "ebs_volumes_attached_to_stopped_instances_trigger_enabled" {
+  type    = bool
+  default = false
+}
 
-  param "region" {
-    type        = string
-  }
+variable "ebs_volumes_attached_to_stopped_instances_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
 
-  param "cred" {
-    type        = string
-  }
+variable "ebs_volumes_attached_to_stopped_instances_default_action" {
+  type        = string
+  description = "The default response to use when EBS volumes attached to stopped instances."
+  default     = "notify"
+}
 
-  output "result" {
-    value = "Mocked: Detach EBS Volume [VolumeID: ${param.volume_id}, Region: ${param.region}, Cred: ${param.cred}]"
-  }
+variable "ebs_volumes_attached_to_stopped_instances_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "detach_volume", "delete_volume"]
 }
