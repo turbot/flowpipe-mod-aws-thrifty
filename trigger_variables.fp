@@ -1,25 +1,6 @@
 // TODO: PLURALISE THE NAMES OF THE VARIABLES
 
 // EBS
-variable "ebs_snapshots_exceeding_max_age_trigger_enabled" {
-  type    = bool
-  default = false
-}
-
-variable "ebs_snapshots_exceeding_max_age_trigger_schedule" {
-  type    = string
-  default = "15m"
-}
-
-variable "ebs_volumes_attached_to_stopped_instances_trigger_enabled" {
-  type    = bool
-  default = false
-}
-
-variable "ebs_volumes_attached_to_stopped_instances_trigger_schedule" {
-  type    = string
-  default = "15m"
-}
 
 variable "ebs_volumes_large_trigger_enabled" {
   type    = bool
