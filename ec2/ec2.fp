@@ -102,7 +102,7 @@ variable "ec2_instance_older_generation_enabled_actions" {
 
 variable "ec2_instance_without_graviton_default_action" {
   type        = string
-  description = "The default response to use when there are older generation EC2 instances."
+  description = "The default response to use when there are EC2 instances that do not use graviton processor."
   default     = "notify"
 }
 

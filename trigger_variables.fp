@@ -257,3 +257,24 @@ variable "vpc_unused_nat_gateways_trigger_schedule" {
   type    = string
   default = "15m"
 }
+
+// ECS
+variable "ecs_cluster_container_instances_without_graviton_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ecs_cluster_container_instances_without_graviton_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "ecs_service_without_autoscaling_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ecs_service_without_autoscaling_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
