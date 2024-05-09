@@ -1,5 +1,5 @@
 locals {
-  route53_record_lower_ttl_query = <<-EOQ
+  route53_records_with_lower_ttl_query = <<-EOQ
   select
     concat(name, ' [', region, '/', account_id, ']') as title,
     name,
@@ -15,25 +15,25 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_route53_record_lower_ttl" {
-  title       = "Detect & correct Route53 records with lower TTL settings"
+trigger "query" "detect_and_correct_route53_records_with_lower_ttl" {
+  title       = "Detect & correct Route53 records with lower TTL"
   description = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
 
   enabled  = var.route53_records_lower_ttl_trigger_enabled
   schedule = var.route53_records_lower_ttl_trigger_schedule
   database = var.database
-  sql      = local.route53_record_lower_ttl_query
+  sql      = local.route53_records_with_lower_ttl_query
 
   capture "insert" {
-    pipeline = pipeline.correct_route53_record_lower_ttl
+    pipeline = pipeline.correct_route53_records_with_lower_ttl
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_route53_record_lower_ttl" {
-  title       = "Detect & correct Route53 records with lower TTL settings"
+pipeline "detect_and_correct_route53_records_with_lower_ttl" {
+  title       = "Detect & correct Route53 records with lower TTL"
   description = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
   tags        = merge(local.route53_common_tags, { class = "higher" })
 
@@ -75,11 +75,11 @@ pipeline "detect_and_correct_route53_record_lower_ttl" {
 
   step "query" "detect" {
     database = param.database
-    sql      = local.route53_record_lower_ttl_query
+    sql      = local.route53_records_with_lower_ttl_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_route53_records_lower_ttl
+    pipeline = pipeline.correct_route53_records_with_lower_ttl
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -91,10 +91,10 @@ pipeline "detect_and_correct_route53_record_lower_ttl" {
   }
 }
 
-pipeline "correct_route53_records_lower_ttl" {
-  title       = "Corrects Route53 records with lower TTL settings"
+pipeline "correct_route53_records_with_lower_ttl" {
+  title       = "Corrects Route53 records with lower TTL"
   description = "Runs corrective action on a collection of Route53 records with TTL lower than 3600 seconds."
-  tags        = merge(local.route53_common_tags, { class = "Higher" })
+  tags        = merge(local.route53_common_tags, { class = "higher" })
 
   param "items" {
     type = list(object({
@@ -141,7 +141,7 @@ pipeline "correct_route53_records_lower_ttl" {
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} Route53 records with lower TTL settings."
+    text     = "Detected ${length(param.items)} Route53 records with lower TTL."
   }
 
   step "transform" "items_by_id" {
@@ -151,7 +151,7 @@ pipeline "correct_route53_records_lower_ttl" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_route53_record_lower_ttl
+    pipeline        = pipeline.correct_one_route53_record_with_lower_ttl
     args = {
       title              = each.value.title
       name               = each.value.name
@@ -169,8 +169,8 @@ pipeline "correct_route53_records_lower_ttl" {
   }
 }
 
-pipeline "correct_one_route53_record_lower_ttl" {
-  title       = "Correct one Route53 record with lower TTL setting"
+pipeline "correct_one_route53_record_with_lower_ttl" {
+  title       = "Correct one Route53 record with lower TTL"
   description = "Runs corrective action on a Route53 record with TTL lower than 3600 seconds."
   tags        = merge(local.route53_common_tags, { class = "higher" })
 
@@ -245,7 +245,7 @@ pipeline "correct_one_route53_record_lower_ttl" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected Route53 record ${param.title} with lower TTL setting."
+      detect_msg         = "Detected Route53 record ${param.title} with lower TTL."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {
@@ -273,7 +273,7 @@ pipeline "correct_one_route53_record_lower_ttl" {
             hosted_zone_id = param.zone_id
             record_name    = param.name
             record_type    = param.type
-            record_ttl     = 3660
+            record_ttl     = 3600
             record_values  = param.records
           }
           success_msg = "Updated Route53 record ${param.title} TTL to 3600."
@@ -291,7 +291,7 @@ variable "route53_records_lower_ttl_trigger_enabled" {
 
 variable "route53_records_lower_ttl_trigger_schedule" {
   type    = string
-  default = "1h"
+  default = "15m"
 }
 
 variable "route53_records_lower_ttl_default_action" {

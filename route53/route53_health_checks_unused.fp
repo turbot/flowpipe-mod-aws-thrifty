@@ -1,5 +1,5 @@
 locals {
-  route53_health_check_unused_query = <<-EOQ
+  route53_health_checks_unused_query = <<-EOQ
   with health_check as (
     select
       r.health_check_id as health_check_id
@@ -23,25 +23,25 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_route53_health_check_unused" {
-  title       = "Detect & correct unused Route53 health checks"
+trigger "query" "detect_and_correct_route53_health_checks_unused" {
+  title       = "Detect & correct Route53 health checks unused"
   description = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
 
   enabled  = var.route53_health_checks_unused_trigger_enabled
   schedule = var.route53_health_checks_unused_trigger_schedule
   database = var.database
-  sql      = local.route53_health_check_unused_query
+  sql      = local.route53_health_checks_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_route53_health_check_unused
+    pipeline = pipeline.correct_route53_health_checks_unused
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_route53_health_check_unused" {
-  title       = "Detect & correct unused Route53 health checks"
+pipeline "detect_and_correct_route53_health_checks_unused" {
+  title       = "Detect & correct Route53 health checks unused"
   description = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
   tags        = merge(local.route53_common_tags, { class = "unused" })
 
@@ -83,11 +83,11 @@ pipeline "detect_and_correct_route53_health_check_unused" {
 
   step "query" "detect" {
     database = param.database
-    sql      = local.route53_health_check_unused_query
+    sql      = local.route53_health_checks_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_route53_health_check_unused
+    pipeline = pipeline.correct_route53_health_checks_unused
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -99,8 +99,8 @@ pipeline "detect_and_correct_route53_health_check_unused" {
   }
 }
 
-pipeline "correct_route53_health_check_unused" {
-  title       = "Correct unused Route53 health checks"
+pipeline "correct_route53_health_checks_unused" {
+  title       = "Correct Route53 health checks unused"
   description = "Runs corrective action on a collection of Route53 health checks that are detected as unused."
   tags        = merge(local.route53_common_tags, { class = "unused" })
 
@@ -172,7 +172,7 @@ pipeline "correct_route53_health_check_unused" {
 }
 
 pipeline "correct_one_route53_health_check_unused" {
-  title       = "Correct one unused Route53 health check"
+  title       = "Correct one Route53 health check unused"
   description = "Runs corrective action on an unused Route53 health check."
   tags        = merge(local.route53_common_tags, { class = "unused" })
 
@@ -274,7 +274,7 @@ variable "route53_health_checks_unused_trigger_enabled" {
 
 variable "route53_health_checks_unused_trigger_schedule" {
   type    = string
-  default = "1h"
+  default = "15m"
 }
 
 variable "route53_health_checks_unused_default_action" {
