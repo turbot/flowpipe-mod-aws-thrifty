@@ -88,7 +88,7 @@ pipeline "detect_and_correct_rds_db_instances_long_running" {
 }
 
 pipeline "correct_rds_db_instances_long_running" {
-  title       = "Corrects long running RDS DB instances"
+  title       = "Correct long running RDS DB instances"
   description = "Runs corrective action on a collection of long running RDS DB instances."
 
   param "items" {

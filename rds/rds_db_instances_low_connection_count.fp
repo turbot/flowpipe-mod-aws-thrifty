@@ -105,7 +105,7 @@ pipeline "detect_and_correct_rds_db_instances_low_connection_count" {
 }
 
 pipeline "correct_rds_db_instances_low_connection_count" {
-  title       = "Corrects RDS DB instances with low connection count"
+  title       = "Correct RDS DB instances with low connection count"
   description = "Runs corrective action on a collection of RDS DB instances with low connection count."
 
   param "items" {

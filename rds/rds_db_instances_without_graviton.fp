@@ -88,7 +88,7 @@ pipeline "detect_and_correct_rds_db_instances_without_graviton" {
 }
 
 pipeline "correct_rds_db_instances_without_graviton" {
-  title       = "Corrects RDS DB instances without graviton processor"
+  title       = "Correct RDS DB instances without graviton processor"
   description = "Runs corrective action on a collection of RDS DB instances without graviton processor."
   // tags          = merge(local.rds_db_common_tags, {
   //   class = "deprecated"

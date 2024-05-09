@@ -101,7 +101,7 @@ pipeline "detect_and_correct_vpc_nat_gateways_unused" {
 }
 
 pipeline "correct_vpc_nat_gateways_unused" {
-  title       = "Corrects unused NAT Gateways"
+  title       = "Correct unused NAT Gateways"
   description = "Runs corrective action on a collection of NAT Gateways which are unused."
   // documentation = file("./vpc/unused_nat_gateways.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })

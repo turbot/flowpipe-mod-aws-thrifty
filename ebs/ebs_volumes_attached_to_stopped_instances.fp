@@ -107,7 +107,7 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Corrects EBS volumes attached to stopped instances"
+  title       = "Correct EBS volumes attached to stopped instances"
   description = "Runs corrective action on a collection of EBS volumes attached to stopped instances."
 
   param "items" {

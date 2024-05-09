@@ -88,7 +88,7 @@ pipeline "detect_and_correct_rds_db_instances_older_generation" {
 }
 
 pipeline "correct_rds_db_instances_older_generation" {
-  title       = "Corrects to older generation RDS DB instances"
+  title       = "Correct to older generation RDS DB instances"
   description = "Runs corrective action on a collection of older generation RDS DB instances."
 
   param "items" {

@@ -90,7 +90,7 @@ pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
 }
 
 pipeline "correct_ebs_volumes_with_low_iops" {
-  title       = "Corrects EBS volumes with low IOPS"
+  title       = "Correct EBS volumes with low IOPS"
   description = "Runs corrective action on a collection of EBS volumes with low IOPS."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 

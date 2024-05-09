@@ -92,7 +92,7 @@ pipeline "detect_and_correct_ec2_instances_without_graviton" {
 }
 
 pipeline "correct_ec2_instances_without_graviton" {
-  title         = "Corrects EC2 instances without graviton processor"
+  title         = "Correct EC2 instances without graviton processor"
   description   = "Runs corrective action on a collection of EC2 instances without graviton processor."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 

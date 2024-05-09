@@ -102,7 +102,7 @@ pipeline "detect_and_correct_ec2_network_load_balancers_unused" {
 }
 
 pipeline "correct_ec2_network_load_balancers_unused" {
-  title         = "Corrects unused EC2 network load balancers"
+  title         = "Correct unused EC2 network load balancers"
   description   = "Runs corrective action on a collection of unused EC2 network load balancers."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 

@@ -92,7 +92,7 @@ pipeline "detect_and_correct_route53_records_with_lower_ttl" {
 }
 
 pipeline "correct_route53_records_with_lower_ttl" {
-  title       = "Corrects Route53 records with lower TTL"
+  title       = "Correct Route53 records with lower TTL"
   description = "Runs corrective action on a collection of Route53 records with TTL lower than 3600 seconds."
   tags        = merge(local.route53_common_tags, { class = "higher" })
 

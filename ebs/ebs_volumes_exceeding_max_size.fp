@@ -88,7 +88,7 @@ pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
 }
 
 pipeline "correct_ebs_volumes_exceeding_max_size" {
-  title       = "Corrects EBS volumes exceeding max size"
+  title       = "Correct EBS volumes exceeding max size"
   description = "Runs corrective action on a collection of EBS volumes exceeding maximum size."
 
   param "items" {

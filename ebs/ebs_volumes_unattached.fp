@@ -88,7 +88,7 @@ pipeline "detect_and_correct_ebs_volumes_unattached" {
 }
 
 pipeline "correct_ebs_volumes_unattached" {
-  title       = "Corrects EBS volumes unattached"
+  title       = "Correct EBS volumes unattached"
   description = "Runs corrective action on a collection of EBS volumes which are unattached."
 
   param "items" {

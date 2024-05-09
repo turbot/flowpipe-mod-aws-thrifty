@@ -89,7 +89,7 @@ pipeline "detect_and_correct_secretsmanager_secrets_unused" {
 }
 
 pipeline "correct_secretsmanager_secrets_unused" {
-  title         = "Corrects SecretsManager secrets that are unused"
+  title         = "Correct SecretsManager secrets that are unused"
   description   = "Runs corrective action on a collection of SecretsManager secrets that are unused (not access in last n days)."
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 

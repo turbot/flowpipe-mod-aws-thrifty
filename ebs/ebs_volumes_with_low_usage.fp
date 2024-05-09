@@ -133,7 +133,7 @@ pipeline "detect_and_correct_ebs_volumes_with_low_usage" {
 }
 
 pipeline "correct_ebs_volumes_with_low_usage" {
-  title       = "Corrects EBS volumes with low usage"
+  title       = "Correct EBS volumes with low usage"
   description = "Runs corrective action on a collection of EBS volumes with low usage."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 

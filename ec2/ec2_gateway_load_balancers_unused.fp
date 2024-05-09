@@ -102,7 +102,7 @@ pipeline "detect_and_correct_ec2_gateway_load_balancers_unused" {
 }
 
 pipeline "correct_ec2_gateway_load_balancers_unused" {
-  title         = "Corrects EC2 gateway load balancers exceeding max age"
+  title         = "Correct EC2 gateway load balancers exceeding max age"
   description   = "Runs corrective action on a collection of EC2 gateway load balancers exceeding max age."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 

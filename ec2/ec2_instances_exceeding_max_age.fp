@@ -92,7 +92,7 @@ pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
 }
 
 pipeline "correct_ec2_instances_exceeding_max_age" {
-  title         = "Corrects EC2 instances exceeding max age"
+  title         = "Correct EC2 instances exceeding max age"
   description   = "Runs corrective action on a collection of EC2 instances exceeding max age."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "unused" 

@@ -88,7 +88,7 @@ pipeline "detect_and_correct_ebs_snapshots_exceeding_max_age" {
 }
 
 pipeline "correct_ebs_snapshots_exceeding_max_age" {
-  title       = "Corrects EBS snapshots exceeding max age"
+  title       = "Correct EBS snapshots exceeding max age"
   description = "Runs corrective action on a collection of EBS snapshots exceeding max age."
 
   param "items" {

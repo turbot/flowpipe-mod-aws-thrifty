@@ -92,7 +92,7 @@ pipeline "detect_and_correct_ec2_instances_large" {
 }
 
 pipeline "correct_ec2_instances_large" {
-  title         = "Corrects large EC2 instances"
+  title         = "Correct large EC2 instances"
   description   = "Runs corrective action on a collection of large EC2 instances."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 

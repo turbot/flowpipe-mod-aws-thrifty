@@ -98,7 +98,7 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 }
 
 pipeline "correct_s3_buckets_without_lifecycle_policy" {
-  title         = "Corrects S3 buckets without lifecycle policy"
+  title         = "Correct S3 buckets without lifecycle policy"
   description   = "Runs corrective action on a collection of S3 buckets which do not have a lifecycle policy."
   documentation = file("./s3/docs/correct_s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })

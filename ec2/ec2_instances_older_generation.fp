@@ -91,7 +91,7 @@ pipeline "detect_and_correct_ec2_instances_older_generation" {
 }
 
 pipeline "correct_ec2_instances_older_generation" {
-  title         = "Corrects older generation EC2 instances"
+  title         = "Correct older generation EC2 instances"
   description   = "Runs corrective action on a collection of older generation EC2 instances."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 
