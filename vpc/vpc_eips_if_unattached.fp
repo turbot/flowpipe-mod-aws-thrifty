@@ -1,5 +1,5 @@
 locals {
-  vpc_eips_unattached_query = <<-EOQ
+  vpc_eips_if_unattached_query = <<-EOQ
   select
     concat(allocation_id, ' [', public_ip, '/', region, '/', account_id, ']') as title,
     allocation_id,
@@ -12,27 +12,27 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_vpc_eips_unattached" {
-  title       = "Detect & correct VPC EIPs unattached"
+trigger "query" "detect_and_correct_vpc_eips_if_unattached" {
+  title       = "Detect & correct VPC EIPs if unattached"
   description = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
 
-  enabled  = var.vpc_eips_unattached_trigger_enabled
-  schedule = var.vpc_eips_unattached_trigger_schedule
+  enabled  = var.vpc_eips_if_unattached_trigger_enabled
+  schedule = var.vpc_eips_if_unattached_trigger_schedule
   database = var.database
-  sql      = local.vpc_eips_unattached_query
+  sql      = local.vpc_eips_if_unattached_query
 
   capture "insert" {
-    pipeline = pipeline.correct_vpc_eips_unattached
+    pipeline = pipeline.correct_vpc_eips_if_unattached
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_vpc_eips_unattached" {
-  title         = "Detect & correct VPC EIPs unattached"
+pipeline "detect_and_correct_vpc_eips_if_unattached" {
+  title         = "Detect & correct VPC EIPs if unattached"
   description   = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
-  documentation = file("./vpc/docs/detect_and_correct_vpc_eips_unattached.md")
+  documentation = file("./vpc/docs/detect_and_correct_vpc_eips_if_unattached.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "database" {
@@ -62,22 +62,22 @@ pipeline "detect_and_correct_vpc_eips_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.vpc_eips_unattached_default_action
+    default     = var.vpc_eips_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.vpc_eips_unattached_enabled_actions
+    default     = var.vpc_eips_if_unattached_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.vpc_eips_unattached_query
+    sql      = local.vpc_eips_if_unattached_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_vpc_eips_unattached
+    pipeline = pipeline.correct_vpc_eips_if_unattached
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -89,10 +89,10 @@ pipeline "detect_and_correct_vpc_eips_unattached" {
   }
 }
 
-pipeline "correct_vpc_eips_unattached" {
-  title         = "Correct VPC EIPs unattached"
+pipeline "correct_vpc_eips_if_unattached" {
+  title         = "Correct VPC EIPs if unattached"
   description   = "Runs corrective action on a collection of EIPs (Elastic IP addresses) which is unattached."
-  documentation = file("./vpc/docs/correct_vpc_eips_unattached.md")
+  documentation = file("./vpc/docs/correct_vpc_eips_if_unattached.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "items" {
@@ -125,13 +125,13 @@ pipeline "correct_vpc_eips_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.vpc_eips_unattached_default_action
+    default     = var.vpc_eips_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.vpc_eips_unattached_enabled_actions
+    default     = var.vpc_eips_if_unattached_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -151,7 +151,7 @@ pipeline "correct_vpc_eips_unattached" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_vpc_eip_unattached
+    pipeline        = pipeline.correct_one_vpc_eip_if_unattached
     args = {
       title              = each.value.title
       allocation_id      = each.value.allocation_id
@@ -166,10 +166,10 @@ pipeline "correct_vpc_eips_unattached" {
   }
 }
 
-pipeline "correct_one_vpc_eip_unattached" {
-  title         = "Correct one VPC EIP unattached"
+pipeline "correct_one_vpc_eip_if_unattached" {
+  title         = "Correct one VPC EIP if unattached"
   description   = "Runs corrective action on one EIP (Elastic IP addresses) which is unattached."
-  documentation = file("./vpc/docs/correct_one_vpc_eip_unattached.md")
+  documentation = file("./vpc/docs/correct_one_vpc_eip_if_unattached.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
@@ -213,13 +213,13 @@ pipeline "correct_one_vpc_eip_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.vpc_eips_unattached_default_action
+    default     = var.vpc_eips_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.vpc_eips_unattached_enabled_actions
+    default     = var.vpc_eips_if_unattached_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -263,23 +263,23 @@ pipeline "correct_one_vpc_eip_unattached" {
   }
 }
 
-variable "vpc_eips_unattached_trigger_enabled" {
+variable "vpc_eips_if_unattached_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "vpc_eips_unattached_trigger_schedule" {
+variable "vpc_eips_if_unattached_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "vpc_eips_unattached_default_action" {
+variable "vpc_eips_if_unattached_default_action" {
   type        = string
   description = "The default response to use when elastic IP addresses are unattached."
   default     = "notify"
 }
 
-variable "vpc_eips_unattached_enabled_actions" {
+variable "vpc_eips_if_unattached_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "release"]
