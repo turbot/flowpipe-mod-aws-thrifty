@@ -239,18 +239,19 @@ pipeline "correct_one_ebs_volume_with_low_iops" {
           success_msg = "Skipped EBS Volume ${param.title}."
           error_msg   = "Error skipping EBS Volume ${param.title}."
         },
-        "delete_volume" = {
-          label        = "Delete_volume"
-          value        = "delete_volume"
-          style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+        "update_to_gp3" = {
+          label        = "Update to gp3"
+          value        = "update_to_gp3"
+          style        = local.style_ok
+          pipeline_ref = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {
-            volume_id = param.volume_id
-            region    = param.region
-            cred      = param.cred
+            volume_id   = param.volume_id
+            volume_type = "gp3"
+            region      = param.region
+            cred        = param.cred
           }
-          success_msg = "Deleted EBS Volume ${param.title}."
-          error_msg   = "Error deleting EBS Volume ${param.title}."
+          success_msg = "Updated EBS volume ${param.title} to gp3."
+          error_msg   = "Error updating EBS volume ${param.title} to gp3."
         }
       }
     }
