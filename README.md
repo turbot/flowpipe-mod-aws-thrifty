@@ -23,12 +23,11 @@ steampipe plugin install aws
 
 Steampipe will automatically use your default AWS credentials. Optionally, you can [setup multiple accounts](https://hub.steampipe.io/plugins/turbot/aws#multi-account-connections) or [customize AWS credentials](https://hub.steampipe.io/plugins/turbot/aws#configuring-aws-credentials).
 
-Finally, download the mod:
+Finally, install the mod:
 
 ```sh
-mkdir aws-thrifty
-cd aws-thrifty
-git clone git@github.com:turbot/flowpipe-mod-aws-thrifty.git
+flowpipe mod init
+flowpipe mod install github.com/turbot/flowpipe-mod-aws-thrifty
 ```
 
 ### Configure Variables
