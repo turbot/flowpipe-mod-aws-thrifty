@@ -32,6 +32,7 @@ trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   title         = "Detect & correct S3 buckets without lifecycle policy"
   description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
+  documentation = file("./s3/docs/s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "database" {
@@ -84,13 +85,13 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_s3_buckets_without_lifecycle_policy
     args     = {
-      items                    = step.query.detect.rows
-      policy                   = param.policy
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      items              = step.query.detect.rows
+      policy             = param.policy
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -98,6 +99,7 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 pipeline "correct_s3_buckets_without_lifecycle_policy" {
   title         = "Corrects S3 buckets without lifecycle policy"
   description   = "Runs corrective action on a collection of S3 buckets which do not have a lifecycle policy."
+  documentation = file("./s3/docs/s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "items" {
@@ -160,16 +162,16 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_s3_bucket_without_lifecycle_policy
     args            = {
-      title                    = each.value.title
-      name                     = each.value.name
-      region                   = each.value.region
-      cred                     = each.value.cred
-      policy                   = param.policy
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      name               = each.value.name
+      region             = each.value.region
+      cred               = each.value.cred
+      policy             = param.policy
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -177,6 +179,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
 pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   title         = "Correct one S3 bucket without lifecycle policy"
   description   = "Runs corrective action on an individual S3 bucket which does not have a lifecycle policy."
+  documentation = file("./s3/docs/s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "title" {
@@ -238,10 +241,10 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args     = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected S3 Bucket ${param.title} without a lifecycle policy."
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected S3 Bucket ${param.title} without a lifecycle policy."
       default_action  = param.default_action
       enabled_actions = param.enabled_actions
       actions = {
@@ -331,11 +334,37 @@ variable "s3_buckets_without_lifecycle_policy_default_policy" {
 {
   "Rules": [
     {
-      "ID": "Expire all objects after one year",
+      "ID": "Transition to STANDARD_IA after 90 days",
       "Status": "Enabled",
-      "Expiration": {
-        "Days": 365
-      }
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 90,
+          "StorageClass": "STANDARD_IA"
+        }
+      ]
+    },
+    {
+      "ID": "Transition to GLACIER after 180 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 180,
+          "StorageClass": "GLACIER"
+        }
+      ]
+    },
+    {
+      "ID": "Transition to DEEP_ARCHIVE after 365 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 365,
+          "StorageClass": "DEEP_ARCHIVE"
+        }
+      ]
     }
   ]
 }

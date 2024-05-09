@@ -70,7 +70,7 @@ flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 Each detection has a corresponding [Query Trigger](https://flowpipe.io/docs/flowpipe-hcl/trigger/query), by default - these are `Disabled` so that you can customize which you wish to enable and the frequency of their running. <!-- TODO: Get link to .fptriggers docs once available -->
 
 
-<!--> TODO: Mention how to obtain human input - link out for setup/instructions. -->
+<!-- TODO: Mention how to obtain human input - link out for setup/instructions/tutorials -->
 
 ## Open Source & Contributing
 
