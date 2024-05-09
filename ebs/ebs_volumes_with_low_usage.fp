@@ -57,7 +57,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_with_low_usage" {
-  title       = "Detect & Correct EBS volumes with low usage"
+  title       = "Detect & Correct EBS Volumes With Low Usage"
   description = "Detects EBS volumes with low usage and runs your chosen action."
 
   enabled  = var.ebs_volumes_with_low_usage_trigger_enabled
@@ -74,7 +74,7 @@ trigger "query" "detect_and_correct_ebs_volumes_with_low_usage" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_with_low_usage" {
-  title       = "Detect & Correct EBS volumes with low usage"
+  title       = "Detect & Correct EBS Volumes With Low Usage"
   description = "Detects EBS volumes with low usage and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
@@ -133,7 +133,7 @@ pipeline "detect_and_correct_ebs_volumes_with_low_usage" {
 }
 
 pipeline "correct_ebs_volumes_with_low_usage" {
-  title       = "Correct EBS volumes with low usage"
+  title       = "Correct EBS Volumes With Low Usage"
   description = "Runs corrective action on a collection of EBS volumes with low usage."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
@@ -205,7 +205,7 @@ pipeline "correct_ebs_volumes_with_low_usage" {
 }
 
 pipeline "correct_one_ebs_volume_with_low_usage" {
-  title       = "Correct one EBS volume with low usage"
+  title       = "Correct One EBS Volume With Low Usage"
   description = "Runs corrective action on an EBS volume with low usage."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 

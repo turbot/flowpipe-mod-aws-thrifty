@@ -1,5 +1,5 @@
 locals {
-  ebs_volumes_unattached_query = <<-EOQ
+  ebs_volumes_if_unattached_query = <<-EOQ
   select
     concat(volume_id, ' [', volume_type, '/', region, '/', account_id, ']') as title,
     volume_id,
@@ -12,25 +12,25 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_ebs_volumes_unattached" {
-  title       = "Detect & Correct EBS volumes unattached"
+trigger "query" "detect_and_correct_ebs_volumes_if_unattached" {
+  title       = "Detect & Correct EBS Volumes If Unattached"
   description = "Detects EBS volumes which are unattached and runs your chosen action."
 
-  enabled  = var.ebs_volumes_unattached_trigger_enabled
-  schedule = var.ebs_volumes_unattached_trigger_schedule
+  enabled  = var.ebs_volumes_if_unattached_trigger_enabled
+  schedule = var.ebs_volumes_if_unattached_trigger_schedule
   database = var.database
-  sql      = local.ebs_volumes_unattached_query
+  sql      = local.ebs_volumes_if_unattached_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ebs_volumes_unattached
+    pipeline = pipeline.correct_ebs_volumes_if_unattached
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ebs_volumes_unattached" {
-  title       = "Detect & Correct EBS volumes unattached"
+pipeline "detect_and_correct_ebs_volumes_if_unattached" {
+  title       = "Detect & Correct EBS Volumes If Unattached"
   description = "Detects EBS volumes which are unattached and runs your chosen action."
 
   param "database" {
@@ -60,22 +60,22 @@ pipeline "detect_and_correct_ebs_volumes_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_unattached_default_action
+    default     = var.ebs_volumes_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_unattached_enabled_actions
+    default     = var.ebs_volumes_if_unattached_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ebs_volumes_unattached_query
+    sql      = local.ebs_volumes_if_unattached_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ebs_volumes_unattached
+    pipeline = pipeline.correct_ebs_volumes_if_unattached
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -87,8 +87,8 @@ pipeline "detect_and_correct_ebs_volumes_unattached" {
   }
 }
 
-pipeline "correct_ebs_volumes_unattached" {
-  title       = "Correct EBS volumes unattached"
+pipeline "correct_ebs_volumes_if_unattached" {
+  title       = "Correct EBS Volumes If Unattached"
   description = "Runs corrective action on a collection of EBS volumes which are unattached."
 
   param "items" {
@@ -121,13 +121,13 @@ pipeline "correct_ebs_volumes_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_unattached_default_action
+    default     = var.ebs_volumes_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_unattached_enabled_actions
+    default     = var.ebs_volumes_if_unattached_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -143,7 +143,7 @@ pipeline "correct_ebs_volumes_unattached" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ebs_volume_unattached
+    pipeline        = pipeline.correct_one_ebs_volume_if_unattached
     args = {
       title              = each.value.title
       volume_id          = each.value.volume_id
@@ -158,8 +158,8 @@ pipeline "correct_ebs_volumes_unattached" {
   }
 }
 
-pipeline "correct_one_ebs_volume_unattached" {
-  title       = "Correct one EBS volume unattached"
+pipeline "correct_one_ebs_volume_if_unattached" {
+  title       = "Correct One EBS Volume If Unattached"
   description = "Runs corrective action on an EBS volume unattached."
 
   param "title" {
@@ -203,13 +203,13 @@ pipeline "correct_one_ebs_volume_unattached" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_unattached_default_action
+    default     = var.ebs_volumes_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_unattached_enabled_actions
+    default     = var.ebs_volumes_if_unattached_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -253,23 +253,23 @@ pipeline "correct_one_ebs_volume_unattached" {
   }
 }
 
-variable "ebs_volumes_unattached_trigger_enabled" {
+variable "ebs_volumes_if_unattached_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "ebs_volumes_unattached_trigger_schedule" {
+variable "ebs_volumes_if_unattached_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "ebs_volumes_unattached_default_action" {
+variable "ebs_volumes_if_unattached_default_action" {
   type        = string
   description = "The default action to take for unattached EBS volumes."
   default     = "notify"
 }
 
-variable "ebs_volumes_unattached_enabled_actions" {
+variable "ebs_volumes_if_unattached_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_volume"]

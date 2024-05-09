@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_with_low_iops" {
-  title       = "Detect & Correct EBS volumes with low IOPS"
+  title       = "Detect & Correct EBS Volumes With Low IOPS"
   description = "Detects EBS volumes with low IOPS and runs your chosen action."
 
   enabled  = var.ebs_volumes_with_low_iops_trigger_enabled
@@ -31,7 +31,7 @@ trigger "query" "detect_and_correct_ebs_volumes_with_low_iops" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
-  title       = "Detect & Correct EBS volumes with low IOPS"
+  title       = "Detect & Correct EBS Volumes With Low IOPS"
   description = "Detects EBS volumes with low IOPS and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 
@@ -90,7 +90,7 @@ pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
 }
 
 pipeline "correct_ebs_volumes_with_low_iops" {
-  title       = "Correct EBS volumes with low IOPS"
+  title       = "Correct EBS Volumes With Low IOPS"
   description = "Runs corrective action on a collection of EBS volumes with low IOPS."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 
@@ -162,7 +162,7 @@ pipeline "correct_ebs_volumes_with_low_iops" {
 }
 
 pipeline "correct_one_ebs_volume_with_low_iops" {
-  title       = "Correct one EBS volume with low IOPS"
+  title       = "Correct One EBS Volume With Low IOPS"
   description = "Runs corrective action on an EBS volume with low IOPS."
   // tags          = merge(local.ebs_common_tags, { class = "management" })
 

@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_exceeding_max_size" {
-  title       = "Detect & Correct EBS volumes exceeding max size"
+  title       = "Detect & Correct EBS Volumes Exceeding Max Size"
   description = "Detects EBS volumes exceeding maximum size and runs your chosen action."
 
   enabled  = var.ebs_volumes_exceeding_max_size_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_ebs_volumes_exceeding_max_size" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
-  title       = "Detect & Correct EBS volumes exceeding max size"
+  title       = "Detect & Correct EBS Volumes Exceeding Max Size"
   description = "Detects EBS volumes exceeding maximum size and runs your chosen action."
 
   param "database" {
@@ -88,7 +88,7 @@ pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
 }
 
 pipeline "correct_ebs_volumes_exceeding_max_size" {
-  title       = "Correct EBS volumes exceeding max size"
+  title       = "Correct EBS Volumes Exceeding Max Size"
   description = "Runs corrective action on a collection of EBS volumes exceeding maximum size."
 
   param "items" {
@@ -159,7 +159,7 @@ pipeline "correct_ebs_volumes_exceeding_max_size" {
 }
 
 pipeline "correct_one_ebs_volume_exceeding_max_size" {
-  title       = "Correct one EBS volume exceeding max size"
+  title       = "Correct One EBS Volume Exceeding Max Size"
   description = "Runs corrective action on an EBS volume exceeding maximum size."
 
   param "title" {

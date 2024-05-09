@@ -32,7 +32,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Detect & Correct EBS volumes attached to stopped instances"
+  title       = "Detect & Correct EBS Volumes Attached To Stopped Instances"
   description = "Detects EBS volumes attached to stopped instances and runs your chosen action."
 
   enabled  = var.ebs_volumes_attached_to_stopped_instances_trigger_enabled
@@ -49,7 +49,7 @@ trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Detect & Correct EBS volumes attached to stopped instances"
+  title       = "Detect & Correct EBS Volumes Attached To Stopped Instances"
   description = "Detects EBS volumes attached to stopped instances and runs your chosen action."
 
   param "database" {
@@ -107,7 +107,7 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Correct EBS volumes attached to stopped instances"
+  title       = "Correct EBS Volumes Attached To Stopped Instances"
   description = "Runs corrective action on a collection of EBS volumes attached to stopped instances."
 
   param "items" {
@@ -178,7 +178,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
-  title       = "Correct one EBS volume attached to stopped instance"
+  title       = "Correct One EBS Volume Attached To Stopped Instance"
   description = "Runs corrective action on an EBS volume attached to a stopped instance."
 
   param "title" {

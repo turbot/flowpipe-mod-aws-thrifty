@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_with_high_iops" {
-  title       = "Detect & Correct EBS volumes with high IOPS"
+  title       = "Detect & Correct EBS Volumes With High IOPS"
   description = "Detects EBS volumes with high IOPS and runs your chosen corrective action."
 
   enabled  = var.ebs_volumes_with_high_iops_trigger_enabled
@@ -31,7 +31,7 @@ trigger "query" "detect_and_correct_ebs_volumes_with_high_iops" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
-  title       = "Detect & Correct EBS volumes with high IOPS"
+  title       = "Detect & Correct EBS Volumes With High IOPS"
   description = "Detects EBS volumes with high IOPS and runs your chosen corrective action."
 
   param "database" {
@@ -89,7 +89,7 @@ pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
 }
 
 pipeline "correct_ebs_volumes_with_high_iops" {
-  title       = "Correct EBS volumes with high IOPS"
+  title       = "Correct EBS Volumes With High IOPS"
   description = "Runs corrective action on a collection of EBS volumes with high IOPS."
 
   param "items" {
@@ -160,7 +160,7 @@ pipeline "correct_ebs_volumes_with_high_iops" {
 }
 
 pipeline "correct_one_ebs_volume_with_high_iops" {
-  title       = "Correct one EBS volume with high IOPS"
+  title       = "Correct One EBS Volume With High IOPS"
   description = "Runs corrective action on an EBS volume with high IOPS."
 
   param "title" {
