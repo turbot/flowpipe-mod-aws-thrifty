@@ -4,12 +4,6 @@ locals {
   })
 }
 
-variable "ebs_snapshot_age_max_days" {
-  type        = number
-  description = "The maximum number of days EBS snapshots can be retained."
-  default     = 90
-}
-
 variable "ebs_volume_max_size_gb" {
   type        = number
   description = "The maximum size (GB) allowed for volumes."
@@ -88,17 +82,6 @@ variable "ebs_volume_unattached_enabled_actions" {
   default     = ["skip", "delete_volume"]
 }
 
-variable "ebs_volumes_attached_to_stopped_instances_default_action" {
-  type        = string
-  description = "The default response to use when EBS volumes attached to stopped instances."
-  default     = "notify"
-}
-
-variable "ebs_volumes_attached_to_stopped_instances_enabled_actions" {
-  type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "detach_volume", "delete_volume"]
-}
 
 variable "ebs_volume_large_default_action" {
   type        = string
