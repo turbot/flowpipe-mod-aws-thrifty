@@ -7,7 +7,7 @@ mod "aws_thrifty" {
   categories    = ["public cloud"]
   require {
     mod "github.com/turbot/flowpipe-mod-aws" {
-      version = "v0.1.1-rc.2"
+      version = "v0.1.1-rc.4"
     }
     mod "github.com/turbot/flowpipe-mod-detect-correct" {
       version = "v0.0.1-alpha.0"

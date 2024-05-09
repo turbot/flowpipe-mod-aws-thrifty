@@ -253,27 +253,6 @@ pipeline "correct_one_rds_db_instance_long_running" {
   }
 }
 
-pipeline "mock_aws_pipeline_delete_rds_instance" {
-  param "db_instance_identifier" {
-    type        = string
-    description = "The identifier of DB instance."
-  }
-
-  param "region" {
-    type        = string
-    description = local.description_region
-  }
-
-  param "cred" {
-    type        = string
-    description = local.description_credential
-  }
-
-  output "result" {
-    value = "Mocked: Delete RDS Instance [ID: ${param.db_instance_identifier}, Region: ${param.region}, Cred: ${param.cred}]"
-  }
-}
-
 variable "rds_db_instances_long_running_days" {
   type        = number
   description = "The maximum number of days DB instances are allowed to run."

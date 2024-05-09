@@ -4,18 +4,18 @@ locals {
     concat(volume_id, ' [', region, '/', account_id, ']') as title,
     volume_id,
     region,
-    _ctx ->> 'connection_name' as cred
+    _ctx ->> 'connection_name' as credential
   from
     aws_ebs_volume
   where
     volume_type in ('io1', 'io2')
-    and iops > ${var.ebs_volume_max_iops}::int
+    and iops > ${var.ebs_volumes_with_high_iops}::int
   EOQ
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_with_high_iops" {
   title       = "Detect & correct EBS volumes with high IOPS"
-  description = "Detects EBS volumes with high IOPS and runs your chosen action."
+  description = "Detects EBS volumes with high IOPS and runs your chosen corrective action."
 
   enabled  = var.ebs_volumes_with_high_iops_trigger_enabled
   schedule = var.ebs_volumes_with_high_iops_trigger_schedule
@@ -32,8 +32,7 @@ trigger "query" "detect_and_correct_ebs_volumes_with_high_iops" {
 
 pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
   title       = "Detect & correct EBS volumes with high IOPS"
-  description = "Detects EBS volumes with high IOPS and runs your chosen action."
-  // tags          = merge(local.ebs_common_tags, { class = "management" })
+  description = "Detects EBS volumes with high IOPS and runs your chosen corrective action."
 
   param "database" {
     type        = string
@@ -62,13 +61,13 @@ pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_with_high_iops_default_action
+    default     = var.ebs_volumes_with_high_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_with_high_iops_enabled_actions
+    default     = var.ebs_volumes_with_high_iops_enabled_actions
   }
 
   step "query" "detect" {
@@ -79,27 +78,26 @@ pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ebs_volumes_with_high_iops
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_ebs_volumes_with_high_iops" {
-  title       = "Corrects EBS volumes with high IOPS"
+  title       = "Correct EBS volumes with high IOPS"
   description = "Runs corrective action on a collection of EBS volumes with high IOPS."
-  // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "items" {
     type = list(object({
-      title     = string
-      volume_id = string
-      region    = string
-      cred      = string
+      title      = string
+      volume_id  = string
+      region     = string
+      credential = string
     }))
   }
 
@@ -124,13 +122,13 @@ pipeline "correct_ebs_volumes_with_high_iops" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_with_high_iops_default_action
+    default     = var.ebs_volumes_with_high_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_with_high_iops_enabled_actions
+    default     = var.ebs_volumes_with_high_iops_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -148,15 +146,15 @@ pipeline "correct_ebs_volumes_with_high_iops" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_ebs_volume_with_high_iops
     args = {
-      title                    = each.value.title
-      volume_id                = each.value.volume_id
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      volume_id          = each.value.volume_id
+      region             = each.value.region
+      credential         = each.value.credential
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -164,7 +162,6 @@ pipeline "correct_ebs_volumes_with_high_iops" {
 pipeline "correct_one_ebs_volume_with_high_iops" {
   title       = "Correct one EBS volume with high IOPS"
   description = "Runs corrective action on an EBS volume with high IOPS."
-  // tags          = merge(local.ebs_common_tags, { class = "management" })
 
   param "title" {
     type        = string
@@ -181,7 +178,7 @@ pipeline "correct_one_ebs_volume_with_high_iops" {
     description = local.description_region
   }
 
-  param "cred" {
+  param "credential" {
     type        = string
     description = local.description_credential
   }
@@ -207,24 +204,24 @@ pipeline "correct_one_ebs_volume_with_high_iops" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volume_with_high_iops_default_action
+    default     = var.ebs_volumes_with_high_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volume_with_high_iops_enabled_actions
+    default     = var.ebs_volumes_with_high_iops_enabled_actions
   }
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected EBS Volume ${param.title} with high IOPS."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected EBS volume ${param.title} with high IOPS."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
@@ -234,25 +231,53 @@ pipeline "correct_one_ebs_volume_with_high_iops" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped EBS Volume ${param.title} with high IOPS."
+            text     = "Skipped EBS volume ${param.title} with high IOPS."
           }
-          success_msg = "Skipped EBS Volume ${param.title}."
-          error_msg   = "Error skipping EBS Volume ${param.title}."
+          success_msg = "Skipped EBS volume ${param.title}."
+          error_msg   = "Error skipping EBS volume ${param.title}."
         },
         "delete_volume" = {
-          label        = "Delete_volume"
+          label        = "Delete volume"
           value        = "delete_volume"
           style        = local.style_alert
           pipeline_ref = local.aws_pipeline_delete_ebs_volume
           pipeline_args = {
-            volume_id = param.volume_id
-            region    = param.region
-            cred      = param.cred
+            volume_id  = param.volume_id
+            region     = param.region
+            credential = param.credential
           }
-          success_msg = "Deleted EBS Volume ${param.title}."
-          error_msg   = "Error deleting EBS Volume ${param.title}."
+          success_msg = "Deleted EBS volume ${param.title}."
+          error_msg   = "Error deleting EBS volume ${param.title}."
         }
       }
     }
   }
+}
+
+variable "ebs_volumes_with_high_iops_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ebs_volumes_with_high_iops_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "ebs_volumes_with_high_iops_default_action" {
+  type        = string
+  description = "The default response to use when EBS volumes with high iops."
+  default     = "notify"
+}
+
+variable "ebs_volumes_with_high_iops_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
+}
+
+variable "ebs_volumes_with_high_iops" {
+  type        = number
+  description = "The maximum IOPS allowed for volumes."
+  default     = 32000
 }

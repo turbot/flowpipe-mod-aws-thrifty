@@ -269,24 +269,6 @@ pipeline "correct_one_vpc_nat_gateway_unused" {
   }
 }
 
-pipeline "mock_aws_pipeline_delete_nat_gateway" {
-  param "nat_gateway_id" {
-    type        = string
-  }
-
-  param "region" {
-    type        = string
-  }
-
-  param "cred" {
-    type        = string
-  }
-
-  output "result" {
-    value = "Mocked: Delete NAT Gateway [GatewayID: ${param.nat_gateway_id}, Region: ${param.region}, Cred: ${param.cred}]"
-  }
-}
-
 variable "vpc_nat_gateways_unused_trigger_enabled" {
   type    = bool
   default = false

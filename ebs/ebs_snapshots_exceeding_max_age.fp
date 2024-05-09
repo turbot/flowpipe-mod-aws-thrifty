@@ -8,7 +8,7 @@ locals {
   from
     aws_ebs_snapshot
   where
-    (current_timestamp - (${var.ebs_snapshots_age_max_days}::int || ' days')::interval) > start_time
+    (current_timestamp - (${var.ebs_snapshots_exceeding_max_age_days}::int || ' days')::interval) > start_time
   EOQ
 }
 
@@ -275,7 +275,7 @@ variable "ebs_snapshots_exceeding_max_age_enabled_actions" {
   default     = ["skip", "delete_snapshot"]
 }
 
-variable "ebs_snapshots_age_max_days" {
+variable "ebs_snapshots_exceeding_max_age_days" {
   type        = number
   description = "The maximum number of days EBS snapshots can be retained."
   default     = 90
