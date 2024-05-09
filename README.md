@@ -23,12 +23,11 @@ steampipe plugin install aws
 
 Steampipe will automatically use your default AWS credentials. Optionally, you can [setup multiple accounts](https://hub.steampipe.io/plugins/turbot/aws#multi-account-connections) or [customize AWS credentials](https://hub.steampipe.io/plugins/turbot/aws#configuring-aws-credentials).
 
-Finally, download the mod:
+Finally, install the mod:
 
 ```sh
-mkdir aws-thrifty
-cd aws-thrifty
-git clone git@github.com:turbot/flowpipe-mod-aws-thrifty.git
+flowpipe mod init
+flowpipe mod install github.com/turbot/flowpipe-mod-aws-thrifty
 ```
 
 ### Configure Variables
@@ -70,7 +69,7 @@ flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 Each detection has a corresponding [Query Trigger](https://flowpipe.io/docs/flowpipe-hcl/trigger/query), by default - these are `Disabled` so that you can customize which you wish to enable and the frequency of their running. <!-- TODO: Get link to .fptriggers docs once available -->
 
 
-<!--> TODO: Mention how to obtain human input - link out for setup/instructions. -->
+<!-- TODO: Mention how to obtain human input - link out for setup/instructions/tutorials -->
 
 ## Open Source & Contributing
 
