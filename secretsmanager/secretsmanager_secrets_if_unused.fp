@@ -1,5 +1,5 @@
 locals {
-  secretsmanager_secrets_unused_query = <<-EOQ
+  secretsmanager_secrets_if_unused_query = <<-EOQ
   select
     concat(name, ' [', region, '/', account_id, ']') as title,
     name,
@@ -8,30 +8,30 @@ locals {
   from
     aws_secretsmanager_secret
   where
-    date_part('day', now()-last_accessed_date) > ${var.secretsmanager_secrets_unused_days}::int
+    date_part('day', now()-last_accessed_date) > ${var.secretsmanager_secrets_if_unused_days}::int
   EOQ
 }
 
-trigger "query" "detect_and_correct_secretsmanager_secrets_unused" {
-  title       = "Detect & correct SecretsManager secrets that are unused"
-  description = "Detects SecretsManager secrets that are unused (not access in last n days) and runs your chosen action."
+trigger "query" "detect_and_correct_secretsmanager_secrets_if_unused" {
+  title       = "Detect & Correct SecretsManager Secrets If Unused"
+  description = "Detects SecretsManager secrets that are unused (not accessed in last n days) and runs your chosen action."
 
-  enabled  = var.secretsmanager_secrets_unused_trigger_enabled
-  schedule = var.secretsmanager_secrets_unused_trigger_schedule
+  enabled  = var.secretsmanager_secrets_if_unused_trigger_enabled
+  schedule = var.secretsmanager_secrets_if_unused_trigger_schedule
   database = var.database
-  sql      = local.secretsmanager_secrets_unused_query
+  sql      = local.secretsmanager_secrets_if_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_secretsmanager_secrets_unused
+    pipeline = pipeline.correct_secretsmanager_secrets_if_unused
     args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_secretsmanager_secrets_unused" {
-  title         = "Detect & correct SecretsManager secrets that are unused"
-  description   = "Detects SecretsManager secrets that are unused (not access in last n days) and runs your chosen action."
+pipeline "detect_and_correct_secretsmanager_secrets_if_unused" {
+  title         = "Detect & Correct SecretsManager Secrets If Unused"
+  description   = "Detects SecretsManager secrets that are unused (not accessed in last n days) and runs your chosen action."
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "database" {
@@ -61,35 +61,35 @@ pipeline "detect_and_correct_secretsmanager_secrets_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.secretsmanager_secrets_unused_default_action
+    default     = var.secretsmanager_secrets_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.secretsmanager_secrets_unused_enabled_actions
+    default     = var.secretsmanager_secrets_if_unused_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.secretsmanager_secrets_unused_query
+    sql      = local.secretsmanager_secrets_if_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_secretsmanager_secrets_unused
+    pipeline = pipeline.correct_secretsmanager_secrets_if_unused
     args     = {
-      items            = step.query.detect.rows
-      notifier         = param.notifier
-      notification_level   = param.notification_level
-      approvers        = param.approvers
-      default_action = param.default_action
-      enabled_actions        = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_secretsmanager_secrets_unused" {
-  title         = "Correct SecretsManager secrets that are unused"
+pipeline "correct_secretsmanager_secrets_if_unused" {
+  title         = "Correct SecretsManager Secrets If Unused"
   description   = "Runs corrective action on a collection of SecretsManager secrets that are unused (not access in last n days)."
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
@@ -123,19 +123,19 @@ pipeline "correct_secretsmanager_secrets_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.secretsmanager_secrets_unused_default_action
+    default     = var.secretsmanager_secrets_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.secretsmanager_secrets_unused_enabled_actions
+    default     = var.secretsmanager_secrets_if_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} SecretsManager secrets unused for ${var.secretsmanager_secrets_unused_days} days."
+    text     = "Detected ${length(param.items)} SecretsManager secrets unused for ${var.secretsmanager_secrets_if_unused_days} days."
   }
 
   step "transform" "items_by_id" {
@@ -145,23 +145,23 @@ pipeline "correct_secretsmanager_secrets_unused" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_secretsmanager_secret_unused
+    pipeline        = pipeline.correct_one_secretsmanager_secret_if_unused
     args            = {
-      title                    = each.value.title
-      name                     = each.value.name
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      name               = each.value.name
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_one_secretsmanager_secret_unused" {
-  title         = "Correct one SecretsManager secret that are unused"
+pipeline "correct_one_secretsmanager_secret_if_unused" {
+  title         = "Correct One SecretsManager Secret If Unused"
   description   = "Runs corrective action on a SecretsManager secret that are unused (not access in last n days)."
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
@@ -206,13 +206,13 @@ pipeline "correct_one_secretsmanager_secret_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.secretsmanager_secrets_unused_default_action
+    default     = var.secretsmanager_secrets_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.secretsmanager_secrets_unused_enabled_actions
+    default     = var.secretsmanager_secrets_if_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -221,7 +221,7 @@ pipeline "correct_one_secretsmanager_secret_unused" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      detect_msg               = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_unused_days} days."
+      detect_msg               = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_if_unused_days} days."
       default_action  = param.default_action
       enabled_actions = param.enabled_actions
       actions = {
@@ -233,7 +233,7 @@ pipeline "correct_one_secretsmanager_secret_unused" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_unused_days} days."
+            text     = "Skipped SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_if_unused_days} days."
           }
           success_msg = ""
           error_msg   = ""
@@ -275,29 +275,29 @@ pipeline "mock_aws_pipeline_delete_secretsmanager_secret" {
   }
 }
 
-variable "secretsmanager_secrets_unused_trigger_enabled" {
+variable "secretsmanager_secrets_if_unused_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "secretsmanager_secrets_unused_trigger_schedule" {
+variable "secretsmanager_secrets_if_unused_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "secretsmanager_secrets_unused_default_action" {
+variable "secretsmanager_secrets_if_unused_default_action" {
   type        = string
   description = "The default response to use when secrets manager secrets are unused."
   default     = "notify"
 }
 
-variable "secretsmanager_secrets_unused_enabled_actions" {
+variable "secretsmanager_secrets_if_unused_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_secret"]
 }
 
-variable "secretsmanager_secrets_unused_days" {
+variable "secretsmanager_secrets_if_unused_days" {
   type        = number
   description = "The default number of days secrets manager secrets to be considered in-use."
   default     = 90

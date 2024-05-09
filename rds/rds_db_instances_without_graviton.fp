@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_rds_db_instances_without_graviton" {
-  title       = "Detect & correct RDS DB instances without graviton processor"
+  title       = "Detect & Correct RDS DB Instances Without Graviton Processor"
   description = "Detects RDS DB instances without graviton processor and runs your chosen action."
 
   enabled  = var.rds_db_instances_without_graviton_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_rds_db_instances_without_graviton" {
 }
 
 pipeline "detect_and_correct_rds_db_instances_without_graviton" {
-  title       = "Detect & correct RDS DB instances without graviton processor"
+  title       = "Detect & Correct RDS DB Instances Without Graviton Processor"
   description = "Detects RDS DB instances without graviton processor and runs your chosen action."
 
   param "database" {
@@ -88,7 +88,7 @@ pipeline "detect_and_correct_rds_db_instances_without_graviton" {
 }
 
 pipeline "correct_rds_db_instances_without_graviton" {
-  title       = "Correct RDS DB instances without graviton processor"
+  title       = "Correct RDS DB Instances Without Graviton Processor"
   description = "Runs corrective action on a collection of RDS DB instances without graviton processor."
   // tags          = merge(local.rds_db_common_tags, {
   //   class = "deprecated"
@@ -162,7 +162,7 @@ pipeline "correct_rds_db_instances_without_graviton" {
 }
 
 pipeline "correct_one_rds_db_instance_without_graviton" {
-  title       = "Correct an RDS DB instance without graviton processor"
+  title       = "Correct One RDS DB Instance Without Graviton Processor"
   description = "Runs corrective action on an RDS DB instance without graviton processor."
   // tags          = merge(local.rds_db_common_tags, { class = "deprecated" })
 

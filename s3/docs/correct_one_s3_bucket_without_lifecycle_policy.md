@@ -1,4 +1,8 @@
+# Correct One S3 Bucket Without Lifecycle Policy
+
 ## Overview
+
+S3 Buckets without a lifecycle policy will not move objects between storage layers or expire objects, causing them to remain in their initial tier perpetually, this is inefficient and can be costly.
 
 This pipeline allows you to specify a single S3 bucket without a lifecycle policy and then either send a notification or attempt to perform a predefined corrective action.
 

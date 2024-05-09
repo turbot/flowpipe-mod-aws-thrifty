@@ -25,7 +25,7 @@ locals {
 
 
 trigger "query" "detect_and_correct_ec2_application_load_balancers_unused" {
-  title       = "Detect & correct unused EC2 application load balancers"
+  title       = "Detect & Correct unused EC2 application load balancers"
   description = "Detects EC2 application load balancers that are unused."
 
   enabled  = var.ec2_application_load_balancer_unused_trigger_enabled
@@ -42,7 +42,7 @@ trigger "query" "detect_and_correct_ec2_application_load_balancers_unused" {
 }
 
 pipeline "detect_and_correct_ec2_application_load_balancers_unused" {
-  title         = "Detect & correct EC2 unused application load balancers"
+  title         = "Detect & Correct EC2 unused application load balancers"
   description   = "Detects unused EC2 application load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 

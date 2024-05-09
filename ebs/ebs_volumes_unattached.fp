@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_unattached" {
-  title       = "Detect & correct EBS volumes unattached"
+  title       = "Detect & Correct EBS volumes unattached"
   description = "Detects EBS volumes which are unattached and runs your chosen action."
 
   enabled  = var.ebs_volumes_unattached_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_ebs_volumes_unattached" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_unattached" {
-  title       = "Detect & correct EBS volumes unattached"
+  title       = "Detect & Correct EBS volumes unattached"
   description = "Detects EBS volumes which are unattached and runs your chosen action."
 
   param "database" {

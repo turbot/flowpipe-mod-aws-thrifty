@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_using_gp2" {
-  title       = "Detect & correct EBS volumes using gp2"
+  title       = "Detect & Correct EBS volumes using gp2"
   description = "Detects EBS volumes using gp2 and executes the chosen action."
 
   enabled  = var.ebs_volumes_using_gp2_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_ebs_volumes_using_gp2" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_using_gp2" {
-  title       = "Detect & correct EBS volumes using gp2"
+  title       = "Detect & Correct EBS volumes using gp2"
   description = "Detects EBS volumes using gp2 and performs the chosen action."
 
   param "database" {

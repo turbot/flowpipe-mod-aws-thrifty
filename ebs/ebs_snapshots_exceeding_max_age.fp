@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_snapshots_exceeding_max_age" {
-  title       = "Detect & correct EBS snapshots exceeding max age"
+  title       = "Detect & Correct EBS snapshots exceeding max age"
   description = "Detects EBS snapshots exceeding max age and runs your chosen action."
 
   enabled  = var.ebs_snapshots_exceeding_max_age_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_ebs_snapshots_exceeding_max_age" {
 }
 
 pipeline "detect_and_correct_ebs_snapshots_exceeding_max_age" {
-  title       = "Detect & correct EBS snapshots exceeding max age"
+  title       = "Detect & Correct EBS snapshots exceeding max age"
   description = "Detects EBS snapshots exceeding max age and runs your chosen action."
 
   param "database" {

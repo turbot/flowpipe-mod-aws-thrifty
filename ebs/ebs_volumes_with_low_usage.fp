@@ -57,7 +57,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_with_low_usage" {
-  title       = "Detect & correct EBS volumes with low usage"
+  title       = "Detect & Correct EBS volumes with low usage"
   description = "Detects EBS volumes with low usage and runs your chosen action."
 
   enabled  = var.ebs_volumes_with_low_usage_trigger_enabled
@@ -74,7 +74,7 @@ trigger "query" "detect_and_correct_ebs_volumes_with_low_usage" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_with_low_usage" {
-  title       = "Detect & correct EBS volumes with low usage"
+  title       = "Detect & Correct EBS volumes with low usage"
   description = "Detects EBS volumes with low usage and runs your chosen action."
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 

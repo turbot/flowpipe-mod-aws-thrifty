@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
-  title       = "Detect & correct EBS volumes using io1"
+  title       = "Detect & Correct EBS volumes using io1"
   description = "Detects EBS volumes using io1 and runs the chosen corrective action."
 
   enabled  = var.ebs_volumes_using_io1_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_using_io1" {
-  title       = "Detect & correct EBS volumes using io1"
+  title       = "Detect & Correct EBS volumes using io1"
   description = "Detects EBS volumes using io1 and runs the chosen corrective action."
 
   param "database" {

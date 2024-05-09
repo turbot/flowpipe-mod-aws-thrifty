@@ -1,5 +1,5 @@
 locals {
-  route53_health_checks_unused_query = <<-EOQ
+  route53_health_checks_if_unused_query = <<-EOQ
   with health_check as (
     select
       r.health_check_id as health_check_id
@@ -23,25 +23,25 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_route53_health_checks_unused" {
-  title       = "Detect & correct Route53 health checks unused"
+trigger "query" "detect_and_correct_route53_health_checks_if_unused" {
+  title       = "Detect & Correct Route53 Health Checks If Unused"
   description = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
 
-  enabled  = var.route53_health_checks_unused_trigger_enabled
-  schedule = var.route53_health_checks_unused_trigger_schedule
+  enabled  = var.route53_health_checks_if_unused_trigger_enabled
+  schedule = var.route53_health_checks_if_unused_trigger_schedule
   database = var.database
-  sql      = local.route53_health_checks_unused_query
+  sql      = local.route53_health_checks_if_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_route53_health_checks_unused
+    pipeline = pipeline.correct_route53_health_checks_if_unused
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_route53_health_checks_unused" {
-  title       = "Detect & correct Route53 health checks unused"
+pipeline "detect_and_correct_route53_health_checks_if_unused" {
+  title       = "Detect & Correct Route53 Health Checks If Unused"
   description = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
   tags        = merge(local.route53_common_tags, { class = "unused" })
 
@@ -72,22 +72,22 @@ pipeline "detect_and_correct_route53_health_checks_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_health_checks_unused_default_action
+    default     = var.route53_health_checks_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_health_checks_unused_enabled_actions
+    default     = var.route53_health_checks_if_unused_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.route53_health_checks_unused_query
+    sql      = local.route53_health_checks_if_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_route53_health_checks_unused
+    pipeline = pipeline.correct_route53_health_checks_if_unused
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -99,8 +99,8 @@ pipeline "detect_and_correct_route53_health_checks_unused" {
   }
 }
 
-pipeline "correct_route53_health_checks_unused" {
-  title       = "Correct Route53 health checks unused"
+pipeline "correct_route53_health_checks_if_unused" {
+  title       = "Correct Route53 Health Checks If Unused"
   description = "Runs corrective action on a collection of Route53 health checks that are detected as unused."
   tags        = merge(local.route53_common_tags, { class = "unused" })
 
@@ -134,13 +134,13 @@ pipeline "correct_route53_health_checks_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_health_checks_unused_default_action
+    default     = var.route53_health_checks_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_health_checks_unused_enabled_actions
+    default     = var.route53_health_checks_if_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -156,7 +156,7 @@ pipeline "correct_route53_health_checks_unused" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_route53_health_check_unused
+    pipeline        = pipeline.correct_one_route53_health_check_if_unused
     args = {
       title              = each.value.title
       id                 = each.value.id
@@ -171,8 +171,8 @@ pipeline "correct_route53_health_checks_unused" {
   }
 }
 
-pipeline "correct_one_route53_health_check_unused" {
-  title       = "Correct one Route53 health check unused"
+pipeline "correct_one_route53_health_check_if_unused" {
+  title       = "Correct One Route53 Health Check If Unused"
   description = "Runs corrective action on an unused Route53 health check."
   tags        = merge(local.route53_common_tags, { class = "unused" })
 
@@ -217,13 +217,13 @@ pipeline "correct_one_route53_health_check_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_health_checks_unused_default_action
+    default     = var.route53_health_checks_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_health_checks_unused_enabled_actions
+    default     = var.route53_health_checks_if_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -267,23 +267,23 @@ pipeline "correct_one_route53_health_check_unused" {
   }
 }
 
-variable "route53_health_checks_unused_trigger_enabled" {
+variable "route53_health_checks_if_unused_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "route53_health_checks_unused_trigger_schedule" {
+variable "route53_health_checks_if_unused_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "route53_health_checks_unused_default_action" {
+variable "route53_health_checks_if_unused_default_action" {
   type        = string
   description = "The default response to use for unused Route53 health checks."
   default     = "notify"
 }
 
-variable "route53_health_checks_unused_enabled_actions" {
+variable "route53_health_checks_if_unused_enabled_actions" {
   type        = list(string)
   description = "Response options for approvers determining the response."
   default     = ["skip", "delete_health_check"]

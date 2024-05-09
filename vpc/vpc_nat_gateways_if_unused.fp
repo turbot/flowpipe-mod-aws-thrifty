@@ -1,5 +1,5 @@
 locals {
-  vpc_nat_gateways_unused_query = <<-EOQ
+  vpc_nat_gateways_if_unused_query = <<-EOQ
 select
   concat(nat.nat_gateway_id, ' [', nat.region, '/', nat.account_id, ']') as title,
   nat.nat_gateway_id,
@@ -23,26 +23,26 @@ having
   EOQ
 }
 
-trigger "query" "detect_and_correct_vpc_nat_gateways_unused" {
-  title       = "Detect & correct unused NAT Gateways"
+trigger "query" "detect_and_correct_vpc_nat_gateways_if_unused" {
+  title       = "Detect & Correct VPC NAT Gateways If Unused"
   description = "Detects unused NAT Gateways and runs your chosen action."
   //tags       = merge(local.vpc_common_tags, { class = "unused" })
 
-  enabled  = var.vpc_nat_gateways_unused_trigger_enabled
-  schedule = var.vpc_nat_gateways_unused_trigger_schedule
+  enabled  = var.vpc_nat_gateways_if_unused_trigger_enabled
+  schedule = var.vpc_nat_gateways_if_unused_trigger_schedule
   database = var.database
-  sql      = local.vpc_nat_gateways_unused_query
+  sql      = local.vpc_nat_gateways_if_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_vpc_nat_gateways_unused
+    pipeline = pipeline.correct_vpc_nat_gateways_if_unused
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_vpc_nat_gateways_unused" {
-  title       = "Detect & correct unused NAT Gateways"
+pipeline "detect_and_correct_vpc_nat_gateways_if_unused" {
+  title       = "Detect & Correct VPC NAT Gateways If Unused"
   description = "Detects unused NAT Gateways and runs your chosen action."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
@@ -73,35 +73,35 @@ pipeline "detect_and_correct_vpc_nat_gateways_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.vpc_nat_gateways_unused_default_action
+    default     = var.vpc_nat_gateways_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.vpc_nat_gateways_unused_enabled_actions
+    default     = var.vpc_nat_gateways_if_unused_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.vpc_nat_gateways_unused_query
+    sql      = local.vpc_nat_gateways_if_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_vpc_nat_gateways_unused
+    pipeline = pipeline.correct_vpc_nat_gateways_if_unused
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_vpc_nat_gateways_unused" {
-  title       = "Correct unused NAT Gateways"
+pipeline "correct_vpc_nat_gateways_if_unused" {
+  title       = "Correct VPC NAT Gateways If Unused"
   description = "Runs corrective action on a collection of NAT Gateways which are unused."
   // documentation = file("./vpc/unused_nat_gateways.md")
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
@@ -136,13 +136,13 @@ pipeline "correct_vpc_nat_gateways_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.vpc_nat_gateways_unused_default_action
+    default     = var.vpc_nat_gateways_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.vpc_nat_gateways_unused_enabled_actions
+    default     = var.vpc_nat_gateways_if_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -158,23 +158,23 @@ pipeline "correct_vpc_nat_gateways_unused" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_vpc_nat_gateway_unused
+    pipeline        = pipeline.correct_one_vpc_nat_gateway_if_unused
     args = {
-      title                    = each.value.title
-      nat_gateway_id           = each.value.nat_gateway_id
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      nat_gateway_id     = each.value.nat_gateway_id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_one_vpc_nat_gateway_unused" {
-  title       = "Correct one unused NAT Gateway"
+pipeline "correct_one_vpc_nat_gateway_if_unused" {
+  title       = "Correct One VPC NAT Gateway If Unused"
   description = "Runs corrective action on an unused NAT Gateway."
   // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
@@ -219,13 +219,13 @@ pipeline "correct_one_vpc_nat_gateway_unused" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.vpc_nat_gateways_unused_default_action
+    default     = var.vpc_nat_gateways_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.vpc_nat_gateways_unused_enabled_actions
+    default     = var.vpc_nat_gateways_if_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -269,23 +269,23 @@ pipeline "correct_one_vpc_nat_gateway_unused" {
   }
 }
 
-variable "vpc_nat_gateways_unused_trigger_enabled" {
+variable "vpc_nat_gateways_if_unused_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "vpc_nat_gateways_unused_trigger_schedule" {
+variable "vpc_nat_gateways_if_unused_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "vpc_nat_gateways_unused_default_action" {
+variable "vpc_nat_gateways_if_unused_default_action" {
   type        = string
   description = "The default response to use when NAT gateways are unused."
   default     = "notify"
 }
 
-variable "vpc_nat_gateways_unused_enabled_actions" {
+variable "vpc_nat_gateways_if_unused_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete"]

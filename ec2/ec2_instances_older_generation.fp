@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_older_generation" {
-  title       = "Detect & correct older generation EC2 instances"
+  title       = "Detect & Correct older generation EC2 instances"
   description = "Detects older generation EC2 instances and runs your chosen action."
 
   enabled  = var.ec2_instances_older_generation_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_ec2_instances_older_generation" {
 }
 
 pipeline "detect_and_correct_ec2_instances_older_generation" {
-  title         = "Detect & correct older generation EC2 instances"
+  title         = "Detect & Correct older generation EC2 instances"
   description   = "Detects older generation EC2 instances and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 

@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_exceeding_max_size" {
-  title       = "Detect & correct EBS volumes exceeding max size"
+  title       = "Detect & Correct EBS volumes exceeding max size"
   description = "Detects EBS volumes exceeding maximum size and runs your chosen action."
 
   enabled  = var.ebs_volumes_exceeding_max_size_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_ebs_volumes_exceeding_max_size" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
-  title       = "Detect & correct EBS volumes exceeding max size"
+  title       = "Detect & Correct EBS volumes exceeding max size"
   description = "Detects EBS volumes exceeding maximum size and runs your chosen action."
 
   param "database" {

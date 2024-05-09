@@ -15,7 +15,7 @@ where
 
 
 trigger "query" "detect_and_correct_ec2_classic_load_balancers_unused" {
-  title       = "Detect & correct unused EC2 classic load balancers"
+  title       = "Detect & Correct unused EC2 classic load balancers"
   description = "Detects EC2 classic load balancers that are unused."
 
   enabled  = var.ec2_classic_load_balancer_unused_trigger_enabled
@@ -32,7 +32,7 @@ trigger "query" "detect_and_correct_ec2_classic_load_balancers_unused" {
 }
 
 pipeline "detect_and_correct_ec2_classic_load_balancers_unused" {
-  title         = "Detect & correct EC2 unused classic load balancers"
+  title         = "Detect & Correct EC2 unused classic load balancers"
   description   = "Detects unused EC2 classic load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
