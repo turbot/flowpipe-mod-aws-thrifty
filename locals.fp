@@ -47,5 +47,5 @@ locals {
   aws_pipeline_delete_route53_health_check  = aws.pipeline.delete_route53_health_check
   aws_pipeline_delete_secretsmanager_secret = aws.pipeline.delete_secretsmanager_secret
   aws_pipeline_delete_elbv2_load_balancer   = aws.pipeline.delete_elbv2_load_balancer
-  aws_pipeline_delete_elb_load_balancer = aws.pipeline.delete_elb_load_balancer
+  aws_pipeline_delete_elb_load_balancer     = aws.pipeline.delete_elb_load_balancer
 }
