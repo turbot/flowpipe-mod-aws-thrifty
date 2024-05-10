@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ebs_volumes_using_gp2" {
   title         = "Detect & Correct EBS Volumes Using GP2"
   description   = "Detects EBS volumes using gp2 and performs the chosen action."
   // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_gp2.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
     type        = string
@@ -95,7 +95,7 @@ pipeline "correct_ebs_volumes_using_gp2" {
   title         = "Correct EBS Volumes Using GP2"
   description   = "Executes corrective actions on EBS volumes using gp2."
   // documentation = file("./ebs/docs/correct_ebs_volumes_using_gp2.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
     type = list(object({
@@ -168,7 +168,7 @@ pipeline "correct_one_ebs_volume_using_gp2" {
   title         = "Correct One EBS Volume Using GP2"
   description   = "Executes corrective action on an EBS volume using gp2."
   // documentation = file("./ebs/docs/correct_one_ebs_volume_using_gp2.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+  tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
     type        = string
