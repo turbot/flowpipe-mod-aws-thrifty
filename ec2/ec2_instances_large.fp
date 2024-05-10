@@ -9,13 +9,13 @@ locals {
     aws_ec2_instance
   where
     instance_state in ('running', 'pending', 'rebooting')
-    and instance_type not like any (array[${join(",", formatlist("'%s'", var.ec2_instance_allowed_types))}])
+    and instance_type not like any (array[${join(",", formatlist("'%s'", var.ec2_instances_large_allowed_types))}])
   EOQ
 }
 
 trigger "query" "detect_and_correct_ec2_instances_large" {
-  title       = "Detect & Correct large EC2 instances"
-  description = "Detects large EC2 instances and runs your chosen action."
+  title       = "Detect and correct EC2 instances large"
+  description = "Identifies large EC2 instances and executes the chosen action."
 
   enabled  = var.ec2_instances_large_trigger_enabled
   schedule = var.ec2_instances_large_trigger_schedule
@@ -24,17 +24,17 @@ trigger "query" "detect_and_correct_ec2_instances_large" {
 
   capture "insert" {
     pipeline = pipeline.correct_ec2_instances_large
-    args     = {
+    args = {
       items = self.inserted_rows
     }
   }
 }
 
 pipeline "detect_and_correct_ec2_instances_large" {
-  title         = "Detect & Correct large EC2 instances"
-  description   = "Detects large EC2 instances and runs your chosen action."
+  title       = "Detect & correct EC2 instances large"
+  description = "Detects large EC2 instances and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
-  //   class = "deprecated" 
+  //   class = "deprecated"
   // })
 
   param "database" {
@@ -64,13 +64,13 @@ pipeline "detect_and_correct_ec2_instances_large" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instance_large_default_action
+    default     = var.ec2_instances_large_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instance_large_enabled_actions
+    default     = var.ec2_instances_large_enabled_actions
   }
 
   step "query" "detect" {
@@ -80,23 +80,20 @@ pipeline "detect_and_correct_ec2_instances_large" {
 
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ec2_instances_large
-    args     = {
-      items            = step.query.detect.rows
-      notifier         = param.notifier
-      notification_level   = param.notification_level
-      approvers        = param.approvers
-      default_action           = param.default_action
-      enabled_actions        = param.enabled_actions
+    args = {
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_ec2_instances_large" {
-  title         = "Correct large EC2 instances"
-  description   = "Runs corrective action on a collection of large EC2 instances."
-  // tags          = merge(local.ec2_common_tags, { 
-  //   class = "deprecated" 
-  // })
+  title       = "Correct EC2 instances large"
+  description = "Executes corrective actions on large EC2 instances."
 
   param "items" {
     type = list(object({
@@ -128,13 +125,13 @@ pipeline "correct_ec2_instances_large" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instance_large_default_action
+    default     = var.ec2_instances_large_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instance_large_enabled_actions
+    default     = var.ec2_instances_large_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -144,31 +141,30 @@ pipeline "correct_ec2_instances_large" {
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.instance_id => row }
+    value = { for row in param.items : row.instance_id => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_ec2_instance_large
-    args            = {
-      title                     = each.value.title
-      instance_id               = each.value.instance_id
-      region                    = each.value.region
-      cred                      = each.value.cred
-      notifier                  = param.notifier
-      notification_level        = param.notification_level
-      approvers                 = param.approvers
-      default_action   = param.default_action
-      enabled_actions  = param.enabled_actions
+    args = {
+      title              = each.value.title
+      instance_id        = each.value.instance_id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_one_ec2_instance_large" {
-  title         = "Correct one large EC2 instance"
-  description   = "Runs corrective action on a large EC2 instance."
-  // tags          = merge(local.ec2_common_tags, { class = "deprecated" })
+  title       = "Correct one EC2 instance large"
+  description = "Executes corrective action on a single large EC2 instance."
 
   param "title" {
     type        = string
@@ -211,30 +207,30 @@ pipeline "correct_one_ec2_instance_large" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instance_large_default_action
+    default     = var.ec2_instances_large_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instance_large_enabled_actions
+    default     = var.ec2_instances_large_enabled_actions
   }
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
-    args     = {
-      notifier         = param.notifier
-      notification_level   = param.notification_level
-      approvers        = param.approvers
-      detect_msg       = "Detected large EC2 Instance ${param.title}."
-      default_action           = param.default_action
-      enabled_actions        = param.enabled_actions
+    args = {
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected large EC2 Instance ${param.title}."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
-          label  = "Skip"
-          value  = "skip"
-          style  = local.style_info
-          pipeline_ref  = local.pipeline_optional_message
+          label        = "Skip"
+          value        = "skip"
+          style        = local.style_info
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -244,10 +240,10 @@ pipeline "correct_one_ec2_instance_large" {
           error_msg   = "Error skipping EC2 Instance ${param.title}."
         },
         "stop_instance" = {
-          label  = "Stop instance"
-          value  = "stop_instance"
-          style  = local.style_alert
-          pipeline_ref  = local.aws_pipeline_stop_ec2_instances
+          label        = "Stop instance"
+          value        = "stop_instance"
+          style        = local.style_alert
+          pipeline_ref = local.aws_pipeline_stop_ec2_instances
           pipeline_args = {
             instance_ids = [param.instance_id]
             region       = param.region
@@ -257,10 +253,10 @@ pipeline "correct_one_ec2_instance_large" {
           error_msg   = "Error stopping EC2 Instance ${param.title}."
         }
         "terminate_instance" = {
-          label  = "Terminate Instance"
-          value  = "terminate_instance"
-          style  = local.style_alert
-          pipeline_ref  = local.aws_pipeline_terminate_ec2_instances
+          label        = "Terminate Instance"
+          value        = "terminate_instance"
+          style        = local.style_alert
+          pipeline_ref = local.aws_pipeline_terminate_ec2_instances
           pipeline_args = {
             instance_ids = [param.instance_id]
             region       = param.region
@@ -272,4 +268,32 @@ pipeline "correct_one_ec2_instance_large" {
       }
     }
   }
+}
+
+variable "ec2_instances_large_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ec2_instances_large_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "ec2_instances_large_allowed_types" {
+  type        = list(string)
+  description = "A list of allowed instance types. PostgreSQL wildcards are supported."
+  default     = ["%.nano", "%.micro", "%.small", "%.medium", "%.large", "%.xlarge", "%._xlarge"]
+}
+
+variable "ec2_instances_large_default_action" {
+  type        = string
+  description = "The default response to use when EC2 instances are larger than the specified types."
+  default     = "notify"
+}
+
+variable "ec2_instances_large_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "stop_instance", "terminate_instance"]
 }
