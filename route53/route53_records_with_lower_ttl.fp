@@ -16,13 +16,13 @@ locals {
 }
 
 trigger "query" "detect_and_correct_route53_records_with_lower_ttl" {
-  title         = "Detect & Correct Route53 Records With Lower TTL"
+  title         = "Detect & correct Route53 records with lower TTL"
   description   = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
   // documentation = file("./route53/docs/detect_and_correct_route53_records_with_lower_ttl_trigger.md")
   // tags          = merge(local.route53_common_tags, { class = "higher" })
 
-  enabled  = var.route53_records_lower_ttl_trigger_enabled
-  schedule = var.route53_records_lower_ttl_trigger_schedule
+  enabled  = var.route53_records_with_lower_ttl_trigger_enabled
+  schedule = var.route53_records_with_lower_ttl_trigger_schedule
   database = var.database
   sql      = local.route53_records_with_lower_ttl_query
 
@@ -35,10 +35,10 @@ trigger "query" "detect_and_correct_route53_records_with_lower_ttl" {
 }
 
 pipeline "detect_and_correct_route53_records_with_lower_ttl" {
-  title         = "Detect & Correct Route53 Records With Lower TTL"
+  title         = "Detect & correct Route53 records with lower TTL"
   description   = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
-  // documentation = file("./route53/docs/detect_and_correct_route53_records_with_lower_ttl.md")
-  tags          = merge(local.route53_common_tags, { class = "higher" })
+  documentation = file("./route53/docs/detect_and_correct_route53_records_with_lower_ttl.md")
+  tags          = merge(local.route53_common_tags, { class = "higher", type = "featured" })
 
   param "database" {
     type        = string
@@ -67,13 +67,13 @@ pipeline "detect_and_correct_route53_records_with_lower_ttl" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_records_lower_ttl_default_action
+    default     = var.route53_records_with_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_records_lower_ttl_enabled_actions
+    default     = var.route53_records_with_lower_ttl_enabled_actions
   }
 
   step "query" "detect" {
@@ -95,9 +95,9 @@ pipeline "detect_and_correct_route53_records_with_lower_ttl" {
 }
 
 pipeline "correct_route53_records_with_lower_ttl" {
-  title         = "Correct Route53 Records With Lower TTL"
+  title         = "Correct Route53 records with lower TTL"
   description   = "Runs corrective action on a collection of Route53 records with TTL lower than 3600 seconds."
-  // documentation = file("./route53/docs/correct_route53_records_with_lower_ttl.md")
+  documentation = file("./route53/docs/correct_route53_records_with_lower_ttl.md")
   tags          = merge(local.route53_common_tags, { class = "higher" })
 
   param "items" {
@@ -133,13 +133,13 @@ pipeline "correct_route53_records_with_lower_ttl" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_records_lower_ttl_default_action
+    default     = var.route53_records_with_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_records_lower_ttl_enabled_actions
+    default     = var.route53_records_with_lower_ttl_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -174,9 +174,9 @@ pipeline "correct_route53_records_with_lower_ttl" {
 }
 
 pipeline "correct_one_route53_record_with_lower_ttl" {
-  title       = "Correct One Route53 Record With Lower TTL"
+  title       = "Correct one Route53 record with lower TTL"
   description = "Runs corrective action on a Route53 record with TTL lower than 3600 seconds."
-  // documentation = file("./route53/docs/correct_one_route53_record_with_lower_ttl.md")
+  documentation = file("./route53/docs/correct_one_route53_record_with_lower_ttl.md")
   tags          = merge(local.route53_common_tags, { class = "higher" })
 
   param "title" {
@@ -235,13 +235,13 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.route53_records_lower_ttl_default_action
+    default     = var.route53_records_with_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.route53_records_lower_ttl_enabled_actions
+    default     = var.route53_records_with_lower_ttl_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -267,9 +267,9 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
           success_msg = ""
           error_msg   = ""
         },
-        "update" = {
-          label        = "Update"
-          value        = "update"
+        "update_ttl" = {
+          label        = "Update TTL"
+          value        = "update_ttl"
           style        = local.style_ok
           pipeline_ref = local.aws_pipeline_update_route53_record
           pipeline_args = {
@@ -289,24 +289,24 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
   }
 }
 
-variable "route53_records_lower_ttl_trigger_enabled" {
+variable "route53_records_with_lower_ttl_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "route53_records_lower_ttl_trigger_schedule" {
+variable "route53_records_with_lower_ttl_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "route53_records_lower_ttl_default_action" {
+variable "route53_records_with_lower_ttl_default_action" {
   type        = string
   description = "The default response to use when Route53 records have a TTL lower than expected."
   default     = "notify"
 }
 
-variable "route53_records_lower_ttl_enabled_actions" {
+variable "route53_records_with_lower_ttl_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "update"]
+  default     = ["skip", "update_ttl"]
 }
