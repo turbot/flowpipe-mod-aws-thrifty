@@ -26,8 +26,8 @@ locals {
 trigger "query" "detect_and_correct_route53_health_checks_if_unused" {
   title         = "Detect & correct Route53 health checks if unused"
   description   = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
-  // documentation = file("./route53/docs/detect_and_correct_route53_health_checks_if_unused_trigger.md")
-  // tags          = merge(local.route53_common_tags, { class = "unused" })
+  documentation = file("./route53/docs/detect_and_correct_route53_health_checks_if_unused_trigger.md")
+  tags          = merge(local.route53_common_tags, { class = "unused" })
 
   enabled  = var.route53_health_checks_if_unused_trigger_enabled
   schedule = var.route53_health_checks_if_unused_trigger_schedule

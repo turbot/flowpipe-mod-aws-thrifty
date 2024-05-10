@@ -18,8 +18,8 @@ locals {
 trigger "query" "detect_and_correct_route53_records_with_lower_ttl" {
   title         = "Detect & correct Route53 records with lower TTL"
   description   = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
-  // documentation = file("./route53/docs/detect_and_correct_route53_records_with_lower_ttl_trigger.md")
-  // tags          = merge(local.route53_common_tags, { class = "higher" })
+  documentation = file("./route53/docs/detect_and_correct_route53_records_with_lower_ttl_trigger.md")
+  tags          = merge(local.route53_common_tags, { class = "higher" })
 
   enabled  = var.route53_records_with_lower_ttl_trigger_enabled
   schedule = var.route53_records_with_lower_ttl_trigger_schedule
