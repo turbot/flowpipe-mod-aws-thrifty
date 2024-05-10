@@ -39,8 +39,6 @@ flowpipe pipeline run detect_and_correct_vpc_eips_if_unattached --host local --a
 
 This will prompt for an action for each detected resource and then attempt to perform the chosen action upon receipt of input.
 
-<!-- TODO: Determine if we want to detail out the available actions -->
-
 You can also decide to bypass asking for decision and just automatically apply the same action against all detections.
 
 ### Automatic Actioning

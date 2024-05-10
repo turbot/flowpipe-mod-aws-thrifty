@@ -1,3 +1,5 @@
+# Correct one VPC EIP if unattached
+
 ## Overview
 
 Elastic IP addresses are a costly resource to maintain, if they are unattached you will be accruing costs without any benefit; therefore unattached Elastic IP addresses should be released if not required.

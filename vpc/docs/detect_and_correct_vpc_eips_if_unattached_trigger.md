@@ -1,4 +1,4 @@
-# Detect & Correct VPC EIPs If Unattached
+# Detect & correct VPC EIPs if unattached
 
 ## Overview
 
