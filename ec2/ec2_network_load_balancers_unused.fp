@@ -11,7 +11,6 @@ locals {
     )
     select
       concat(a.name, ' [', a.region, '/', a.account_id, ']') as title,
-      a.name,
       a.arn,
       a.region,
       a._ctx ->> 'connection_name' as cred
@@ -34,17 +33,17 @@ trigger "query" "detect_and_correct_ec2_network_load_balancers_unused" {
 
   capture "insert" {
     pipeline = pipeline.correct_ec2_network_load_balancers_unused
-    args     = {
+    args = {
       items = self.inserted_rows
     }
   }
 }
 
 pipeline "detect_and_correct_ec2_network_load_balancers_unused" {
-  title         = "Detect & correct EC2 unused network load balancers"
-  description   = "Detects unused EC2 network load balancers and runs your chosen action."
+  title       = "Detect & correct EC2 unused network load balancers"
+  description = "Detects unused EC2 network load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
-  //   class = "unused" 
+  //   class = "unused"
   // })
 
   param "database" {
@@ -90,31 +89,30 @@ pipeline "detect_and_correct_ec2_network_load_balancers_unused" {
 
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ec2_network_load_balancers_unused
-    args     = {
-      items            = step.query.detect.rows
-      notifier         = param.notifier
-      notification_level   = param.notification_level
-      approvers        = param.approvers
-      default_action           = param.default_action
-      enabled_actions        = param.enabled_actions
+    args = {
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_ec2_network_load_balancers_unused" {
-  title         = "Corrects unused EC2 network load balancers"
-  description   = "Runs corrective action on a collection of unused EC2 network load balancers."
-  // tags          = merge(local.ec2_common_tags, { 
-  //   class = "deprecated" 
+  title       = "Corrects unused EC2 network load balancers"
+  description = "Runs corrective action on a collection of unused EC2 network load balancers."
+  // tags          = merge(local.ec2_common_tags, {
+  //   class = "deprecated"
   // })
 
   param "items" {
     type = list(object({
-      title       = string
-      name        = string
-      arn         = string
-      region      = string
-      cred        = string
+      title  = string
+      arn    = string
+      region = string
+      cred   = string
     }))
   }
 
@@ -155,41 +153,35 @@ pipeline "correct_ec2_network_load_balancers_unused" {
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.name => row }
+    value = { for row in param.items : row.name => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_ec2_network_load_balancer_unused
-    args            = {
-      title                     = each.value.title
-      arn                       = each.value.arn
-      name                      = each.value.name
-      region                    = each.value.region
-      cred                      = each.value.cred
-      notifier                  = param.notifier
-      notification_level        = param.notification_level
-      approvers                 = param.approvers
-      default_action   = param.default_action
-      enabled_actions  = param.enabled_actions
+    args = {
+      title              = each.value.title
+      arn                = each.value.arn
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_one_ec2_network_load_balancer_unused" {
-  title         = "Correct one unused EC2 network load balancer"
-  description   = "Runs corrective action on an unused EC2 network load balance."
+  title       = "Correct one unused EC2 network load balancer"
+  description = "Runs corrective action on an unused EC2 network load balance."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
     description = local.description_title
-  }
-
-  param "name" {
-    type        = string
-    description = "The name of the EC2 network load balancer."
   }
 
   param "arn" {
@@ -239,19 +231,19 @@ pipeline "correct_one_ec2_network_load_balancer_unused" {
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
-    args     = {
-      notifier         = param.notifier
-      notification_level   = param.notification_level
-      approvers        = param.approvers
-      detect_msg       = "Detected unused EC2 Network Load Balancer ${param.title}."
-      default_action           = param.default_action
-      enabled_actions        = param.enabled_actions
+    args = {
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected unused EC2 Network Load Balancer ${param.title}."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
-          label  = "Skip"
-          value  = "skip"
-          style  = local.style_info
-          pipeline_ref  = local.pipeline_optional_message
+          label        = "Skip"
+          value        = "skip"
+          style        = local.style_info
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -261,13 +253,12 @@ pipeline "correct_one_ec2_network_load_balancer_unused" {
           error_msg   = "Error skipping EC2 Network Load Balancer ${param.title}."
         },
         "delete_network_load_balancer" = {
-          label  = "Delete Network Load Balancer"
-          value  = "delete_network_load_balancer"
-          style  = local.style_alert
-          // pipeline_ref  = local.aws_pipeline_delete_ec2_network_load_balancer // TODO: update it when you develop the pipeline
-          pipeline_ref = pipeline.mock_aws_lib_delete_network_load_balancer
+          label        = "Delete Network Load Balancer"
+          value        = "delete_network_load_balancer"
+          style        = local.style_alert
+          pipeline_ref = local.aws_pipeline_delete_elbv2_load_balancer
           pipeline_args = {
-            load_balancer_arn = [param.arn]
+            load_balancer_arn = param.arn
             region            = param.region
             cred              = param.cred
           }
@@ -276,28 +267,5 @@ pipeline "correct_one_ec2_network_load_balancer_unused" {
         }
       }
     }
-  }
-}
-
-pipeline "mock_aws_lib_delete_network_load_balancer" {
-  param "cred" {
-    type = string
-    default = "default"
-  }
-
-  param "load_balancer_arn" {
-    type = string
-  }
-
-  param "region" {
-    type = string
-  }
-
-  param "account_id" {
-    type = string
-  }
-
-  output "result" {
-    value = "Mocked: aws.pipeline.mock_aws_lib_delete_network_load_balancer ${param.load_balancer_arn} [${param.region}/${param.account_id}]."
   }
 }
