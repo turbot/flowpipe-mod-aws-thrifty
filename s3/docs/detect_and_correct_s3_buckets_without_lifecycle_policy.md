@@ -1,4 +1,4 @@
-# Detect & Correct S3 Buckets Without Lifecycle Policy
+# Detect & correct S3 buckets without lifecycle policy
 
 ## Overview
 

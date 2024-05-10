@@ -1,4 +1,4 @@
-# Correct VPC EIPs If Unattached
+# Correct VPC EIPs if unattached
 
 ## Overview
 
