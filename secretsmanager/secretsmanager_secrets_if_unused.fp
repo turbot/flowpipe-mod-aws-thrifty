@@ -32,10 +32,10 @@ trigger "query" "detect_and_correct_secretsmanager_secrets_if_unused" {
 }
 
 pipeline "detect_and_correct_secretsmanager_secrets_if_unused" {
-  title         = "Detect & Correct SecretsManager Secrets If Unused"
+  title         = "Detect & correct SecretsManager secrets if unused"
   description   = "Detects SecretsManager secrets that are unused (not accessed in last n days) and runs your chosen action."
-  // documentation = file("./secretsmanager/docs/detect_and_correct_secretsmanager_secrets_if_unused.md")
-  tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
+  documentation = file("./secretsmanager/docs/detect_and_correct_secretsmanager_secrets_if_unused.md")
+  tags          = merge(local.secretsmanager_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string
@@ -92,9 +92,9 @@ pipeline "detect_and_correct_secretsmanager_secrets_if_unused" {
 }
 
 pipeline "correct_secretsmanager_secrets_if_unused" {
-  title         = "Correct SecretsManager Secrets If Unused"
+  title         = "Correct SecretsManager secrets if unused"
   description   = "Runs corrective action on a collection of SecretsManager secrets that are unused (not access in last n days)."
-  // documentation = file("./secretsmanager/docs/correct_secretsmanager_secrets_if_unused.md")
+  documentation = file("./secretsmanager/docs/correct_secretsmanager_secrets_if_unused.md")
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "items" {
@@ -165,9 +165,9 @@ pipeline "correct_secretsmanager_secrets_if_unused" {
 }
 
 pipeline "correct_one_secretsmanager_secret_if_unused" {
-  title         = "Correct One SecretsManager Secret If Unused"
+  title         = "Correct one SecretsManager secret if unused"
   description   = "Runs corrective action on a SecretsManager secret that are unused (not access in last n days)."
-  // documentation = file("./secretsmanager/docs/correct_one_secretsmanager_secret_if_unused.md")
+  documentation = file("./secretsmanager/docs/correct_one_secretsmanager_secret_if_unused.md")
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   param "title" {
