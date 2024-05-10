@@ -13,8 +13,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_vpc_eips_if_unattached" {
-  title       = "Detect & Correct VPC EIPs If Unattached"
-  description = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
+  title         = "Detect & Correct VPC EIPs If Unattached"
+  description   = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
+  // documentation = file("./vpc/docs/detect_and_correct_vpc_eips_if_unattached_trigger.md")
+  // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   enabled  = var.vpc_eips_if_unattached_trigger_enabled
   schedule = var.vpc_eips_if_unattached_trigger_schedule
@@ -33,7 +35,7 @@ pipeline "detect_and_correct_vpc_eips_if_unattached" {
   title         = "Detect & Correct VPC EIPs If Unattached"
   description   = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
   documentation = file("./vpc/docs/detect_and_correct_vpc_eips_if_unattached.md")
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -91,9 +93,9 @@ pipeline "detect_and_correct_vpc_eips_if_unattached" {
 
 pipeline "correct_vpc_eips_if_unattached" {
   title         = "Correct VPC EIPs If Unattached"
-  description   = "Runs corrective action on a collection of EIPs (Elastic IP addresses) which is unattached."
+  description   = "Runs corrective action on a collection of EIPs (Elastic IP addresses) which are unattached."
   documentation = file("./vpc/docs/correct_vpc_eips_if_unattached.md")
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -168,9 +170,9 @@ pipeline "correct_vpc_eips_if_unattached" {
 
 pipeline "correct_one_vpc_eip_if_unattached" {
   title         = "Correct One VPC EIP If Unattached"
-  description   = "Runs corrective action on one EIP (Elastic IP addresses) which is unattached."
+  description   = "Runs corrective action on one EIP (Elastic IP addresses) which are unattached."
   documentation = file("./vpc/docs/correct_one_vpc_eip_if_unattached.md")
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
     type        = string

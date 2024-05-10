@@ -26,7 +26,8 @@ having
 trigger "query" "detect_and_correct_vpc_nat_gateways_if_unused" {
   title       = "Detect & Correct VPC NAT Gateways If Unused"
   description = "Detects unused NAT Gateways and runs your chosen action."
-  //tags       = merge(local.vpc_common_tags, { class = "unused" })
+  // documentation = file("./vpc/docs/detect_and_correct_vpc_nat_gateways_if_unused_trigger.md")
+  // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   enabled  = var.vpc_nat_gateways_if_unused_trigger_enabled
   schedule = var.vpc_nat_gateways_if_unused_trigger_schedule
@@ -42,9 +43,10 @@ trigger "query" "detect_and_correct_vpc_nat_gateways_if_unused" {
 }
 
 pipeline "detect_and_correct_vpc_nat_gateways_if_unused" {
-  title       = "Detect & Correct VPC NAT Gateways If Unused"
-  description = "Detects unused NAT Gateways and runs your chosen action."
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  title         = "Detect & Correct VPC NAT Gateways If Unused"
+  description   = "Detects unused NAT Gateways and runs your chosen action."
+  documentation = file("./vpc/docs/detect_and_correct_vpc_nat_gateways_if_unused.md")
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -103,8 +105,8 @@ pipeline "detect_and_correct_vpc_nat_gateways_if_unused" {
 pipeline "correct_vpc_nat_gateways_if_unused" {
   title       = "Correct VPC NAT Gateways If Unused"
   description = "Runs corrective action on a collection of NAT Gateways which are unused."
-  // documentation = file("./vpc/unused_nat_gateways.md")
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  // documentation = file("./vpc/docs/correct_vpc_nat_gateways_if_unused.md")
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -176,7 +178,8 @@ pipeline "correct_vpc_nat_gateways_if_unused" {
 pipeline "correct_one_vpc_nat_gateway_if_unused" {
   title       = "Correct One VPC NAT Gateway If Unused"
   description = "Runs corrective action on an unused NAT Gateway."
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  // documentation = file("./vpc/docs/correct_one_vpc_nat_gateway_if_unused.md")
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
     type        = string

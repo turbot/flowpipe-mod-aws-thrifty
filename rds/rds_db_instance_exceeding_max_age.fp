@@ -13,8 +13,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_rds_db_instances_exceeding_max_age" {
-  title       = "Detect & Correct RDS DB Instances Exceeding Max Age"
-  description = "Detects long running RDS DB instances and runs your chosen action."
+  title         = "Detect & Correct RDS DB Instances Exceeding Max Age"
+  description   = "Detects long running RDS DB instances and runs your chosen action."
+  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_exceeding_max_age_trigger.md")
+  // tags          = merge(local.rds_common_tags, { class = "managed" })
 
   enabled  = var.rds_db_instances_exceeding_max_age_trigger_enabled
   schedule = var.rds_db_instances_exceeding_max_age_trigger_schedule
@@ -32,6 +34,8 @@ trigger "query" "detect_and_correct_rds_db_instances_exceeding_max_age" {
 pipeline "detect_and_correct_rds_db_instances_exceeding_max_age" {
   title       = "Detect & Correct RDS DB Instances Exceeding Max Age"
   description = "Detects long running RDS DB instances and runs your chosen action."
+  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_exceeding_max_age.md")
+  tags          = merge(local.rds_common_tags, { class = "managed" })
 
   param "database" {
     type        = string
@@ -88,8 +92,10 @@ pipeline "detect_and_correct_rds_db_instances_exceeding_max_age" {
 }
 
 pipeline "correct_rds_db_instances_exceeding_max_age" {
-  title       = "Correct RDS DB Instances Exceeding Max Age"
-  description = "Runs corrective action on a collection of long running RDS DB instances."
+  title         = "Correct RDS DB Instances Exceeding Max Age"
+  description   = "Runs corrective action on a collection of long running RDS DB instances."
+  // documentation = file("./rds/docs/correct_rds_db_instances_exceeding_max_age.md")
+  tags          = merge(local.rds_common_tags, { class = "managed" })
 
   param "items" {
     type = list(object({
@@ -159,8 +165,10 @@ pipeline "correct_rds_db_instances_exceeding_max_age" {
 }
 
 pipeline "correct_one_rds_db_instance_exceeding_max_age" {
-  title       = "Correct One RDS DB Instance Exceeding Max Age"
-  description = "Runs corrective action on a long running RDS DB instance."
+  title         = "Correct One RDS DB Instance Exceeding Max Age"
+  description   = "Runs corrective action on a long running RDS DB instance."
+  // documentation = file("./rds/docs/correct_one_rds_db_instance_exceeding_max_age.md")
+  tags          = merge(local.rds_common_tags, { class = "managed" })
 
   param "title" {
     type        = string

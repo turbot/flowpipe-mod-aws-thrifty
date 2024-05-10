@@ -24,8 +24,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_route53_health_checks_if_unused" {
-  title       = "Detect & Correct Route53 Health Checks If Unused"
-  description = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
+  title         = "Detect & Correct Route53 Health Checks If Unused"
+  description   = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
+  // documentation = file("./route53/docs/detect_and_correct_route53_health_checks_if_unused_trigger.md")
+  // tags          = merge(local.route53_common_tags, { class = "unused" })
 
   enabled  = var.route53_health_checks_if_unused_trigger_enabled
   schedule = var.route53_health_checks_if_unused_trigger_schedule
@@ -41,9 +43,10 @@ trigger "query" "detect_and_correct_route53_health_checks_if_unused" {
 }
 
 pipeline "detect_and_correct_route53_health_checks_if_unused" {
-  title       = "Detect & Correct Route53 Health Checks If Unused"
-  description = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
-  tags        = merge(local.route53_common_tags, { class = "unused" })
+  title         = "Detect & Correct Route53 Health Checks If Unused"
+  description   = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
+  // documentation = file("./route53/docs/detect_and_correct_route53_health_checks_if_unused.md")
+  tags          = merge(local.route53_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -100,9 +103,10 @@ pipeline "detect_and_correct_route53_health_checks_if_unused" {
 }
 
 pipeline "correct_route53_health_checks_if_unused" {
-  title       = "Correct Route53 Health Checks If Unused"
-  description = "Runs corrective action on a collection of Route53 health checks that are detected as unused."
-  tags        = merge(local.route53_common_tags, { class = "unused" })
+  title         = "Correct Route53 Health Checks If Unused"
+  description   = "Runs corrective action on a collection of Route53 health checks that are detected as unused."
+  // documentation = file("./route53/docs/correct_route53_health_checks_if_unused.md")
+  tags          = merge(local.route53_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -172,9 +176,10 @@ pipeline "correct_route53_health_checks_if_unused" {
 }
 
 pipeline "correct_one_route53_health_check_if_unused" {
-  title       = "Correct One Route53 Health Check If Unused"
-  description = "Runs corrective action on an unused Route53 health check."
-  tags        = merge(local.route53_common_tags, { class = "unused" })
+  title         = "Correct One Route53 Health Check If Unused"
+  description   = "Runs corrective action on an unused Route53 health check."
+  // documentation = file("./route53/docs/correct_one_route53_health_check_if_unused.md")
+  tags          = merge(local.route53_common_tags, { class = "unused" })
 
   param "title" {
     type        = string

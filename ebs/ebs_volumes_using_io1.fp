@@ -13,8 +13,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
-  title       = "Detect & Correct EBS Volumes Using IO1"
-  description = "Detects EBS volumes using io1 and runs the chosen corrective action."
+  title         = "Detect & Correct EBS Volumes Using IO1"
+  description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
+  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_io1_trigger.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   enabled  = var.ebs_volumes_using_io1_trigger_enabled
   schedule = var.ebs_volumes_using_io1_trigger_schedule
@@ -30,8 +32,10 @@ trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_using_io1" {
-  title       = "Detect & Correct EBS Volumes Using IO1"
-  description = "Detects EBS volumes using io1 and runs the chosen corrective action."
+  title         = "Detect & Correct EBS Volumes Using IO1"
+  description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
+  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_io1.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
     type        = string
@@ -88,8 +92,10 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
 }
 
 pipeline "correct_ebs_volumes_using_io1" {
-  title       = "Correct EBS Volumes Using IO1"
-  description = "Executes corrective action on a collection of EBS volumes using io1."
+  title         = "Correct EBS Volumes Using IO1"
+  description   = "Executes corrective action on a collection of EBS volumes using io1."
+  // documentation = file("./ebs/docs/correct_ebs_volumes_using_io1.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
     type = list(object({
@@ -159,8 +165,10 @@ pipeline "correct_ebs_volumes_using_io1" {
 }
 
 pipeline "correct_one_ebs_volume_using_io1" {
-  title       = "Correct One EBS Volume Using IO1"
-  description = "Executes corrective action on a single EBS volume using io1."
+  title         = "Correct One EBS Volume Using IO1"
+  description   = "Executes corrective action on a single EBS volume using io1."
+  // documentation = file("./ebs/docs/correct_one_ebs_volume_using_io1.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
     type        = string
