@@ -13,10 +13,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_rds_db_instances_of_older_generation" {
-  title         = "Detect & Correct RDS DB Instances Of Older Generation"
+  title         = "Detect & correct RDS DB instances of older generation"
   description   = "Detects older generation RDS DB instances and runs your chosen action."
-  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_of_older_generation_trigger.md")
-  // tags          = merge(local.rds_common_tags, { class = "deprecated" })
+  documentation = file("./rds/docs/detect_and_correct_rds_db_instances_of_older_generation_trigger.md")
+  tags          = merge(local.rds_common_tags, { class = "deprecated" })
 
   enabled  = var.rds_db_instances_of_older_generation_trigger_enabled
   schedule = var.rds_db_instances_of_older_generation_trigger_schedule
@@ -32,10 +32,10 @@ trigger "query" "detect_and_correct_rds_db_instances_of_older_generation" {
 }
 
 pipeline "detect_and_correct_rds_db_instances_of_older_generation" {
-  title         = "Detect & Correct RDS DB Instances Of Older Generation"
+  title         = "Detect & correct RDS DB instances of older generation"
   description   = "Detects older generation RDS DB instances and runs your chosen action."
-  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_of_older_generation.md")
-  tags          = merge(local.rds_common_tags, { class = "deprecated" })
+  documentation = file("./rds/docs/detect_and_correct_rds_db_instances_of_older_generation.md")
+  tags          = merge(local.rds_common_tags, { class = "deprecated", type = "featured" })
 
   param "database" {
     type        = string
@@ -92,9 +92,9 @@ pipeline "detect_and_correct_rds_db_instances_of_older_generation" {
 }
 
 pipeline "correct_rds_db_instances_of_older_generation" {
-  title       = "Correct RDS DB Instances Of Older Generation"
-  description = "Runs corrective action on a collection of older generation RDS DB instances."
-  // documentation = file("./rds/docs/correct_rds_db_instances_of_older_generation.md")
+  title         = "Correct RDS DB instances of older generation"
+  description   = "Runs corrective action on a collection of older generation RDS DB instances."
+  documentation = file("./rds/docs/correct_rds_db_instances_of_older_generation.md")
   tags          = merge(local.rds_common_tags, { class = "deprecated" })
 
   param "items" {
@@ -165,9 +165,9 @@ pipeline "correct_rds_db_instances_of_older_generation" {
 }
 
 pipeline "correct_one_rds_db_instance_of_older_generation" {
-  title         = "Correct RDS DB Instance Of Older Generation"
+  title         = "Correct one RDS DB instance of older generation"
   description   = "Runs corrective action on an older generation RDS DB instance."
-  // documentation = file("./rds/docs/correct_one_rds_db_instance_of_older_generation.md")
+  documentation = file("./rds/docs/correct_one_rds_db_instance_of_older_generation.md")
   tags          = merge(local.rds_common_tags, { class = "deprecated" })
 
   param "title" {

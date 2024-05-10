@@ -30,10 +30,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_rds_db_instances_with_low_connection_count" {
-  title       = "Detect & Correct RDS DB Instances With Low Connection Count"
-  description = "Detects RDS DB instances with low connection count and runs your chosen action."
-  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_with_low_connection_count_trigger.md")
-  // tags          = merge(local.rds_common_tags, { class = "unused" })
+  title         = "Detect & correct RDS DB instances with low connection count"
+  description   = "Detects RDS DB instances with low connection count and runs your chosen action."
+  documentation = file("./rds/docs/detect_and_correct_rds_db_instances_with_low_connection_count_trigger.md")
+  tags          = merge(local.rds_common_tags, { class = "unused" })
 
   enabled  = var.rds_db_instances_with_low_connection_count_trigger_enabled
   schedule = var.rds_db_instances_with_low_connection_count_trigger_schedule
@@ -49,10 +49,10 @@ trigger "query" "detect_and_correct_rds_db_instances_with_low_connection_count" 
 }
 
 pipeline "detect_and_correct_rds_db_instances_with_low_connection_count" {
-  title       = "Detect & Correct RDS DB Instances With Low Connection Count"
-  description = "Detects RDS DB instances with low connection count and runs your chosen action."
-  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_with_low_connection_count.md")
-  tags          = merge(local.rds_common_tags, { class = "unused" })
+  title         = "Detect & correct RDS DB instances with low connection count"
+  description   = "Detects RDS DB instances with low connection count and runs your chosen action."
+  documentation = file("./rds/docs/detect_and_correct_rds_db_instances_with_low_connection_count.md")
+  tags          = merge(local.rds_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string
@@ -109,9 +109,9 @@ pipeline "detect_and_correct_rds_db_instances_with_low_connection_count" {
 }
 
 pipeline "correct_rds_db_instances_with_low_connection_count" {
-  title       = "Correct RDS DB Instances With Low Connection Count"
-  description = "Runs corrective action on a collection of RDS DB instances with low connection count."
-  // documentation = file("./rds/docs/correct_rds_db_instances_with_low_connection_count.md")
+  title         = "Correct RDS DB instances with low connection count"
+  description   = "Runs corrective action on a collection of RDS DB instances with low connection count."
+  documentation = file("./rds/docs/correct_rds_db_instances_with_low_connection_count.md")
   tags          = merge(local.rds_common_tags, { class = "unused" })
 
   param "items" {
@@ -182,9 +182,9 @@ pipeline "correct_rds_db_instances_with_low_connection_count" {
 }
 
 pipeline "correct_one_rds_db_instance_with_low_connection_count" {
-  title         = "Correct One RDS DB Instance With Low Connection Count"
+  title         = "Correct one RDS DB instance with low connection count"
   description   = "Runs corrective action on an RDS DB instance with low connection count."
-  // documentation = file("./rds/docs/correct_one_rds_db_instance_with_low_connection_count.md")
+  documentation = file("./rds/docs/correct_one_rds_db_instance_with_low_connection_count.md")
   tags          = merge(local.rds_common_tags, { class = "unused" })
 
   param "title" {
