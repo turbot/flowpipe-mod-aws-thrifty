@@ -46,12 +46,12 @@ You can also decide to bypass asking for decision and just automatically apply t
 
 You can automatically apply a specific action without the need for running a Flowpipe Server and asking for a decision by setting the `default_action` parameter:
 ```sh
-flowpipe pipeline run detect_and_correct_route53_records_with_lower_ttl --arg='default_action="update"'
+flowpipe pipeline run detect_and_correct_route53_records_with_lower_ttl --arg='default_action="update_ttl"'
 ```
 
 However; if you have configured a non-empty list for your `approvers` variable, you will need to override it as below:
 ```sh
-flowpipe pipeline run detect_and_correct_route53_records_with_lower_ttl --arg='approvers=[]' --arg='default_action="update"'
+flowpipe pipeline run detect_and_correct_route53_records_with_lower_ttl --arg='approvers=[]' --arg='default_action="update_ttl"'
 ```
 
 This will attempt to apply the action to every detected item, if you're happy with this approach you could have this occur mmore frequently by either scheduling the command by yourself or enabling the associated [Query Trigger](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_route53_records_with_lower_ttl).
