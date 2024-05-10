@@ -14,8 +14,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_with_low_iops" {
-  title       = "Detect & correct EBS volumes with low IOPS"
+  title       = "Detect & Correct EBS Volumes With Low IOPS"
   description = "Detects EBS volumes with low IOPS and runs your chosen action."
+  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_iops_trigger.md")
+  // tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   enabled  = var.ebs_volumes_with_low_iops_trigger_enabled
   schedule = var.ebs_volumes_with_low_iops_trigger_schedule
@@ -31,44 +33,45 @@ trigger "query" "detect_and_correct_ebs_volumes_with_low_iops" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
-  title       = "Detect & correct EBS volumes with low IOPS"
+  title       = "Detect & Correct EBS Volumes With Low IOPS"
   description = "Detects EBS volumes with low IOPS and runs your chosen action."
-  // tags          = merge(local.ebs_common_tags, { class = "management" })
+   // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_iops.md")
+  // tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "database" {
     type        = string
-    description = local.DatabaseDescription
+    description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_low_iops_default_action
+    description = local.description_default_action
+    default     = var.ebs_volumes_with_low_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.ebs_volume_with_low_iops_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.ebs_volumes_with_low_iops_enabled_actions
   }
 
   step "query" "detect" {
@@ -79,20 +82,21 @@ pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ebs_volumes_with_low_iops
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_ebs_volumes_with_low_iops" {
-  title       = "Corrects EBS volumes with low IOPS"
-  description = "Runs corrective action on a collection of EBS volumes with low IOPS."
-  // tags          = merge(local.ebs_common_tags, { class = "management" })
+  title         = "Correct EBS Volumes With Low IOPS"
+  description   = "Runs corrective action on a collection of EBS volumes with low IOPS."
+  // documentation = file("./ebs/docs/correct_ebs_volumes_with_low_iops.md")
+  // tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "items" {
     type = list(object({
@@ -105,36 +109,36 @@ pipeline "correct_ebs_volumes_with_low_iops" {
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_low_iops_default_action
+    description = local.description_default_action
+    default     = var.ebs_volumes_with_low_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.ebs_volume_with_low_iops_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.ebs_volumes_with_low_iops_enabled_actions
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} EBS volumes with low IOPS."
   }
@@ -146,29 +150,30 @@ pipeline "correct_ebs_volumes_with_low_iops" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_ebs_volume_with_low_iops
+    pipeline        = pipeline.correct_one_ebs_volume_with_low_iops
     args = {
-      title                    = each.value.title
-      volume_id                = each.value.volume_id
-      region                   = each.value.region
-      cred                     = each.value.cred
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      volume_id          = each.value.volume_id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_ebs_volume_with_low_iops" {
-  title       = "Correct one EBS volume with low IOPS"
+pipeline "correct_one_ebs_volume_with_low_iops" {
+  title       = "Correct One EBS Volume With Low IOPS"
   description = "Runs corrective action on an EBS volume with low IOPS."
-  // tags          = merge(local.ebs_common_tags, { class = "management" })
+  // documentation = file("./ebs/docs/correct_one_ebs_volume_with_low_iops.md")
+  // tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "title" {
     type        = string
-    description = local.TitleDescription
+    description = local.description_title
   }
 
   param "volume_id" {
@@ -178,81 +183,104 @@ pipeline "correct_ebs_volume_with_low_iops" {
 
   param "region" {
     type        = string
-    description = local.RegionDescription
+    description = local.description_region
   }
 
   param "cred" {
     type        = string
-    description = local.CredentialDescription
+    description = local.description_credential
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.ebs_volume_with_low_iops_default_action
+    description = local.description_default_action
+    default     = var.ebs_volumes_with_low_iops_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.ebs_volume_with_low_iops_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.ebs_volumes_with_low_iops_enabled_actions
   }
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected EBS Volume ${param.title} with low IOPS."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected EBS Volume ${param.title} with low IOPS."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
           value        = "skip"
-          style        = local.StyleInfo
+          style        = local.style_info
           pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped EBS Volume ${param.title} with low IOPS."
           }
           success_msg = "Skipped EBS Volume ${param.title}."
           error_msg   = "Error skipping EBS Volume ${param.title}."
         },
-        "delete_volume" = {
-          label        = "Delete_volume"
-          value        = "delete_volume"
-          style        = local.StyleAlert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+        "update_to_gp3" = {
+          label        = "Update to gp3"
+          value        = "update_to_gp3"
+          style        = local.style_ok
+          pipeline_ref = local.aws_pipeline_modify_ebs_volume
           pipeline_args = {
-            volume_id = param.volume_id
-            region    = param.region
-            cred      = param.cred
+            volume_id   = param.volume_id
+            volume_type = "gp3"
+            region      = param.region
+            cred        = param.cred
           }
-          success_msg = "Deleted EBS Volume ${param.title}."
-          error_msg   = "Error deleting EBS Volume ${param.title}."
+          success_msg = "Updated EBS volume ${param.title} to gp3."
+          error_msg   = "Error updating EBS volume ${param.title} to gp3."
         }
       }
     }
   }
+}
+
+variable "ebs_volumes_with_low_iops_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ebs_volumes_with_low_iops_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "ebs_volumes_with_low_iops_default_action" {
+  type        = string
+  description = "The default response to use when EBS volumes with low iops."
+  default     = "notify"
+}
+
+variable "ebs_volumes_with_low_iops_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_volume"]
 }

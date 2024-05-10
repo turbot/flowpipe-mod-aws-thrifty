@@ -1,41 +1,44 @@
 locals {
-  ebs_volumes_using_io1_query = <<-EOQ
+  route53_records_with_lower_ttl_query = <<-EOQ
   select
-    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, '/', availability_zone, ']') as title,
-    volume_id,
+    concat(name, ' [', region, '/', account_id, ']') as title,
+    name,
     region,
+    zone_id,
+    type,
+    records,
     _ctx ->> 'connection_name' as cred
   from
-    aws_ebs_volume
+    aws_route53_record
   where
-    volume_type = 'io1';
+    ttl :: int < 3600
   EOQ
 }
 
-trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
-  title         = "Detect & Correct EBS Volumes Using IO1"
-  description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_io1_trigger.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+trigger "query" "detect_and_correct_route53_records_with_lower_ttl" {
+  title         = "Detect & Correct Route53 Records With Lower TTL"
+  description   = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
+  // documentation = file("./route53/docs/detect_and_correct_route53_records_with_lower_ttl_trigger.md")
+  // tags          = merge(local.route53_common_tags, { class = "higher" })
 
-  enabled  = var.ebs_volumes_using_io1_trigger_enabled
-  schedule = var.ebs_volumes_using_io1_trigger_schedule
+  enabled  = var.route53_records_lower_ttl_trigger_enabled
+  schedule = var.route53_records_lower_ttl_trigger_schedule
   database = var.database
-  sql      = local.ebs_volumes_using_io1_query
+  sql      = local.route53_records_with_lower_ttl_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ebs_volumes_using_io1
+    pipeline = pipeline.correct_route53_records_with_lower_ttl
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ebs_volumes_using_io1" {
-  title         = "Detect & Correct EBS Volumes Using IO1"
-  description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "detect_and_correct_route53_records_with_lower_ttl" {
+  title         = "Detect & Correct Route53 Records With Lower TTL"
+  description   = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
+  // documentation = file("./route53/docs/detect_and_correct_route53_records_with_lower_ttl.md")
+  tags          = merge(local.route53_common_tags, { class = "higher" })
 
   param "database" {
     type        = string
@@ -64,22 +67,22 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.route53_records_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.route53_records_lower_ttl_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ebs_volumes_using_io1_query
+    sql      = local.route53_records_with_lower_ttl_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ebs_volumes_using_io1
+    pipeline = pipeline.correct_route53_records_with_lower_ttl
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -91,18 +94,21 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
   }
 }
 
-pipeline "correct_ebs_volumes_using_io1" {
-  title         = "Correct EBS Volumes Using IO1"
-  description   = "Executes corrective action on a collection of EBS volumes using io1."
-  // documentation = file("./ebs/docs/correct_ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_route53_records_with_lower_ttl" {
+  title         = "Correct Route53 Records With Lower TTL"
+  description   = "Runs corrective action on a collection of Route53 records with TTL lower than 3600 seconds."
+  // documentation = file("./route53/docs/correct_route53_records_with_lower_ttl.md")
+  tags          = merge(local.route53_common_tags, { class = "higher" })
 
   param "items" {
     type = list(object({
-      title     = string
-      volume_id = string
-      region    = string
-      cred      = string
+      title   = string
+      name    = string
+      region  = string
+      zone_id = string
+      type    = string
+      records = list(string)
+      cred    = string
     }))
   }
 
@@ -127,33 +133,36 @@ pipeline "correct_ebs_volumes_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.route53_records_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.route53_records_lower_ttl_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS volumes using io1."
+    text     = "Detected ${length(param.items)} Route53 records with lower TTL."
   }
 
   step "transform" "items_by_id" {
-    value = { for row in param.items : row.volume_id => row }
+    value = { for row in param.items : row.name => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ebs_volume_using_io1
+    pipeline        = pipeline.correct_one_route53_record_with_lower_ttl
     args = {
       title              = each.value.title
-      volume_id          = each.value.volume_id
+      name               = each.value.name
       region             = each.value.region
+      zone_id            = each.value.zone_id
+      type               = each.value.type
+      records            = each.value.records
       cred               = each.value.cred
       notifier           = param.notifier
       notification_level = param.notification_level
@@ -164,20 +173,35 @@ pipeline "correct_ebs_volumes_using_io1" {
   }
 }
 
-pipeline "correct_one_ebs_volume_using_io1" {
-  title         = "Correct One EBS Volume Using IO1"
-  description   = "Executes corrective action on a single EBS volume using io1."
-  // documentation = file("./ebs/docs/correct_one_ebs_volume_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_one_route53_record_with_lower_ttl" {
+  title       = "Correct One Route53 Record With Lower TTL"
+  description = "Runs corrective action on a Route53 record with TTL lower than 3600 seconds."
+  // documentation = file("./route53/docs/correct_one_route53_record_with_lower_ttl.md")
+  tags          = merge(local.route53_common_tags, { class = "higher" })
 
   param "title" {
     type        = string
     description = local.description_title
   }
 
-  param "volume_id" {
+  param "name" {
     type        = string
-    description = "EBS volume ID."
+    description = "The name of the record."
+  }
+
+  param "zone_id" {
+    type        = string
+    description = "The ID of the hosted zone to contain this record."
+  }
+
+  param "type" {
+    type        = string
+    description = "The record type."
+  }
+
+  param "records" {
+    type        = list(string)
+    description = "The resource records."
   }
 
   param "region" {
@@ -211,13 +235,13 @@ pipeline "correct_one_ebs_volume_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.route53_records_lower_ttl_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.route53_records_lower_ttl_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -226,7 +250,7 @@ pipeline "correct_one_ebs_volume_using_io1" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected EBS volume ${param.title} using io1."
+      detect_msg         = "Detected Route53 record ${param.title} with lower TTL."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {
@@ -238,48 +262,51 @@ pipeline "correct_one_ebs_volume_using_io1" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped EBS volume ${param.title} using io1."
+            text     = "Skipped Route53 record ${param.title}."
           }
           success_msg = ""
           error_msg   = ""
         },
-        "update_to_io2" = {
-          label        = "Update to io2"
-          value        = "update_to_io2"
+        "update" = {
+          label        = "Update"
+          value        = "update"
           style        = local.style_ok
-          pipeline_ref = local.aws_pipeline_modify_ebs_volume
+          pipeline_ref = local.aws_pipeline_update_route53_record
           pipeline_args = {
-            volume_id   = param.volume_id
-            volume_type = "io2"
-            region      = param.region
-            cred        = param.cred
+            region         = param.region
+            cred           = param.cred
+            hosted_zone_id = param.zone_id
+            record_name    = param.name
+            record_type    = param.type
+            record_ttl     = 3600
+            record_values  = param.records
           }
-          success_msg = "Updated EBS volume ${param.title} to io2."
-          error_msg   = "Error updating EBS volume ${param.title} to io2."
+          success_msg = "Updated Route53 record ${param.title} TTL to 3600."
+          error_msg   = "Error updating Route53 record ${param.title} TTL to 3600"
         }
       }
     }
   }
 }
 
-variable "ebs_volumes_using_io1_trigger_enabled" {
+variable "route53_records_lower_ttl_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "ebs_volumes_using_io1_trigger_schedule" {
+variable "route53_records_lower_ttl_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "ebs_volumes_using_io1_default_action" {
+variable "route53_records_lower_ttl_default_action" {
   type        = string
-  description = "The default response to use when EBS volumes are using io1."
+  description = "The default response to use when Route53 records have a TTL lower than expected."
   default     = "notify"
 }
 
-variable "ebs_volumes_using_io1_enabled_actions" {
+variable "route53_records_lower_ttl_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "update_to_io2"]
+  default     = ["skip", "update"]
 }

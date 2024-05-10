@@ -1,38 +1,47 @@
 locals {
-  ec2_instances_exceeding_max_age_query = <<-EOQ
-  select
-    concat(instance_id, ' [', region, '/', account_id, ']') as title,
-    instance_id,
-    region,
-    _ctx ->> 'connection_name' as cred
-  from
-    aws_ec2_instance
-  where
-    date_part('day', now()-launch_time) > ${var.ec2_instances_exceeding_max_age_days}
-    and instance_state in ('running', 'pending', 'rebooting')
+  ec2_gateway_load_balancers_if_unused_query = <<-EOQ
+    with target_resource as (
+      select
+        load_balancer_arn,
+        target_health_descriptions,
+        target_type
+      from
+        aws_ec2_target_group,
+        jsonb_array_elements_text(load_balancer_arns) as load_balancer_arn
+    )
+    select
+      concat(a.name, ' [', a.region, '/', a.account_id, ']') as title,
+      a.arn,
+      a.region,
+      a._ctx ->> 'connection_name' as cred
+    from
+      aws_ec2_gateway_load_balancer a
+      left join target_resource b on a.arn = b.load_balancer_arn
+    where
+      jsonb_array_length(b.target_health_descriptions) = 0
   EOQ
 }
 
-trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
-  title       = "Detect and correct EC2 instances exceeding max age"
-  description = "Identifies EC2 instances exceeding max age and executes the chosen action."
+trigger "query" "detect_and_correct_ec2_gateway_load_balancers_if_unused" {
+  title       = "Detect and correct EC2 gateway load balancers if unused"
+  description = "Identifies EC2 gateway load balancers that are unused and executes the chosen action."
 
-  enabled  = var.ec2_instances_exceeding_max_age_trigger_enabled
-  schedule = var.ec2_instances_exceeding_max_age_trigger_schedule
+  enabled  = var.ec2_gateway_load_balancers_if_unused_trigger_enabled
+  schedule = var.ec2_gateway_load_balancers_if_unused_trigger_schedule
   database = var.database
-  sql      = local.ec2_instances_exceeding_max_age_query
+  sql      = local.ec2_gateway_load_balancers_if_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ec2_instances_exceeding_max_age
+    pipeline = pipeline.correct_ec2_gateway_load_balancers_if_unused
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
-  title       = "Detect and correct EC2 instances exceeding max age"
-  description = "Identifies EC2 instances exceeding max age and executes corrective actions."
+pipeline "detect_and_correct_ec2_gateway_load_balancers_if_unused" {
+  title       = "Detect and correct EC2 gateway load balancers if unused"
+  description = "Identifies EC2 gateway load balancers that are unused and executes corrective actions."
 
   param "database" {
     type        = string
@@ -61,22 +70,22 @@ pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instances_exceeding_max_age_default_action
+    default     = var.ec2_gateway_load_balancers_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instances_exceeding_max_age_enabled_actions
+    default     = var.ec2_gateway_load_balancers_if_unused_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ec2_instances_exceeding_max_age_query
+    sql      = local.ec2_gateway_load_balancers_if_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ec2_instances_exceeding_max_age
+    pipeline = pipeline.correct_ec2_gateway_load_balancers_if_unused
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -88,16 +97,16 @@ pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
   }
 }
 
-pipeline "correct_ec2_instances_exceeding_max_age" {
-  title       = "Correct EC2 instances exceeding max age"
-  description = "Executes corrective actions on EC2 instances exceeding max age."
+pipeline "correct_ec2_gateway_load_balancers_if_unused" {
+  title       = "Correct EC2 gateway load balancers if unused"
+  description = "Executes corrective actions on EC2 gateway load balancers if unused."
 
   param "items" {
     type = list(object({
-      title       = string
-      instance_id = string
-      region      = string
-      cred        = string
+      title  = string
+      arn    = string
+      region = string
+      cred   = string
     }))
   }
 
@@ -122,22 +131,28 @@ pipeline "correct_ec2_instances_exceeding_max_age" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instances_exceeding_max_age_default_action
+    default     = var.ec2_gateway_load_balancers_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instances_exceeding_max_age_enabled_actions
+    default     = var.ec2_gateway_load_balancers_if_unused_enabled_actions
+  }
+
+  step "message" "notify_detection_count" {
+    if       = var.notification_level == "verbose"
+    notifier = notifier[param.notifier]
+    text     = "Detected ${length(param.items)} unused EC2 gateway load balancers."
   }
 
   step "pipeline" "correct_item" {
-    for_each        = { for item in param.items : item.instance_id => item }
+    for_each        = { for item in param.items : item.arn => item }
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ec2_instance_exceeding_max_age
+    pipeline        = pipeline.correct_one_ec2_gateway_load_balancer_if_unused
     args = {
       title              = each.value.title
-      instance_id        = each.value.instance_id
+      arn                = each.value.arn
       region             = each.value.region
       cred               = each.value.cred
       notifier           = param.notifier
@@ -149,18 +164,18 @@ pipeline "correct_ec2_instances_exceeding_max_age" {
   }
 }
 
-pipeline "correct_one_ec2_instance_exceeding_max_age" {
-  title       = "Correct one EC2 instance exceeding max age"
-  description = "Executes corrective action on a single EC2 instance exceeding max age."
+pipeline "correct_one_ec2_gateway_load_balancer_if_unused" {
+  title       = "Correct one EC2 gateway load balancer if unused"
+  description = "Executes corrective action on a single EC2 gateway load balancer if unused."
 
   param "title" {
     type        = string
     description = local.description_title
   }
 
-  param "instance_id" {
+  param "arn" {
     type        = string
-    description = "The ID of the EC2 instance."
+    description = "The ARN of the EC2 gateway load balancer."
   }
 
   param "region" {
@@ -194,13 +209,13 @@ pipeline "correct_one_ec2_instance_exceeding_max_age" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instances_exceeding_max_age_default_action
+    default     = var.ec2_gateway_load_balancers_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instances_exceeding_max_age_enabled_actions
+    default     = var.ec2_gateway_load_balancers_if_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -209,7 +224,7 @@ pipeline "correct_one_ec2_instance_exceeding_max_age" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected EC2 instance ${param.title} exceeding maximum age."
+      detect_msg         = "Detected unused EC2 gateway load balancer ${param.title}."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {
@@ -221,66 +236,47 @@ pipeline "correct_one_ec2_instance_exceeding_max_age" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped EC2 instance ${param.title} exceeding maximum age."
+            text     = "Skipped unused EC2 gateway load balancer ${param.title}."
           }
-          success_msg = "Skipping EC2 instance ${param.title}."
-          error_msg   = "Error skipping EC2 instance ${param.title}."
+          success_msg = "Skipped EC2 gateway load balancer ${param.title}."
+          error_msg   = "Error skipping EC2 gateway load balancer ${param.title}."
         },
-        "stop_instance" = {
-          label        = "Stop Instance"
-          value        = "stop_instance"
+        "delete_load_balancer" = {
+          label        = "Delete Load Balancer"
+          value        = "delete_load_balancer"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_stop_ec2_instances
+          pipeline_ref = local.aws_pipeline_delete_elbv2_load_balancer
           pipeline_args = {
-            instance_ids = [param.instance_id]
-            region       = param.region
-            cred         = param.cred
+            load_balancer_arn = param.arn
+            region            = param.region
+            cred              = param.cred
           }
-          success_msg = "Stopped EC2 instance ${param.title}."
-          error_msg   = "Error stopping EC2 instance ${param.title}."
-        },
-        "terminate_instance" = {
-          label        = "Terminate Instance"
-          value        = "terminate_instance"
-          style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_terminate_ec2_instances
-          pipeline_args = {
-            instance_ids = [param.instance_id]
-            region       = param.region
-            cred         = param.cred
-          }
-          success_msg = "Deleted EC2 instance ${param.title}."
-          error_msg   = "Error deleting EC2 instance ${param.title}."
+          success_msg = "Deleted EC2 gateway load balancer ${param.title}."
+          error_msg   = "Error deleting EC2 gateway load balancer ${param.title}."
         }
       }
     }
   }
 }
 
-variable "ec2_instances_exceeding_max_age_trigger_enabled" {
+variable "ec2_gateway_load_balancers_if_unused_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "ec2_instances_exceeding_max_age_trigger_schedule" {
+variable "ec2_gateway_load_balancers_if_unused_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "ec2_instances_exceeding_max_age_default_action" {
+variable "ec2_gateway_load_balancers_if_unused_default_action" {
   type        = string
-  description = "The default response to use when EC2 instances are older than the maximum number of days."
+  description = "The default response to use for unused EC2 gateway load balancers."
   default     = "notify"
 }
 
-variable "ec2_instances_exceeding_max_age_enabled_actions" {
+variable "ec2_gateway_load_balancers_if_unused_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "stop_instance", "terminate_instance"]
-}
-
-variable "ec2_instances_exceeding_max_age_days" {
-  type        = number
-  description = "The maximum number of days EC2 instances can be retained."
-  default     = 90
+  default     = ["skip", "delete_load_balancer"]
 }

@@ -1,41 +1,41 @@
 locals {
-  ebs_volumes_using_gp2_query = <<-EOQ
+  ebs_volumes_exceeding_max_size_query = <<-EOQ
   select
-    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, '/', availability_zone, ']') as title,
+    concat(volume_id, ' [', region, '/', account_id, ']') as title,
     volume_id,
     region,
     _ctx ->> 'connection_name' as cred
   from
     aws_ebs_volume
   where
-    volume_type = 'gp2';
+    size > ${var.ebs_volumes_exceeding_max_size}::int
   EOQ
 }
 
-trigger "query" "detect_and_correct_ebs_volumes_using_gp2" {
-  title         = "Detect & Correct EBS Volumes Using GP2"
-  description   = "Detects EBS volumes using gp2 and executes the chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_gp2_trigger.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+trigger "query" "detect_and_correct_ebs_volumes_exceeding_max_size" {
+  title         = "Detect & Correct EBS Volumes Exceeding Max Size"
+  description   = "Detects EBS volumes exceeding maximum size and runs your chosen action."
+  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_exceeding_max_size_trigger.md")
+  // tags          = merge(local.ebs_common_tags, { class = "managed" })
 
-  enabled  = var.ebs_volumes_using_gp2_trigger_enabled
-  schedule = var.ebs_volumes_using_gp2_trigger_schedule
+  enabled  = var.ebs_volumes_exceeding_max_size_trigger_enabled
+  schedule = var.ebs_volumes_exceeding_max_size_trigger_schedule
   database = var.database
-  sql      = local.ebs_volumes_using_gp2_query
+  sql      = local.ebs_volumes_exceeding_max_size_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ebs_volumes_using_gp2
+    pipeline = pipeline.correct_ebs_volumes_exceeding_max_size
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ebs_volumes_using_gp2" {
-  title         = "Detect & Correct EBS Volumes Using GP2"
-  description   = "Detects EBS volumes using gp2 and performs the chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_gp2.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
+  title         = "Detect & Correct EBS Volumes Exceeding Max Size"
+  description   = "Detects EBS volumes exceeding maximum size and runs your chosen action."
+  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_exceeding_max_size.md")
+  // tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "database" {
     type        = string
@@ -64,38 +64,38 @@ pipeline "detect_and_correct_ebs_volumes_using_gp2" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_gp2_default_action
+    default     = var.ebs_volumes_exceeding_max_size_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_gp2_enabled_actions
+    default     = var.ebs_volumes_exceeding_max_size_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ebs_volumes_using_gp2_query
+    sql      = local.ebs_volumes_exceeding_max_size_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ebs_volumes_using_gp2
+    pipeline = pipeline.correct_ebs_volumes_exceeding_max_size
     args = {
-      items              = step.query.detect.rows
-      notifier           = param.notifier
-      notification_level = param.notification_level
-      approvers          = param.approvers
-      default_action     = param.default_action
-      enabled_actions    = param.enabled_actions
+      items                    = step.query.detect.rows
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_action           = param.default_action
+      enabled_actions          = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_ebs_volumes_using_gp2" {
-  title         = "Correct EBS Volumes Using GP2"
-  description   = "Executes corrective actions on EBS volumes using gp2."
-  // documentation = file("./ebs/docs/correct_ebs_volumes_using_gp2.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_ebs_volumes_exceeding_max_size" {
+  title         = "Correct EBS Volumes Exceeding Max Size"
+  description   = "Runs corrective action on a collection of EBS volumes exceeding maximum size."
+  // documentation = file("./ebs/docs/correct_ebs_volumes_exceeding_max_size.md")
+  // tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "items" {
     type = list(object({
@@ -127,19 +127,19 @@ pipeline "correct_ebs_volumes_using_gp2" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_gp2_default_action
+    default     = var.ebs_volumes_exceeding_max_size_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_gp2_enabled_actions
+    default     = var.ebs_volumes_exceeding_max_size_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS volumes using gp2."
+    text     = "Detected ${length(param.items)} EBS volumes exceeding maximum size."
   }
 
   step "transform" "items_by_id" {
@@ -149,7 +149,7 @@ pipeline "correct_ebs_volumes_using_gp2" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ebs_volume_using_gp2
+    pipeline        = pipeline.correct_one_ebs_volume_exceeding_max_size
     args = {
       title              = each.value.title
       volume_id          = each.value.volume_id
@@ -164,11 +164,11 @@ pipeline "correct_ebs_volumes_using_gp2" {
   }
 }
 
-pipeline "correct_one_ebs_volume_using_gp2" {
-  title         = "Correct One EBS Volume Using GP2"
-  description   = "Executes corrective action on an EBS volume using gp2."
-  // documentation = file("./ebs/docs/correct_one_ebs_volume_using_gp2.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_one_ebs_volume_exceeding_max_size" {
+  title         = "Correct One EBS Volume Exceeding Max Size"
+  description   = "Runs corrective action on an EBS volume exceeding maximum size."
+  // documentation = file("./ebs/docs/correct_one_ebs_volume_exceeding_max_size.md")
+  // tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "title" {
     type        = string
@@ -177,7 +177,7 @@ pipeline "correct_one_ebs_volume_using_gp2" {
 
   param "volume_id" {
     type        = string
-    description = "EBS volume ID."
+    description = "The ID of the EBS volume."
   }
 
   param "region" {
@@ -211,13 +211,13 @@ pipeline "correct_one_ebs_volume_using_gp2" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_gp2_default_action
+    default     = var.ebs_volumes_exceeding_max_size_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_gp2_enabled_actions
+    default     = var.ebs_volumes_exceeding_max_size_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -226,9 +226,9 @@ pipeline "correct_one_ebs_volume_using_gp2" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      detect_msg               = "Detected EBS volume ${param.title} using gp2."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      detect_msg               = "Detected EBS volume ${param.title} exceeding maximum size."
+      default_action           = param.default_action
+      enabled_actions          = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
@@ -238,48 +238,53 @@ pipeline "correct_one_ebs_volume_using_gp2" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped EBS volume ${param.title} using gp2."
+            text     = "Skipped EBS volume ${param.title} exceeding maximum size."
           }
-          success_msg = ""
-          error_msg   = ""
+          success_msg = "Skipped EBS volume ${param.title}."
+          error_msg   = "Error skipping EBS volume ${param.title}."
         },
-        "update_to_gp3" = {
-          label        = "Update to gp3"
-          value        = "update_to_gp3"
-          style        = local.style_ok
-          pipeline_ref = local.aws_pipeline_modify_ebs_volume
+        "delete_volume" = {
+          label        = "Delete Volume"
+          value        = "delete_volume"
+          style        = local.style_alert
+          pipeline_ref = local.aws_pipeline_delete_ebs_volume
           pipeline_args = {
-            volume_id   = param.volume_id
-            volume_type = "gp3"
-            region      = param.region
-            cred        = param.cred
+            volume_id = param.volume_id
+            region    = param.region
+            cred      = param.cred
           }
-          success_msg = "Updated EBS volume ${param.title} to gp3."
-          error_msg   = "Error updating EBS volume ${param.title} to gp3."
+          success_msg = "Deleted EBS volume ${param.title}."
+          error_msg   = "Error deleting EBS volume ${param.title}."
         }
       }
     }
   }
 }
 
-variable "ebs_volumes_using_gp2_trigger_enabled" {
+variable "ebs_volumes_exceeding_max_size_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "ebs_volumes_using_gp2_trigger_schedule" {
+variable "ebs_volumes_exceeding_max_size_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "ebs_volumes_using_gp2_default_action" {
+variable "ebs_volumes_exceeding_max_size_default_action" {
   type        = string
-  description = "The default response to use when EBS volumes are using gp2."
+  description = "The default action to take for EBS volumes exceeding maximum size."
   default     = "notify"
 }
 
-variable "ebs_volumes_using_gp2_enabled_actions" {
+variable "ebs_volumes_exceeding_max_size_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "update_to_gp3"]
+  default     = ["skip", "delete_volume"]
+}
+
+variable "ebs_volumes_exceeding_max_size" {
+  type        = number
+  description = "The maximum size (GB) allowed for volumes."
+  default     = 100
 }

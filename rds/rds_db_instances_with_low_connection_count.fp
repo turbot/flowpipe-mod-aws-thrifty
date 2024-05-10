@@ -1,5 +1,5 @@
 locals {
-  rds_db_instances_low_connection_count_query = <<-EOQ
+  rds_db_instances_with_low_connection_count_query = <<-EOQ
   with rds_db_usage as (
   select
     db_instance_identifier,
@@ -29,70 +29,74 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_rds_db_instances_low_connection_count" {
-  title       = "Detect & correct RDS DB instances with low connection count"
+trigger "query" "detect_and_correct_rds_db_instances_with_low_connection_count" {
+  title       = "Detect & Correct RDS DB Instances With Low Connection Count"
   description = "Detects RDS DB instances with low connection count and runs your chosen action."
+  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_with_low_connection_count_trigger.md")
+  // tags          = merge(local.rds_common_tags, { class = "unused" })
 
-  enabled  = var.rds_db_instances_low_connection_count_trigger_enabled
-  schedule = var.rds_db_instances_low_connection_count_trigger_schedule
+  enabled  = var.rds_db_instances_with_low_connection_count_trigger_enabled
+  schedule = var.rds_db_instances_with_low_connection_count_trigger_schedule
   database = var.database
-  sql      = local.rds_db_instances_low_connection_count_query
+  sql      = local.rds_db_instances_with_low_connection_count_query
 
   capture "insert" {
-    pipeline = pipeline.correct_to_rds_db_instances_low_connection_count
+    pipeline = pipeline.correct_rds_db_instances_with_low_connection_count
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_rds_db_instances_low_connection_count" {
-  title       = "Detect & correct RDS DB instances with low connection count"
+pipeline "detect_and_correct_rds_db_instances_with_low_connection_count" {
+  title       = "Detect & Correct RDS DB Instances With Low Connection Count"
   description = "Detects RDS DB instances with low connection count and runs your chosen action."
+  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_with_low_connection_count.md")
+  tags          = merge(local.rds_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
-    description = local.DatabaseDescription
+    description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_low_connection_count_default_action
+    description = local.description_default_action
+    default     = var.rds_db_instances_with_low_connection_count_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.rds_db_instance_low_connection_count_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.rds_db_instances_with_low_connection_count_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.rds_db_instances_low_connection_count_query
+    sql      = local.rds_db_instances_with_low_connection_count_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_to_rds_db_instances_low_connection_count
+    pipeline = pipeline.correct_rds_db_instances_with_low_connection_count
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -104,9 +108,11 @@ pipeline "detect_and_correct_rds_db_instances_low_connection_count" {
   }
 }
 
-pipeline "correct_to_rds_db_instances_low_connection_count" {
-  title       = "Corrects RDS DB instances with low connection count"
+pipeline "correct_rds_db_instances_with_low_connection_count" {
+  title       = "Correct RDS DB Instances With Low Connection Count"
   description = "Runs corrective action on a collection of RDS DB instances with low connection count."
+  // documentation = file("./rds/docs/correct_rds_db_instances_with_low_connection_count.md")
+  tags          = merge(local.rds_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -119,36 +125,36 @@ pipeline "correct_to_rds_db_instances_low_connection_count" {
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_low_connection_count_default_action
+    description = local.description_default_action
+    default     = var.rds_db_instances_with_low_connection_count_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.rds_db_instance_low_connection_count_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.rds_db_instances_with_low_connection_count_enabled_actions
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} RDS DB instances with low connection count."
   }
@@ -160,7 +166,7 @@ pipeline "correct_to_rds_db_instances_low_connection_count" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_to_rds_db_instance_low_connection_count
+    pipeline        = pipeline.correct_one_rds_db_instance_with_low_connection_count
     args = {
       title                  = each.value.title
       db_instance_identifier = each.value.db_instance_identifier
@@ -175,13 +181,15 @@ pipeline "correct_to_rds_db_instances_low_connection_count" {
   }
 }
 
-pipeline "correct_to_rds_db_instance_low_connection_count" {
-  title       = "Correct an RDS DB instance with low connection count"
-  description = "Runs corrective action on an RDS DB instance with low connection count."
+pipeline "correct_one_rds_db_instance_with_low_connection_count" {
+  title         = "Correct One RDS DB Instance With Low Connection Count"
+  description   = "Runs corrective action on an RDS DB instance with low connection count."
+  // documentation = file("./rds/docs/correct_one_rds_db_instance_with_low_connection_count.md")
+  tags          = merge(local.rds_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
-    description = local.TitleDescription
+    description = local.description_title
   }
 
   param "db_instance_identifier" {
@@ -191,42 +199,42 @@ pipeline "correct_to_rds_db_instance_low_connection_count" {
 
   param "region" {
     type        = string
-    description = local.RegionDescription
+    description = local.description_region
   }
 
   param "cred" {
     type        = string
-    description = local.CredentialDescription
+    description = local.description_credential
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.rds_db_instance_low_connection_count_default_action
+    description = local.description_default_action
+    default     = var.rds_db_instances_with_low_connection_count_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.rds_db_instance_low_connection_count_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.rds_db_instances_with_low_connection_count_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -242,11 +250,11 @@ pipeline "correct_to_rds_db_instance_low_connection_count" {
         "skip" = {
           label        = "Skip"
           value        = "skip"
-          style        = local.StyleInfo
+          style        = local.style_info
           pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped RDS DB Instance ${param.title} with low connection count."
           }
           success_msg = "Skipped RDS DB Instance ${param.title}."
@@ -255,7 +263,7 @@ pipeline "correct_to_rds_db_instance_low_connection_count" {
         "delete_instance" = {
           label        = "Delete Instance"
           value        = "delete_instance"
-          style        = local.StyleAlert
+          style        = local.style_alert
           pipeline_ref = local.aws_pipeline_delete_rds_db_instance
           pipeline_args = {
             db_instance_identifier = param.db_instance_identifier
@@ -268,4 +276,26 @@ pipeline "correct_to_rds_db_instance_low_connection_count" {
       }
     }
   }
+}
+
+variable "rds_db_instances_with_low_connection_count_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "rds_db_instances_with_low_connection_count_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "rds_db_instances_with_low_connection_count_default_action" {
+  type        = string
+  description = "The default response to use when there are RDS DB instances with low connection count."
+  default     = "notify"
+}
+
+variable "rds_db_instances_with_low_connection_count_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_instance"]
 }

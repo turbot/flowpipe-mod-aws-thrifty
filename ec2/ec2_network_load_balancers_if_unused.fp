@@ -1,41 +1,47 @@
 locals {
-  ebs_volumes_using_io1_query = <<-EOQ
-  select
-    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, '/', availability_zone, ']') as title,
-    volume_id,
-    region,
-    _ctx ->> 'connection_name' as cred
-  from
-    aws_ebs_volume
-  where
-    volume_type = 'io1';
+  ec2_network_load_balancers_if_unused_query = <<-EOQ
+    with target_resource as (
+      select
+        load_balancer_arn,
+        target_health_descriptions,
+        target_type
+      from
+        aws_ec2_target_group,
+        jsonb_array_elements_text(load_balancer_arns) as load_balancer_arn
+    )
+    select
+      concat(a.name, ' [', a.region, '/', a.account_id, ']') as title,
+      a.arn,
+      a.region,
+      a._ctx ->> 'connection_name' as cred
+    from
+      aws_ec2_network_load_balancer a
+      left join target_resource b on a.arn = b.load_balancer_arn
+    where
+      jsonb_array_length(b.target_health_descriptions) = 0
   EOQ
 }
 
-trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
-  title         = "Detect & Correct EBS Volumes Using IO1"
-  description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_io1_trigger.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+trigger "query" "detect_and_correct_ec2_network_load_balancers_if_unused" {
+  title       = "Detect & correct EC2 network load balancers if unused"
+  description = "Detects EC2 network load balancers that are unused (not serving any targets) and runs your chosen action."
 
-  enabled  = var.ebs_volumes_using_io1_trigger_enabled
-  schedule = var.ebs_volumes_using_io1_trigger_schedule
+  enabled  = var.ec2_network_load_balancers_if_unused_trigger_enabled
+  schedule = var.ec2_network_load_balancers_if_unused_trigger_schedule
   database = var.database
-  sql      = local.ebs_volumes_using_io1_query
+  sql      = local.ec2_network_load_balancers_if_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ebs_volumes_using_io1
+    pipeline = pipeline.correct_ec2_network_load_balancers_if_unused
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ebs_volumes_using_io1" {
-  title         = "Detect & Correct EBS Volumes Using IO1"
-  description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "detect_and_correct_ec2_network_load_balancers_if_unused" {
+  title       = "Detect & correct EC2 network load balancers if unused"
+  description = "Detects EC2 network load balancers that are unused (not serving any targets) and runs your chosen action."
 
   param "database" {
     type        = string
@@ -64,22 +70,22 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.ec2_network_load_balancers_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.ec2_network_load_balancers_if_unused_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ebs_volumes_using_io1_query
+    sql      = local.ec2_network_load_balancers_if_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ebs_volumes_using_io1
+    pipeline = pipeline.correct_ec2_network_load_balancers_if_unused
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -91,18 +97,16 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
   }
 }
 
-pipeline "correct_ebs_volumes_using_io1" {
-  title         = "Correct EBS Volumes Using IO1"
-  description   = "Executes corrective action on a collection of EBS volumes using io1."
-  // documentation = file("./ebs/docs/correct_ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_ec2_network_load_balancers_if_unused" {
+  title       = "Correct EC2 network load balancers if unused"
+  description = "Runs corrective action on a collection of EC2 network load balancers that are unused (not serving any targets)."
 
   param "items" {
     type = list(object({
-      title     = string
-      volume_id = string
-      region    = string
-      cred      = string
+      title  = string
+      arn    = string
+      region = string
+      cred   = string
     }))
   }
 
@@ -127,32 +131,32 @@ pipeline "correct_ebs_volumes_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.ec2_network_load_balancers_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.ec2_network_load_balancers_if_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS volumes using io1."
+    text     = "Detected ${length(param.items)} EC2 network load balancers unused (not serving any targets)."
   }
 
   step "transform" "items_by_id" {
-    value = { for row in param.items : row.volume_id => row }
+    value = { for row in param.items : row.arn => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ebs_volume_using_io1
+    pipeline        = pipeline.correct_one_ec2_network_load_balancer_if_unused
     args = {
       title              = each.value.title
-      volume_id          = each.value.volume_id
+      arn                = each.value.arn
       region             = each.value.region
       cred               = each.value.cred
       notifier           = param.notifier
@@ -164,20 +168,18 @@ pipeline "correct_ebs_volumes_using_io1" {
   }
 }
 
-pipeline "correct_one_ebs_volume_using_io1" {
-  title         = "Correct One EBS Volume Using IO1"
-  description   = "Executes corrective action on a single EBS volume using io1."
-  // documentation = file("./ebs/docs/correct_one_ebs_volume_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_one_ec2_network_load_balancer_if_unused" {
+  title       = "Correct one EC2 network load balancer if unused"
+  description = "Runs corrective action on an EC2 network load balancer that is unused (not serving any targets)."
 
   param "title" {
     type        = string
     description = local.description_title
   }
 
-  param "volume_id" {
+  param "arn" {
     type        = string
-    description = "EBS volume ID."
+    description = "The ARN of the EC2 network load balancer."
   }
 
   param "region" {
@@ -211,13 +213,13 @@ pipeline "correct_one_ebs_volume_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.ec2_network_load_balancers_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.ec2_network_load_balancers_if_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -226,7 +228,7 @@ pipeline "correct_one_ebs_volume_using_io1" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected EBS volume ${param.title} using io1."
+      detect_msg         = "Detected EC2 network load balancer ${param.title} unused (not serving any targets)."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {
@@ -238,48 +240,47 @@ pipeline "correct_one_ebs_volume_using_io1" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped EBS volume ${param.title} using io1."
+            text     = "Skipped EC2 network load balancer ${param.title} unused (not serving any targets)."
           }
-          success_msg = ""
-          error_msg   = ""
+          success_msg = "Skipped EC2 network load balancer ${param.title} unused (not serving any targets)."
+          error_msg   = "Error skipping EC2 network load balancer ${param.title} unused (not serving any targets)."
         },
-        "update_to_io2" = {
-          label        = "Update to io2"
-          value        = "update_to_io2"
-          style        = local.style_ok
-          pipeline_ref = local.aws_pipeline_modify_ebs_volume
+        "delete_load_balancer" = {
+          label        = "Delete Load Balancer"
+          value        = "delete_load_balancer"
+          style        = local.style_alert
+          pipeline_ref = local.aws_pipeline_delete_elbv2_load_balancer
           pipeline_args = {
-            volume_id   = param.volume_id
-            volume_type = "io2"
-            region      = param.region
-            cred        = param.cred
+            load_balancer_arn = param.arn
+            region            = param.region
+            cred              = param.cred
           }
-          success_msg = "Updated EBS volume ${param.title} to io2."
-          error_msg   = "Error updating EBS volume ${param.title} to io2."
+          success_msg = "Deleted EC2 network load balancer ${param.title}."
+          error_msg   = "Error deleting EC2 network load balancer ${param.title}."
         }
       }
     }
   }
 }
 
-variable "ebs_volumes_using_io1_trigger_enabled" {
+variable "ec2_network_load_balancers_if_unused_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "ebs_volumes_using_io1_trigger_schedule" {
+variable "ec2_network_load_balancers_if_unused_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "ebs_volumes_using_io1_default_action" {
+variable "ec2_network_load_balancers_if_unused_default_action" {
   type        = string
-  description = "The default response to use when EBS volumes are using io1."
+  description = "The default response to use for unused EC2 network load balancers."
   default     = "notify"
 }
 
-variable "ebs_volumes_using_io1_enabled_actions" {
+variable "ec2_network_load_balancers_if_unused_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "update_to_io2"]
+  default     = ["skip", "delete_load_balancer"]
 }

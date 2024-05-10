@@ -13,8 +13,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
-  title       = "Detect & correct S3 buckets without lifecycle policy"
-  description = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
+  title         = "Detect & correct S3 buckets without lifecycle policy"
+  description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
+  // documentation = file("./s3/docs/detect_and_correct_s3_buckets_without_lifecycle_policy_trigger.md")
+  // tags          = merge(local.s3_common_tags, { class = "managed" })
 
   enabled  = var.s3_buckets_without_lifecycle_policy_trigger_enabled
   schedule = var.s3_buckets_without_lifecycle_policy_trigger_schedule
@@ -32,48 +34,49 @@ trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   title         = "Detect & correct S3 buckets without lifecycle policy"
   description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
-  tags          = merge(local.s3_common_tags, { class = "managed" })
+  documentation = file("./s3/docs/detect_and_correct_s3_buckets_without_lifecycle_policy.md")
+  tags          = merge(local.s3_common_tags, { class = "managed", type = "featured" })
 
   param "database" {
     type        = string
-    description = local.DatabaseDescription
+    description = local.description_database
     default     = var.database
   }
 
   param "policy" {
     type        = string
     description = "Lifecycle policy to apply to the S3 bucket, if 'apply' is the chosen response."
-    default     = var.s3_bucket_default_lifecycle_policy
+    default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_action
+    description = local.description_default_action
+    default     = var.s3_buckets_without_lifecycle_policy_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
   }
 
   step "query" "detect" {
@@ -84,20 +87,21 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_s3_buckets_without_lifecycle_policy
     args     = {
-      items                    = step.query.detect.rows
-      policy                   = param.policy
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      items              = step.query.detect.rows
+      policy             = param.policy
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
 pipeline "correct_s3_buckets_without_lifecycle_policy" {
-  title         = "Corrects S3 buckets without lifecycle policy"
+  title         = "Correct S3 buckets without lifecycle policy"
   description   = "Runs corrective action on a collection of S3 buckets which do not have a lifecycle policy."
+  documentation = file("./s3/docs/correct_s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "items" {
@@ -112,41 +116,41 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   param "policy" {
     type        = string
     description = "Lifecycle policy to apply to the S3 bucket, if 'apply' is the chosen response."
-    default     = var.s3_bucket_default_lifecycle_policy
+    default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_action
+    description = local.description_default_action
+    default     = var.s3_buckets_without_lifecycle_policy_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
   }
 
   step "message" "notify_detection_count" {
-    if       = var.notification_level == local.NotifierLevelVerbose
+    if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
     text     = "Detected ${length(param.items)} S3 Buckets without a lifecycle policy."
   }
@@ -158,30 +162,31 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_s3_bucket_without_lifecycle_policy
+    pipeline        = pipeline.correct_one_s3_bucket_without_lifecycle_policy
     args            = {
-      title                    = each.value.title
-      name                     = each.value.name
-      region                   = each.value.region
-      cred                     = each.value.cred
-      policy                   = param.policy
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      title              = each.value.title
+      name               = each.value.name
+      region             = each.value.region
+      cred               = each.value.cred
+      policy             = param.policy
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_s3_bucket_without_lifecycle_policy" {
+pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   title         = "Correct one S3 bucket without lifecycle policy"
   description   = "Runs corrective action on an individual S3 bucket which does not have a lifecycle policy."
+  documentation = file("./s3/docs/correct_one_s3_bucket_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
 
   param "title" {
     type        = string
-    description = local.TitleDescription
+    description = local.description_title
   }
 
   param "name" {
@@ -191,68 +196,68 @@ pipeline "correct_s3_bucket_without_lifecycle_policy" {
 
   param "region" {
     type        = string
-    description = local.RegionDescription
+    description = local.description_region
   }
 
   param "cred" {
     type        = string
-    description = local.CredentialDescription
+    description = local.description_credential
   }
 
   param "policy" {
     type        = string
     description = "Lifecycle policy to apply to the S3 Bucket."
-    default     = var.s3_bucket_default_lifecycle_policy
+    default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
   param "notifier" {
     type        = string
-    description = local.NotifierDescription
+    description = local.description_notifier
     default     = var.notifier
   }
 
   param "notification_level" {
     type        = string
-    description = local.NotifierLevelDescription
+    description = local.description_notifier_level
     default     = var.notification_level
   }
 
   param "approvers" {
     type        = list(string)
-    description = local.ApproversDescription
+    description = local.description_approvers
     default     = var.approvers
   }
 
   param "default_action" {
     type        = string
-    description = local.DefaultResponseDescription
-    default     = var.s3_bucket_without_lifecycle_policy_default_action
+    description = local.description_default_action
+    default     = var.s3_buckets_without_lifecycle_policy_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
-    description = local.ResponsesDescription
-    default     = var.s3_bucket_without_lifecycle_policy_enabled_actions
+    description = local.description_enabled_actions
+    default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
   }
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args     = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected S3 Bucket ${param.title} without a lifecycle policy."
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected S3 Bucket ${param.title} without a lifecycle policy."
       default_action  = param.default_action
       enabled_actions = param.enabled_actions
       actions = {
         "skip" = {
           label  = "Skip"
           value  = "skip"
-          style  = local.StyleInfo
+          style  = local.style_info
           pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
-            send     = param.notification_level == local.NotifierLevelVerbose
+            send     = param.notification_level == local.level_verbose
             text     = "Skipped S3 Bucket ${param.title} without a lifecycle policy."
           }
           success_msg = ""
@@ -261,7 +266,7 @@ pipeline "correct_s3_bucket_without_lifecycle_policy" {
         "apply_policy" = {
           label  = "Apply Policy"
           value  = "apply_policy"
-          style  = local.StyleOk
+          style  = local.style_ok
           pipeline_ref  = pipeline.mock_aws_pipeline_put_s3_lifecycle_policy // TODO: Replace with real pipeline when added to aws library mod.
           pipeline_args = {
             bucket_name = param.name
@@ -298,4 +303,71 @@ pipeline "mock_aws_pipeline_put_s3_lifecycle_policy" {
   output "result" {
     value = "Mocked: Put S3 Lifecycle Policy [Name: ${param.bucket_name}, Region: ${param.region}, Cred: ${param.cred}]\n${param.policy}"
   }
+}
+
+variable "s3_buckets_without_lifecycle_policy_trigger_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "s3_buckets_without_lifecycle_policy_trigger_schedule" {
+  type    = string
+  default = "15m"
+}
+
+variable "s3_buckets_without_lifecycle_policy_default_action" {
+  type        = string
+  description = "The default response to use for S3 buckets without lifecycle policy."
+  default     = "notify"
+}
+
+variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "apply_policy"]
+}
+
+// TODO: Change to an array of objects (contents of 'Rules') - let lib mod wrap it; no JSONified strings!
+variable "s3_buckets_without_lifecycle_policy_default_policy" {
+  type        = string
+  description = "The default S3 bucket lifecycle policy to apply"
+  default     = <<-EOF
+{
+  "Rules": [
+    {
+      "ID": "Transition to STANDARD_IA after 90 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 90,
+          "StorageClass": "STANDARD_IA"
+        }
+      ]
+    },
+    {
+      "ID": "Transition to GLACIER after 180 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 180,
+          "StorageClass": "GLACIER"
+        }
+      ]
+    },
+    {
+      "ID": "Transition to DEEP_ARCHIVE after 365 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 365,
+          "StorageClass": "DEEP_ARCHIVE"
+        }
+      ]
+    }
+  ]
+}
+  EOF
 }
