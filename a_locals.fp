@@ -48,4 +48,6 @@ locals {
   aws_pipeline_delete_secretsmanager_secret = aws.pipeline.delete_secretsmanager_secret
   aws_pipeline_delete_elbv2_load_balancer   = aws.pipeline.delete_elbv2_load_balancer
   aws_pipeline_delete_elb_load_balancer     = aws.pipeline.delete_elb_load_balancer
+  aws_pipeline_delete_elasticache_cluster   = aws.pipeline.delete_elasticache_cluster
+  aws_pipeline_delete_eks_node_group        = aws.pipeline.delete_eks_node_group
 }
