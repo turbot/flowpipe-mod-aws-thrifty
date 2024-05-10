@@ -46,7 +46,7 @@ pipeline "detect_and_correct_vpc_nat_gateways_if_unused" {
   title         = "Detect & correct VPC NAT gateways if unused"
   description   = "Detects unused NAT gateways and runs your chosen action."
   documentation = file("./vpc/docs/detect_and_correct_vpc_nat_gateways_if_unused.md")
-  tags          = merge(local.vpc_common_tags, { class = "unused" })
+  tags          = merge(local.vpc_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string
@@ -234,12 +234,12 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected unused NAT Gateway ${param.title}."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected unused NAT Gateway ${param.title}."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
