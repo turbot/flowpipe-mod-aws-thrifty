@@ -1,4 +1,4 @@
-# Correct S3 Buckets Without Lifecycle Policy
+# Correct S3 buckets without lifecycle policy
 
 ## Overview
 

@@ -1,4 +1,4 @@
-# Correct One S3 Bucket Without Lifecycle Policy
+# Correct one S3 bucket without lifecycle policy
 
 ## Overview
 
