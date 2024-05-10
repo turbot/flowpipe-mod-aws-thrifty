@@ -15,8 +15,8 @@ locals {
 trigger "query" "detect_and_correct_vpc_eips_if_unattached" {
   title         = "Detect & correct VPC EIPs if unattached"
   description   = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
-  // documentation = file("./vpc/docs/detect_and_correct_vpc_eips_if_unattached_trigger.md")
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  documentation = file("./vpc/docs/detect_and_correct_vpc_eips_if_unattached_trigger.md")
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   enabled  = var.vpc_eips_if_unattached_trigger_enabled
   schedule = var.vpc_eips_if_unattached_trigger_schedule

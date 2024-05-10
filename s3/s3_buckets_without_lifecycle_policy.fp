@@ -15,8 +15,8 @@ locals {
 trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   title         = "Detect & correct S3 buckets without lifecycle policy"
   description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
-  // documentation = file("./s3/docs/detect_and_correct_s3_buckets_without_lifecycle_policy_trigger.md")
-  // tags          = merge(local.s3_common_tags, { class = "managed" })
+  documentation = file("./s3/docs/detect_and_correct_s3_buckets_without_lifecycle_policy_trigger.md")
+  tags          = merge(local.s3_common_tags, { class = "managed" })
 
   enabled  = var.s3_buckets_without_lifecycle_policy_trigger_enabled
   schedule = var.s3_buckets_without_lifecycle_policy_trigger_schedule

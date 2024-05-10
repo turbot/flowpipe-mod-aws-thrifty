@@ -24,10 +24,10 @@ having
 }
 
 trigger "query" "detect_and_correct_vpc_nat_gateways_if_unused" {
-  title       = "Detect & correct VPC NAT gateways if unused"
-  description = "Detects unused NAT gateways and runs your chosen action."
-  // documentation = file("./vpc/docs/detect_and_correct_vpc_nat_gateways_if_unused_trigger.md")
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  title         = "Detect & correct VPC NAT gateways if unused"
+  description   = "Detects unused NAT gateways and runs your chosen action."
+  documentation = file("./vpc/docs/detect_and_correct_vpc_nat_gateways_if_unused_trigger.md")
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   enabled  = var.vpc_nat_gateways_if_unused_trigger_enabled
   schedule = var.vpc_nat_gateways_if_unused_trigger_schedule

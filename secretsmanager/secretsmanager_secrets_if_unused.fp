@@ -15,8 +15,8 @@ locals {
 trigger "query" "detect_and_correct_secretsmanager_secrets_if_unused" {
   title       = "Detect & Correct SecretsManager Secrets If Unused"
   description = "Detects SecretsManager secrets that are unused (not accessed in last n days) and runs your chosen action."
-  // documentation = file("./secretsmanager/docs/detect_and_correct_secretsmanager_secrets_if_unused_trigger.md")
-  // tags          = merge(local.vpc_common_tags, { class = "unused" })
+  documentation = file("./secretsmanager/docs/detect_and_correct_secretsmanager_secrets_if_unused_trigger.md")
+  tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
   enabled  = var.secretsmanager_secrets_if_unused_trigger_enabled
   schedule = var.secretsmanager_secrets_if_unused_trigger_schedule
