@@ -1,41 +1,52 @@
 locals {
-  ebs_volumes_using_io1_query = <<-EOQ
+  route53_health_checks_if_unused_query = <<-EOQ
+  with health_check as (
+    select
+      r.health_check_id as health_check_id
+    from
+      aws_route53_zone as z,
+      aws_route53_record as r
+    where
+      r.zone_id = z.id
+  )
   select
-    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, '/', availability_zone, ']') as title,
-    volume_id,
-    region,
-    _ctx ->> 'connection_name' as cred
+    concat(h.id, ' [', h.region, '/', h.account_id, ']') as title,
+    h.id,
+    h.region,
+    h._ctx ->> 'connection_name' as cred
   from
-    aws_ebs_volume
+    aws_route53_health_check as h
+  left join
+    health_check as c on h.id = c.health_check_id
   where
-    volume_type = 'io1';
+    c.health_check_id is null
   EOQ
 }
 
-trigger "query" "detect_and_correct_ebs_volumes_using_io1" {
-  title         = "Detect & Correct EBS Volumes Using IO1"
-  description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_io1_trigger.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+trigger "query" "detect_and_correct_route53_health_checks_if_unused" {
+  title         = "Detect & Correct Route53 Health Checks If Unused"
+  description   = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
+  // documentation = file("./route53/docs/detect_and_correct_route53_health_checks_if_unused_trigger.md")
+  // tags          = merge(local.route53_common_tags, { class = "unused" })
 
-  enabled  = var.ebs_volumes_using_io1_trigger_enabled
-  schedule = var.ebs_volumes_using_io1_trigger_schedule
+  enabled  = var.route53_health_checks_if_unused_trigger_enabled
+  schedule = var.route53_health_checks_if_unused_trigger_schedule
   database = var.database
-  sql      = local.ebs_volumes_using_io1_query
+  sql      = local.route53_health_checks_if_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ebs_volumes_using_io1
+    pipeline = pipeline.correct_route53_health_checks_if_unused
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ebs_volumes_using_io1" {
-  title         = "Detect & Correct EBS Volumes Using IO1"
-  description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "detect_and_correct_route53_health_checks_if_unused" {
+  title         = "Detect & Correct Route53 Health Checks If Unused"
+  description   = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
+  // documentation = file("./route53/docs/detect_and_correct_route53_health_checks_if_unused.md")
+  tags          = merge(local.route53_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -64,22 +75,22 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.route53_health_checks_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.route53_health_checks_if_unused_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ebs_volumes_using_io1_query
+    sql      = local.route53_health_checks_if_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ebs_volumes_using_io1
+    pipeline = pipeline.correct_route53_health_checks_if_unused
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -91,18 +102,18 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
   }
 }
 
-pipeline "correct_ebs_volumes_using_io1" {
-  title         = "Correct EBS Volumes Using IO1"
-  description   = "Executes corrective action on a collection of EBS volumes using io1."
-  // documentation = file("./ebs/docs/correct_ebs_volumes_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_route53_health_checks_if_unused" {
+  title         = "Correct Route53 Health Checks If Unused"
+  description   = "Runs corrective action on a collection of Route53 health checks that are detected as unused."
+  // documentation = file("./route53/docs/correct_route53_health_checks_if_unused.md")
+  tags          = merge(local.route53_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
-      title     = string
-      volume_id = string
-      region    = string
-      cred      = string
+      title  = string
+      id     = string
+      region = string
+      cred   = string
     }))
   }
 
@@ -127,32 +138,32 @@ pipeline "correct_ebs_volumes_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.route53_health_checks_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.route53_health_checks_if_unused_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS volumes using io1."
+    text     = "Detected unused Route53 health checks ${length(param.items)}."
   }
 
   step "transform" "items_by_id" {
-    value = { for row in param.items : row.volume_id => row }
+    value = { for row in param.items : row.id => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ebs_volume_using_io1
+    pipeline        = pipeline.correct_one_route53_health_check_if_unused
     args = {
       title              = each.value.title
-      volume_id          = each.value.volume_id
+      id                 = each.value.id
       region             = each.value.region
       cred               = each.value.cred
       notifier           = param.notifier
@@ -164,20 +175,20 @@ pipeline "correct_ebs_volumes_using_io1" {
   }
 }
 
-pipeline "correct_one_ebs_volume_using_io1" {
-  title         = "Correct One EBS Volume Using IO1"
-  description   = "Executes corrective action on a single EBS volume using io1."
-  // documentation = file("./ebs/docs/correct_one_ebs_volume_using_io1.md")
-  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
+pipeline "correct_one_route53_health_check_if_unused" {
+  title         = "Correct One Route53 Health Check If Unused"
+  description   = "Runs corrective action on an unused Route53 health check."
+  // documentation = file("./route53/docs/correct_one_route53_health_check_if_unused.md")
+  tags          = merge(local.route53_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
     description = local.description_title
   }
 
-  param "volume_id" {
+  param "id" {
     type        = string
-    description = "EBS volume ID."
+    description = "The ID of the health check."
   }
 
   param "region" {
@@ -211,13 +222,13 @@ pipeline "correct_one_ebs_volume_using_io1" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_using_io1_default_action
+    default     = var.route53_health_checks_if_unused_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_using_io1_enabled_actions
+    default     = var.route53_health_checks_if_unused_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -226,7 +237,7 @@ pipeline "correct_one_ebs_volume_using_io1" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected EBS volume ${param.title} using io1."
+      detect_msg         = "Detected unused Route53 health check ${param.title}."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {
@@ -238,48 +249,47 @@ pipeline "correct_one_ebs_volume_using_io1" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped EBS volume ${param.title} using io1."
+            text     = "Skipped unused Route53 health check ${param.title}."
           }
           success_msg = ""
           error_msg   = ""
         },
-        "update_to_io2" = {
-          label        = "Update to io2"
-          value        = "update_to_io2"
+        "delete_health_check" = {
+          label        = "Delete Health Check"
+          value        = "delete_health_check"
           style        = local.style_ok
-          pipeline_ref = local.aws_pipeline_modify_ebs_volume
+          pipeline_ref = local.aws_pipeline_delete_route53_health_check
           pipeline_args = {
-            volume_id   = param.volume_id
-            volume_type = "io2"
-            region      = param.region
-            cred        = param.cred
+            region          = param.region
+            cred            = param.cred
+            health_check_id = param.id
           }
-          success_msg = "Updated EBS volume ${param.title} to io2."
-          error_msg   = "Error updating EBS volume ${param.title} to io2."
+          success_msg = "Deleted unused Route53 health check ${param.title}."
+          error_msg   = "Error deleting unused Route53 health check ${param.title}."
         }
       }
     }
   }
 }
 
-variable "ebs_volumes_using_io1_trigger_enabled" {
+variable "route53_health_checks_if_unused_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "ebs_volumes_using_io1_trigger_schedule" {
+variable "route53_health_checks_if_unused_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "ebs_volumes_using_io1_default_action" {
+variable "route53_health_checks_if_unused_default_action" {
   type        = string
-  description = "The default response to use when EBS volumes are using io1."
+  description = "The default response to use for unused Route53 health checks."
   default     = "notify"
 }
 
-variable "ebs_volumes_using_io1_enabled_actions" {
+variable "route53_health_checks_if_unused_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "update_to_io2"]
+  description = "Response options for approvers determining the response."
+  default     = ["skip", "delete_health_check"]
 }

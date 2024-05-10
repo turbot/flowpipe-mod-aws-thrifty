@@ -13,8 +13,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_using_gp2" {
-  title       = "Detect & correct EBS volumes using gp2"
-  description = "Detects EBS volumes using gp2 and executes the chosen action."
+  title         = "Detect & Correct EBS Volumes Using GP2"
+  description   = "Detects EBS volumes using gp2 and executes the chosen action."
+  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_gp2_trigger.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   enabled  = var.ebs_volumes_using_gp2_trigger_enabled
   schedule = var.ebs_volumes_using_gp2_trigger_schedule
@@ -30,8 +32,10 @@ trigger "query" "detect_and_correct_ebs_volumes_using_gp2" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_using_gp2" {
-  title       = "Detect & correct EBS volumes using gp2"
-  description = "Detects EBS volumes using gp2 and performs the chosen action."
+  title         = "Detect & Correct EBS Volumes Using GP2"
+  description   = "Detects EBS volumes using gp2 and performs the chosen action."
+  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_using_gp2.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "database" {
     type        = string
@@ -88,8 +92,10 @@ pipeline "detect_and_correct_ebs_volumes_using_gp2" {
 }
 
 pipeline "correct_ebs_volumes_using_gp2" {
-  title       = "Correct EBS volumes using gp2"
-  description = "Executes corrective actions on EBS volumes using gp2."
+  title         = "Correct EBS Volumes Using GP2"
+  description   = "Executes corrective actions on EBS volumes using gp2."
+  // documentation = file("./ebs/docs/correct_ebs_volumes_using_gp2.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "items" {
     type = list(object({
@@ -159,8 +165,10 @@ pipeline "correct_ebs_volumes_using_gp2" {
 }
 
 pipeline "correct_one_ebs_volume_using_gp2" {
-  title       = "Correct one EBS volume using gp2"
-  description = "Executes corrective action on an EBS volume using gp2."
+  title         = "Correct One EBS Volume Using GP2"
+  description   = "Executes corrective action on an EBS volume using gp2."
+  // documentation = file("./ebs/docs/correct_one_ebs_volume_using_gp2.md")
+  // tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
   param "title" {
     type        = string

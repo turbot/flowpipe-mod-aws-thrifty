@@ -1,5 +1,5 @@
 locals {
-  ec2_application_load_balancer_unused_query = <<-EOQ
+  ec2_application_load_balancers_if_unused_query = <<-EOQ
     with target_resource as (
       select
         load_balancer_arn,
@@ -23,26 +23,26 @@ locals {
 }
 
 
-trigger "query" "detect_and_correct_ec2_application_load_balancers_unused" {
-  title       = "Detect & correct unused EC2 application load balancers"
+trigger "query" "detect_and_correct_ec2_application_load_balancers_if_unused" {
+  title       = "Detect & Correct EC2 Application Load Balancers If Unused"
   description = "Detects EC2 application load balancers that are unused."
 
   enabled  = var.ec2_application_load_balancer_unused_trigger_enabled
   schedule = var.ec2_application_load_balancer_unused_trigger_schedule
   database = var.database
-  sql      = local.ec2_application_load_balancer_unused_query
+  sql      = local.ec2_application_load_balancers_if_unused_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ec2_application_load_balancers_unused
-    args = {
+    pipeline = pipeline.correct_ec2_application_load_balancers_if_unused
+    args     = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ec2_application_load_balancers_unused" {
-  title       = "Detect & correct EC2 unused application load balancers"
-  description = "Detects unused EC2 application load balancers and runs your chosen action."
+pipeline "detect_and_correct_ec2_application_load_balancers_if_unused" {
+  title         = "Detect & Correct EC2 Application Load Balancers If Unused"
+  description   = "Detects unused EC2 application load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused"
   // })
@@ -85,25 +85,25 @@ pipeline "detect_and_correct_ec2_application_load_balancers_unused" {
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ec2_application_load_balancer_unused_query
+    sql      = local.ec2_application_load_balancers_if_unused_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ec2_application_load_balancers_unused
-    args = {
-      items              = step.query.detect.rows
-      notifier           = param.notifier
-      notification_level = param.notification_level
-      approvers          = param.approvers
-      default_action     = param.default_action
-      enabled_actions    = param.enabled_actions
+    pipeline = pipeline.correct_ec2_application_load_balancers_if_unused
+    args     = {
+      items                    = step.query.detect.rows
+      notifier                 = param.notifier
+      notification_level       = param.notification_level
+      approvers                = param.approvers
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_ec2_application_load_balancers_unused" {
-  title       = "Corrects EC2 application load balancers exceeding max age"
-  description = "Runs corrective action on a collection of EC2 application load balancers exceeding max age."
+pipeline "correct_ec2_application_load_balancers_if_unused" {
+  title         = "Correct EC2 Application Load Balancers If Unused"
+  description   = "Runs corrective action on a collection of EC2 application load balancers that are not used."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "deprecated"
   // })
@@ -160,24 +160,25 @@ pipeline "correct_ec2_application_load_balancers_unused" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ec2_application_load_balancer_unused
-    args = {
-      title              = each.value.title
-      arn                = each.value.arn
-      region             = each.value.region
-      cred               = each.value.cred
-      notifier           = param.notifier
-      notification_level = param.notification_level
-      approvers          = param.approvers
-      default_action     = param.default_action
-      enabled_actions    = param.enabled_actions
+    pipeline        = pipeline.correct_one_ec2_application_load_balancer_if_unused
+    args            = {
+      title            = each.value.title
+      arn              = each.value.arn
+      name             = each.value.name
+      region           = each.value.region
+      cred             = each.value.cred
+      notifier         = param.notifier
+      notification_level   = param.notification_level
+      approvers        = param.approvers
+      default_action           = param.default_action
+      enabled_actions        = param.enabled_actions
     }
   }
 }
 
-pipeline "correct_one_ec2_application_load_balancer_unused" {
-  title       = "Correct one unused EC2 application load balancer"
-  description = "Runs corrective action on an unused EC2 application load balance."
+pipeline "correct_one_ec2_application_load_balancer_if_unused" {
+  title         = "Correct One EC2 Application Load Balancer If Unused"
+  description   = "Runs corrective action on an unused EC2 application load balance."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {

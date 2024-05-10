@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_without_graviton" {
-  title       = "Detect & correct EC2 instances without graviton processor"
+  title       = "Detect & Correct EC2 instances without graviton processor"
   description = "Detects EC2 instances without graviton processor and runs your chosen action."
 
   enabled  = var.ec2_instances_without_graviton_trigger_enabled
@@ -31,7 +31,7 @@ trigger "query" "detect_and_correct_ec2_instances_without_graviton" {
 }
 
 pipeline "detect_and_correct_ec2_instances_without_graviton" {
-  title         = "Detect & correct EC2 instances without graviton processor"
+  title         = "Detect & Correct EC2 instances without graviton processor"
   description   = "Detects EC2 instances without graviton processor and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
@@ -92,7 +92,7 @@ pipeline "detect_and_correct_ec2_instances_without_graviton" {
 }
 
 pipeline "correct_ec2_instances_without_graviton" {
-  title         = "Corrects EC2 instances without graviton processor"
+  title         = "Correct EC2 instances without graviton processor"
   description   = "Runs corrective action on a collection of EC2 instances without graviton processor."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "deprecated" 

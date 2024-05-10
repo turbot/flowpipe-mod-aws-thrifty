@@ -1,38 +1,41 @@
 locals {
-  ebs_volumes_with_high_iops_query = <<-EOQ
+  vpc_eips_if_unattached_query = <<-EOQ
   select
-    concat(volume_id, ' [', region, '/', account_id, ']') as title,
-    volume_id,
+    concat(allocation_id, ' [', public_ip, '/', region, '/', account_id, ']') as title,
+    allocation_id,
     region,
-    _ctx ->> 'connection_name' as credential
+    _ctx ->> 'connection_name' as cred
   from
-    aws_ebs_volume
+    aws_vpc_eip
   where
-    volume_type in ('io1', 'io2')
-    and iops > ${var.ebs_volumes_with_high_iops}::int
+    association_id is null;
   EOQ
 }
 
-trigger "query" "detect_and_correct_ebs_volumes_with_high_iops" {
-  title       = "Detect & correct EBS volumes with high IOPS"
-  description = "Detects EBS volumes with high IOPS and runs your chosen corrective action."
+trigger "query" "detect_and_correct_vpc_eips_if_unattached" {
+  title         = "Detect & Correct VPC EIPs If Unattached"
+  description   = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
+  // documentation = file("./vpc/docs/detect_and_correct_vpc_eips_if_unattached_trigger.md")
+  // tags          = merge(local.vpc_common_tags, { class = "unused" })
 
-  enabled  = var.ebs_volumes_with_high_iops_trigger_enabled
-  schedule = var.ebs_volumes_with_high_iops_trigger_schedule
+  enabled  = var.vpc_eips_if_unattached_trigger_enabled
+  schedule = var.vpc_eips_if_unattached_trigger_schedule
   database = var.database
-  sql      = local.ebs_volumes_with_high_iops_query
+  sql      = local.vpc_eips_if_unattached_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ebs_volumes_with_high_iops
+    pipeline = pipeline.correct_vpc_eips_if_unattached
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
-  title       = "Detect & correct EBS volumes with high IOPS"
-  description = "Detects EBS volumes with high IOPS and runs your chosen corrective action."
+pipeline "detect_and_correct_vpc_eips_if_unattached" {
+  title         = "Detect & Correct VPC EIPs If Unattached"
+  description   = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
+  documentation = file("./vpc/docs/detect_and_correct_vpc_eips_if_unattached.md")
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -61,22 +64,22 @@ pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_with_high_iops_default_action
+    default     = var.vpc_eips_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_with_high_iops_enabled_actions
+    default     = var.vpc_eips_if_unattached_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ebs_volumes_with_high_iops_query
+    sql      = local.vpc_eips_if_unattached_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ebs_volumes_with_high_iops
+    pipeline = pipeline.correct_vpc_eips_if_unattached
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -88,16 +91,18 @@ pipeline "detect_and_correct_ebs_volumes_with_high_iops" {
   }
 }
 
-pipeline "correct_ebs_volumes_with_high_iops" {
-  title       = "Correct EBS volumes with high IOPS"
-  description = "Runs corrective action on a collection of EBS volumes with high IOPS."
+pipeline "correct_vpc_eips_if_unattached" {
+  title         = "Correct VPC EIPs If Unattached"
+  description   = "Runs corrective action on a collection of EIPs (Elastic IP addresses) which are unattached."
+  documentation = file("./vpc/docs/correct_vpc_eips_if_unattached.md")
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
-      title      = string
-      volume_id  = string
-      region     = string
-      credential = string
+      title         = string
+      allocation_id = string
+      region        = string
+      cred          = string
     }))
   }
 
@@ -122,34 +127,38 @@ pipeline "correct_ebs_volumes_with_high_iops" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_with_high_iops_default_action
+    default     = var.vpc_eips_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_with_high_iops_enabled_actions
+    default     = var.vpc_eips_if_unattached_enabled_actions
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} EBS volumes with high IOPS."
+    text     = "Detected ${length(param.items)} elastic IP addresses unattached."
   }
 
   step "transform" "items_by_id" {
-    value = { for row in param.items : row.volume_id => row }
+    value = { for row in param.items : row.allocation_id => row }
+
+    output "debug" {
+      value = param.approvers
+    }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_ebs_volume_with_high_iops
+    pipeline        = pipeline.correct_one_vpc_eip_if_unattached
     args = {
       title              = each.value.title
-      volume_id          = each.value.volume_id
+      allocation_id      = each.value.allocation_id
       region             = each.value.region
-      credential         = each.value.credential
+      cred               = each.value.cred
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -159,18 +168,20 @@ pipeline "correct_ebs_volumes_with_high_iops" {
   }
 }
 
-pipeline "correct_one_ebs_volume_with_high_iops" {
-  title       = "Correct one EBS volume with high IOPS"
-  description = "Runs corrective action on an EBS volume with high IOPS."
+pipeline "correct_one_vpc_eip_if_unattached" {
+  title         = "Correct One VPC EIP If Unattached"
+  description   = "Runs corrective action on one EIP (Elastic IP addresses) which are unattached."
+  documentation = file("./vpc/docs/correct_one_vpc_eip_if_unattached.md")
+  tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
     description = local.description_title
   }
 
-  param "volume_id" {
+  param "allocation_id" {
     type        = string
-    description = "The ID of the EBS volume."
+    description = "The ID representing the allocation of the address for use with EC2-VPC."
   }
 
   param "region" {
@@ -178,7 +189,7 @@ pipeline "correct_one_ebs_volume_with_high_iops" {
     description = local.description_region
   }
 
-  param "credential" {
+  param "cred" {
     type        = string
     description = local.description_credential
   }
@@ -204,13 +215,13 @@ pipeline "correct_one_ebs_volume_with_high_iops" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ebs_volumes_with_high_iops_default_action
+    default     = var.vpc_eips_if_unattached_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ebs_volumes_with_high_iops_enabled_actions
+    default     = var.vpc_eips_if_unattached_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -219,65 +230,59 @@ pipeline "correct_one_ebs_volume_with_high_iops" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected EBS volume ${param.title} with high IOPS."
+      detect_msg         = "Detected elastic IP address ${param.title} unattached."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
-          label        = "Skip"
-          value        = "skip"
-          style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          label         = "Skip"
+          value         = "skip"
+          style         = local.style_info
+          pipeline_ref  = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped EBS volume ${param.title} with high IOPS."
+            text     = "Skipped elastic IP address ${param.title} unattached."
           }
-          success_msg = "Skipped EBS volume ${param.title}."
-          error_msg   = "Error skipping EBS volume ${param.title}."
+          success_msg = ""
+          error_msg   = ""
         },
-        "delete_volume" = {
-          label        = "Delete volume"
-          value        = "delete_volume"
-          style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+        "release" = {
+          label         = "Release"
+          value         = "release"
+          style         = local.style_ok
+          pipeline_ref  = local.aws_pipeline_release_eip
           pipeline_args = {
-            volume_id  = param.volume_id
-            region     = param.region
-            credential = param.credential
+            allocation_id = param.allocation_id
+            region        = param.region
+            cred          = param.cred
           }
-          success_msg = "Deleted EBS volume ${param.title}."
-          error_msg   = "Error deleting EBS volume ${param.title}."
+          success_msg = "Released elastic IP address ${param.title}."
+          error_msg   = "Error releasing elastic IP address ${param.title}."
         }
       }
     }
   }
 }
 
-variable "ebs_volumes_with_high_iops_trigger_enabled" {
+variable "vpc_eips_if_unattached_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "ebs_volumes_with_high_iops_trigger_schedule" {
+variable "vpc_eips_if_unattached_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "ebs_volumes_with_high_iops_default_action" {
+variable "vpc_eips_if_unattached_default_action" {
   type        = string
-  description = "The default response to use when EBS volumes with high iops."
+  description = "The default response to use when elastic IP addresses are unattached."
   default     = "notify"
 }
 
-variable "ebs_volumes_with_high_iops_enabled_actions" {
+variable "vpc_eips_if_unattached_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete_volume"]
-}
-
-variable "ebs_volumes_with_high_iops" {
-  type        = number
-  description = "The maximum IOPS allowed for volumes."
-  default     = 32000
+  default     = ["skip", "release"]
 }

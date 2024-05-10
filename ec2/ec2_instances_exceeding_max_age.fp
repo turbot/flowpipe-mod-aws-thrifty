@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
-  title       = "Detect & correct EC2 instances exceeding max age"
+  title       = "Detect & Correct EC2 instances exceeding max age"
   description = "Detects EC2 instances exceeding max age and runs your chosen action."
 
   enabled  = var.ec2_instances_exceeding_max_age_trigger_enabled
@@ -31,7 +31,7 @@ trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
 }
 
 pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
-  title         = "Detect & correct EC2 instances exceeding max age"
+  title         = "Detect & Correct EC2 instances exceeding max age"
   description   = "Detects EC2 instances exceeding max age and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused" 
@@ -92,7 +92,7 @@ pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
 }
 
 pipeline "correct_ec2_instances_exceeding_max_age" {
-  title         = "Corrects EC2 instances exceeding max age"
+  title         = "Correct EC2 instances exceeding max age"
   description   = "Runs corrective action on a collection of EC2 instances exceeding max age."
   // tags          = merge(local.ec2_common_tags, { 
   //   class = "unused" 

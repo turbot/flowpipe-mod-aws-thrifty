@@ -1,5 +1,5 @@
 locals {
-  rds_db_instances_long_running_query = <<-EOQ
+  rds_db_instances_exceeding_max_age_query = <<-EOQ
   select
     concat(db_instance_identifier, ' [', region, '/', account_id, ']') as title,
     db_instance_identifier,
@@ -8,30 +8,34 @@ locals {
   from
     aws_rds_db_instance
   where
-    (current_timestamp - (${var.rds_db_instances_long_running_days}::int || ' days')::interval) > create_time
+    (current_timestamp - (${var.rds_db_instances_exceeding_max_age_days}::int || ' days')::interval) > create_time
   EOQ
 }
 
-trigger "query" "detect_and_correct_rds_db_instances_long_running" {
-  title       = "Detect & correct long running RDS DB instances"
-  description = "Detects long running RDS DB instances and runs your chosen action."
+trigger "query" "detect_and_correct_rds_db_instances_exceeding_max_age" {
+  title         = "Detect & Correct RDS DB Instances Exceeding Max Age"
+  description   = "Detects long running RDS DB instances and runs your chosen action."
+  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_exceeding_max_age_trigger.md")
+  // tags          = merge(local.rds_common_tags, { class = "managed" })
 
-  enabled  = var.rds_db_instances_long_running_trigger_enabled
-  schedule = var.rds_db_instances_long_running_trigger_schedule
+  enabled  = var.rds_db_instances_exceeding_max_age_trigger_enabled
+  schedule = var.rds_db_instances_exceeding_max_age_trigger_schedule
   database = var.database
-  sql      = local.rds_db_instances_long_running_query
+  sql      = local.rds_db_instances_exceeding_max_age_query
 
   capture "insert" {
-    pipeline = pipeline.correct_rds_db_instances_long_running
+    pipeline = pipeline.correct_rds_db_instances_exceeding_max_age
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_rds_db_instances_long_running" {
-  title       = "Detect & correct long running RDS DB instances"
+pipeline "detect_and_correct_rds_db_instances_exceeding_max_age" {
+  title       = "Detect & Correct RDS DB Instances Exceeding Max Age"
   description = "Detects long running RDS DB instances and runs your chosen action."
+  // documentation = file("./rds/docs/detect_and_correct_rds_db_instances_exceeding_max_age.md")
+  tags          = merge(local.rds_common_tags, { class = "managed" })
 
   param "database" {
     type        = string
@@ -60,22 +64,22 @@ pipeline "detect_and_correct_rds_db_instances_long_running" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.rds_db_instances_long_running_default_action
+    default     = var.rds_db_instances_exceeding_max_age_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.rds_db_instances_long_running_enabled_actions
+    default     = var.rds_db_instances_exceeding_max_age_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.rds_db_instances_long_running_query
+    sql      = local.rds_db_instances_exceeding_max_age_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_rds_db_instances_long_running
+    pipeline = pipeline.correct_rds_db_instances_exceeding_max_age
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -87,9 +91,11 @@ pipeline "detect_and_correct_rds_db_instances_long_running" {
   }
 }
 
-pipeline "correct_rds_db_instances_long_running" {
-  title       = "Corrects long running RDS DB instances"
-  description = "Runs corrective action on a collection of long running RDS DB instances."
+pipeline "correct_rds_db_instances_exceeding_max_age" {
+  title         = "Correct RDS DB Instances Exceeding Max Age"
+  description   = "Runs corrective action on a collection of long running RDS DB instances."
+  // documentation = file("./rds/docs/correct_rds_db_instances_exceeding_max_age.md")
+  tags          = merge(local.rds_common_tags, { class = "managed" })
 
   param "items" {
     type = list(object({
@@ -121,13 +127,13 @@ pipeline "correct_rds_db_instances_long_running" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.rds_db_instances_long_running_default_action
+    default     = var.rds_db_instances_exceeding_max_age_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.rds_db_instances_long_running_enabled_actions
+    default     = var.rds_db_instances_exceeding_max_age_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -143,7 +149,7 @@ pipeline "correct_rds_db_instances_long_running" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_rds_db_instance_long_running
+    pipeline        = pipeline.correct_one_rds_db_instance_exceeding_max_age
     args = {
       title                  = each.value.title
       db_instance_identifier = each.value.db_instance_identifier
@@ -158,9 +164,11 @@ pipeline "correct_rds_db_instances_long_running" {
   }
 }
 
-pipeline "correct_one_rds_db_instance_long_running" {
-  title       = "Correct one long running RDS DB instance"
-  description = "Runs corrective action on a long running RDS DB instance."
+pipeline "correct_one_rds_db_instance_exceeding_max_age" {
+  title         = "Correct One RDS DB Instance Exceeding Max Age"
+  description   = "Runs corrective action on a long running RDS DB instance."
+  // documentation = file("./rds/docs/correct_one_rds_db_instance_exceeding_max_age.md")
+  tags          = merge(local.rds_common_tags, { class = "managed" })
 
   param "title" {
     type        = string
@@ -203,13 +211,13 @@ pipeline "correct_one_rds_db_instance_long_running" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.rds_db_instances_long_running_default_action
+    default     = var.rds_db_instances_exceeding_max_age_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.rds_db_instances_long_running_enabled_actions
+    default     = var.rds_db_instances_exceeding_max_age_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -253,29 +261,29 @@ pipeline "correct_one_rds_db_instance_long_running" {
   }
 }
 
-variable "rds_db_instances_long_running_days" {
+variable "rds_db_instances_exceeding_max_age_days" {
   type        = number
   description = "The maximum number of days DB instances are allowed to run."
   default     = 90
 }
 
-variable "rds_db_instances_long_running_trigger_enabled" {
+variable "rds_db_instances_exceeding_max_age_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "rds_db_instances_long_running_trigger_schedule" {
+variable "rds_db_instances_exceeding_max_age_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "rds_db_instances_long_running_default_action" {
+variable "rds_db_instances_exceeding_max_age_default_action" {
   type        = string
   description = "The default response to use when RDS DB instances are long running."
   default     = "notify"
 }
 
-variable "rds_db_instances_long_running_enabled_actions" {
+variable "rds_db_instances_exceeding_max_age_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "delete_instance"]

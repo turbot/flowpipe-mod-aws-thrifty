@@ -23,7 +23,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_network_load_balancers_unused" {
-  title       = "Detect & correct unused EC2 network load balancers"
+  title       = "Detect & Correct unused EC2 network load balancers"
   description = "Detects EC2 network load balancers that are unused."
 
   enabled  = var.ec2_network_load_balancer_unused_trigger_enabled
@@ -40,8 +40,8 @@ trigger "query" "detect_and_correct_ec2_network_load_balancers_unused" {
 }
 
 pipeline "detect_and_correct_ec2_network_load_balancers_unused" {
-  title       = "Detect & correct EC2 unused network load balancers"
-  description = "Detects unused EC2 network load balancers and runs your chosen action."
+  title         = "Detect & Correct EC2 unused network load balancers"
+  description   = "Detects unused EC2 network load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused"
   // })
@@ -101,8 +101,8 @@ pipeline "detect_and_correct_ec2_network_load_balancers_unused" {
 }
 
 pipeline "correct_ec2_network_load_balancers_unused" {
-  title       = "Corrects unused EC2 network load balancers"
-  description = "Runs corrective action on a collection of unused EC2 network load balancers."
+  title         = "Correct unused EC2 network load balancers"
+  description   = "Runs corrective action on a collection of unused EC2 network load balancers."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "deprecated"
   // })

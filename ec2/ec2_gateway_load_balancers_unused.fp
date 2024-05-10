@@ -23,7 +23,7 @@ where
 }
 
 trigger "query" "detect_and_correct_ec2_gateway_load_balancers_unused" {
-  title       = "Detect & correct unused EC2 gateway load balancers"
+  title       = "Detect & Correct unused EC2 gateway load balancers"
   description = "Detects EC2 gateway load balancers that are unused and runs your chosen action."
 
   enabled  = var.ec2_gateway_load_balancer_unused_trigger_enabled
@@ -40,8 +40,8 @@ trigger "query" "detect_and_correct_ec2_gateway_load_balancers_unused" {
 }
 
 pipeline "detect_and_correct_ec2_gateway_load_balancers_unused" {
-  title       = "Detect & correct EC2 unused gateway load balancers"
-  description = "Detects unused EC2 gateway load balancers and runs your chosen action."
+  title         = "Detect & Correct EC2 unused gateway load balancers"
+  description   = "Detects unused EC2 gateway load balancers and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused"
   // })
@@ -101,8 +101,8 @@ pipeline "detect_and_correct_ec2_gateway_load_balancers_unused" {
 }
 
 pipeline "correct_ec2_gateway_load_balancers_unused" {
-  title       = "Corrects EC2 gateway load balancers exceeding max age"
-  description = "Runs corrective action on a collection of EC2 gateway load balancers exceeding max age."
+  title         = "Correct EC2 gateway load balancers exceeding max age"
+  description   = "Runs corrective action on a collection of EC2 gateway load balancers exceeding max age."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "deprecated"
   // })

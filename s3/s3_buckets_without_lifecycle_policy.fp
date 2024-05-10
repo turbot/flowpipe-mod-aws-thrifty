@@ -13,9 +13,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
-  title         = "Detect & correct S3 buckets without lifecycle policy"
+  title         = "Detect & Correct S3 Buckets Without Lifecycle Policy"
   description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
   // documentation = file("./s3/docs/detect_and_correct_s3_buckets_without_lifecycle_policy_trigger.md")
+  // tags          = merge(local.s3_common_tags, { class = "managed" })
 
   enabled  = var.s3_buckets_without_lifecycle_policy_trigger_enabled
   schedule = var.s3_buckets_without_lifecycle_policy_trigger_schedule
@@ -31,7 +32,7 @@ trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 }
 
 pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
-  title         = "Detect & correct S3 buckets without lifecycle policy"
+  title         = "Detect & Correct S3 Buckets Without Lifecycle Policy"
   description   = "Detects S3 buckets which do not have a lifecycle policy and runs your chosen action."
   documentation = file("./s3/docs/detect_and_correct_s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
@@ -98,7 +99,7 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 }
 
 pipeline "correct_s3_buckets_without_lifecycle_policy" {
-  title         = "Corrects S3 buckets without lifecycle policy"
+  title         = "Correct S3 Buckets Without Lifecycle Policy"
   description   = "Runs corrective action on a collection of S3 buckets which do not have a lifecycle policy."
   documentation = file("./s3/docs/correct_s3_buckets_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
@@ -178,7 +179,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
 }
 
 pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
-  title         = "Correct one S3 bucket without lifecycle policy"
+  title         = "Correct One S3 Bucket Without Lifecycle Policy"
   description   = "Runs corrective action on an individual S3 bucket which does not have a lifecycle policy."
   documentation = file("./s3/docs/correct_one_s3_bucket_without_lifecycle_policy.md")
   tags          = merge(local.s3_common_tags, { class = "managed" })
