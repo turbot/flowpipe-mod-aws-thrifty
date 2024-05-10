@@ -103,9 +103,9 @@ pipeline "detect_and_correct_vpc_nat_gateways_if_unused" {
 }
 
 pipeline "correct_vpc_nat_gateways_if_unused" {
-  title       = "Correct VPC NAT gateways if unused"
-  description = "Runs corrective action on a collection of NAT Gateways which are unused."
-  // documentation = file("./vpc/docs/correct_vpc_nat_gateways_if_unused.md")
+  title         = "Correct VPC NAT gateways if unused"
+  description   = "Runs corrective action on a collection of NAT Gateways which are unused."
+  documentation = file("./vpc/docs/correct_vpc_nat_gateways_if_unused.md")
   tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "items" {
@@ -176,9 +176,9 @@ pipeline "correct_vpc_nat_gateways_if_unused" {
 }
 
 pipeline "correct_one_vpc_nat_gateway_if_unused" {
-  title       = "Correct one VPC NAT gateway if unused"
-  description = "Runs corrective action on an unused NAT Gateway."
-  // documentation = file("./vpc/docs/correct_one_vpc_nat_gateway_if_unused.md")
+  title         = "Correct one VPC NAT gateway if unused"
+  description   = "Runs corrective action on an unused NAT Gateway."
+  documentation = file("./vpc/docs/correct_one_vpc_nat_gateway_if_unused.md")
   tags          = merge(local.vpc_common_tags, { class = "unused" })
 
   param "title" {
