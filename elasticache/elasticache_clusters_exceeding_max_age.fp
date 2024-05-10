@@ -41,10 +41,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_elasticache_clusters_exceeding_max_age" {
-  title       = "Detect & correct Elasticache clusters exceeding max age"
-  description = "Detects Elasticache clusters exceeding max age and responds with your chosen action."
-  // documentation = file("./elasticache/docs/detect_and_correct_elasticache_clusters_exceeding_max_age_trigger.md")
-  //tags        = merge(local.elasticache_common_tags, { class = "managed" })
+  title         = "Detect & correct Elasticache clusters exceeding max age"
+  description   = "Detects Elasticache clusters exceeding max age and responds with your chosen action."
+  documentation = file("./elasticache/docs/detect_and_correct_elasticache_clusters_exceeding_max_age_trigger.md")
+  tags          = merge(local.elasticache_common_tags, { class = "managed" })
 
   enabled  = var.elasticache_clusters_exceeding_max_age_trigger_enabled
   schedule = var.elasticache_clusters_exceeding_max_age_trigger_schedule
