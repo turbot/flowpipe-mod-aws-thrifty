@@ -115,7 +115,7 @@ pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
 }
 
 pipeline "correct_emr_clusters_idle_30_mins" {
-  title         = "Correct EMR Clusters Idle 30 Mins"
+  title         = "Correct EMR Clusters idle 30 mins"
   description   = "Runs corrective action on a collection of EMR clusters idle for more than 30 mins."
   documentation = file("./emr/docs/correct_emr_clusters_idle_30_mins.md")
   tags          = merge(local.emr_common_tags, { 
@@ -190,7 +190,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
 }
 
 pipeline "correct_one_emr_cluster_idle_30_mins" {
-  title         = "Correct one EMR Cluster Idle 30 Mins"
+  title         = "Correct one EMR Cluster idle 30 mins"
   description   = "Runs corrective action on an EMR cluster idle for more than 30 mins."
   documentation = file("./emr/docs/correct_one_emr_cluster_idle_30_mins.md")
   tags          = merge(local.emr_common_tags, { class = "unused" })
