@@ -1,7 +1,7 @@
 locals {
   ebs_volumes_exceeding_max_size_query = <<-EOQ
   select
-    concat(volume_id, ' [', region, '/', account_id, ']') as title,
+    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, ']') as title,
     volume_id,
     region,
     _ctx ->> 'connection_name' as cred
