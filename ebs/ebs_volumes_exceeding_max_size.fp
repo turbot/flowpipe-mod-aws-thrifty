@@ -13,10 +13,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_exceeding_max_size" {
-  title         = "Detect & Correct EBS Volumes Exceeding Max Size"
+  title         = "Detect & correct EBS volumes exceeding max size"
   description   = "Detects EBS volumes exceeding maximum size and runs your chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_exceeding_max_size_trigger.md")
-  // tags          = merge(local.ebs_common_tags, { class = "managed" })
+  documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_exceeding_max_size_trigger.md")
+  tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   enabled  = var.ebs_volumes_exceeding_max_size_trigger_enabled
   schedule = var.ebs_volumes_exceeding_max_size_trigger_schedule
@@ -32,10 +32,10 @@ trigger "query" "detect_and_correct_ebs_volumes_exceeding_max_size" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
-  title         = "Detect & Correct EBS Volumes Exceeding Max Size"
+  title         = "Detect & correct EBS volumes exceeding max size"
   description   = "Detects EBS volumes exceeding maximum size and runs your chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_exceeding_max_size.md")
-  tags          = merge(local.ebs_common_tags, { class = "managed" })
+  documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_exceeding_max_size.md")
+  tags          = merge(local.ebs_common_tags, { class = "managed", type = "featured" })
 
   param "database" {
     type        = string
@@ -92,9 +92,9 @@ pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
 }
 
 pipeline "correct_ebs_volumes_exceeding_max_size" {
-  title         = "Correct EBS Volumes Exceeding Max Size"
+  title         = "Correct EBS volumes exceeding max size"
   description   = "Runs corrective action on a collection of EBS volumes exceeding maximum size."
-  // documentation = file("./ebs/docs/correct_ebs_volumes_exceeding_max_size.md")
+  documentation = file("./ebs/docs/correct_ebs_volumes_exceeding_max_size.md")
   tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "items" {
@@ -165,9 +165,9 @@ pipeline "correct_ebs_volumes_exceeding_max_size" {
 }
 
 pipeline "correct_one_ebs_volume_exceeding_max_size" {
-  title         = "Correct One EBS Volume Exceeding Max Size"
+  title         = "Correct one EBS volume exceeding max size"
   description   = "Runs corrective action on an EBS volume exceeding maximum size."
-  // documentation = file("./ebs/docs/correct_one_ebs_volume_exceeding_max_size.md")
+  documentation = file("./ebs/docs/correct_one_ebs_volume_exceeding_max_size.md")
   tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "title" {
