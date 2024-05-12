@@ -10,7 +10,7 @@ mod "aws_thrifty" {
       version = "v0.1.1-rc.5"
     }
     mod "github.com/turbot/flowpipe-mod-detect-correct" {
-      version = "v0.0.1-alpha.1"
+      version = "v0.0.1-rc.1"
     }
   }
 }

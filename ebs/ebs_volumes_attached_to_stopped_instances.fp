@@ -20,7 +20,7 @@ locals {
       v._ctx
   )
   select
-    concat(volume_id, ' [', region, '/', account_id, ']') as title,
+    concat(volume_id, ' [', volume_type, '/', region, '/', account_id, ']') as title,
     volume_id,
     region,
     _ctx ->> 'connection_name' as cred
@@ -32,10 +32,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
-  title         = "Detect & Correct EBS Volumes Attached To Stopped Instances"
+  title         = "Detect & correct EBS volumes attached to stopped instances"
   description   = "Detects EBS volumes attached to stopped instances and runs your chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_attached_to_stopped_instances_trigger.md")
-  // tags          = merge(local.ebs_common_tags, { class = "unused" })
+  documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_attached_to_stopped_instances_trigger.md")
+  tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   enabled  = var.ebs_volumes_attached_to_stopped_instances_trigger_enabled
   schedule = var.ebs_volumes_attached_to_stopped_instances_trigger_schedule
@@ -51,10 +51,10 @@ trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
-  title       = "Detect & Correct EBS Volumes Attached To Stopped Instances"
+  title       = "Detect & correct EBS volumes attached to stopped instances"
   description = "Detects EBS volumes attached to stopped instances and runs your chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_attached_to_stopped_instances.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_attached_to_stopped_instances.md")
+  tags          = merge(local.ebs_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string
@@ -111,9 +111,9 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
-  title         = "Correct EBS Volumes Attached To Stopped Instances"
+  title         = "Correct EBS volumes attached to stopped instances"
   description   = "Runs corrective action on a collection of EBS volumes attached to stopped instances."
-  // documentation = file("./ebs/docs/correct_ebs_volumes_attached_to_stopped_instances.md")
+  documentation = file("./ebs/docs/correct_ebs_volumes_attached_to_stopped_instances.md")
   tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
@@ -184,9 +184,9 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
-  title         = "Correct One EBS Volume Attached To Stopped Instance"
+  title         = "Correct one EBS volume attached to stopped instance"
   description   = "Runs corrective action on an EBS volume attached to a stopped instance."
-  // documentation = file("./ebs/docs/correct_one_ebs_volume_attached_to_stopped_instance.md")
+  documentation = file("./ebs/docs/correct_one_ebs_volume_attached_to_stopped_instance.md")
   tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
