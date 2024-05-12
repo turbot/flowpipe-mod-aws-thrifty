@@ -57,10 +57,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_with_low_usage" {
-  title         = "Detect & Correct EBS Volumes With Low Usage"
+  title         = "Detect & correct EBS volumes with low usage"
   description   = "Detects EBS volumes with low usage and runs your chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_usage_trigger.md")
-  // tags          = merge(local.ebs_common_tags, { class = "unused" })
+  documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_usage_trigger.md")
+  tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   enabled  = var.ebs_volumes_with_low_usage_trigger_enabled
   schedule = var.ebs_volumes_with_low_usage_trigger_schedule
@@ -76,10 +76,10 @@ trigger "query" "detect_and_correct_ebs_volumes_with_low_usage" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_with_low_usage" {
-  title         = "Detect & Correct EBS Volumes With Low Usage"
+  title         = "Detect & correct EBS volumes with low usage"
   description   = "Detects EBS volumes with low usage and runs your chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_usage.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_usage.md")
+  tags          = merge(local.ebs_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string
@@ -136,9 +136,9 @@ pipeline "detect_and_correct_ebs_volumes_with_low_usage" {
 }
 
 pipeline "correct_ebs_volumes_with_low_usage" {
-  title       = "Correct EBS Volumes With Low Usage"
-  description = "Runs corrective action on a collection of EBS volumes with low usage."
-  // documentation = file("./ebs/docs/correct_ebs_volumes_with_low_usage.md")
+  title         = "Correct EBS volumes with low usage"
+  description   = "Runs corrective action on a collection of EBS volumes with low usage."
+  documentation = file("./ebs/docs/correct_ebs_volumes_with_low_usage.md")
   tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
@@ -209,9 +209,9 @@ pipeline "correct_ebs_volumes_with_low_usage" {
 }
 
 pipeline "correct_one_ebs_volume_with_low_usage" {
-  title         = "Correct One EBS Volume With Low Usage"
+  title         = "Correct one EBS volume with low usage"
   description   = "Runs corrective action on an EBS volume with low usage."
-  // documentation = file("./ebs/docs/correct_one_ebs_volume_with_low_usage.md")
+  documentation = file("./ebs/docs/correct_one_ebs_volume_with_low_usage.md")
   tags          = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
