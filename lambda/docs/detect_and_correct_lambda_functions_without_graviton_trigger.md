@@ -9,7 +9,7 @@ This query trigger identifies Lambda functions without graviton processor and th
 By default, this trigger is disabled, but it can be configured by [setting the following variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables):
 - `lambda_functions_without_graviton_trigger_enabled` should be set to `true` as the default is `false`.
 - `lambda_functions_without_graviton_trigger_schedule` should be set to your preferred [schedule](https://flowpipe.io/docs/flowpipe-hcl/trigger/schedule#more-examples).
-- `lambda_functions_without_graviton_default_action` should be set to the desired action (e.g., `"notify"` for notifications or `"delete_cluster"` to delete the function).
+- `lambda_functions_without_graviton_default_action` should be set to the desired action (e.g., `"notify"` for notifications or `"delete_function"` to delete the function).
 
 Then starting the server:
 ```sh

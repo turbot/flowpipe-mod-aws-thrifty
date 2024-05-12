@@ -34,7 +34,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
-  title       = "Detect & Correct EMR Clusters Idle 30 Mins"
+  title       = "Detect and correct EMR Clusters idle 30 mins"
   description = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins_trigger.md")
   tags          = merge(local.emr_common_tags, { class = "unused" })
@@ -53,7 +53,7 @@ trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
 }
 
 pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
-  title         = "Detect & Correct EMR Clusters Idle 30 Mins"
+  title         = "Detect and correct EMR Clusters idle 30 mins"
   description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins.md")
   tags          = merge(local.emr_common_tags, {
@@ -190,7 +190,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
 }
 
 pipeline "correct_one_emr_cluster_idle_30_mins" {
-  title         = "Correct One EMR Cluster Idle 30 Mins"
+  title         = "Correct one EMR Cluster Idle 30 Mins"
   description   = "Runs corrective action on an EMR cluster idle for more than 30 mins."
   documentation = file("./emr/docs/correct_one_emr_cluster_idle_30_mins.md")
   tags          = merge(local.emr_common_tags, { class = "unused" })
@@ -272,12 +272,12 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           label  = "Terminate Cluster"
           value  = "terminate_cluster"
           style  = local.style_alert
-          // pipeline_ref  = local.aws_pipeline_terminate_emr_clusters // TODO: Add pipeline
-          // pipeline_args = {
-          //   cluster_ids = [param.id]
-          //   region       = param.region
-          //   cred         = param.cred
-          // }
+          pipeline_ref  = local.aws_pipeline_terminate_emr_clusters
+          pipeline_args = {
+            cluster_ids = [param.id]
+            region       = param.region
+            cred         = param.cred
+          }
           success_msg = "Deleted EMR cluster ${param.title}."
           error_msg   = "Error deleting EMR cluster ${param.title}."
         }

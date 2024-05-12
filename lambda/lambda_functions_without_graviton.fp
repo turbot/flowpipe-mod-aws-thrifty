@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_lambda_functions_without_graviton" {
-  title       = "Detect & Correct Lambda Functions Without Graviton"
+  title       = "Detect and correct Lambda functions without graviton"
   description = "Detects Lambda functions without graviton processor and runs your chosen action."
   documentation = file("./lambda/docs/detect_and_correct_lambda_functions_without_graviton_trigger.md")
   tags          = merge(local.lambda_common_tags, { class = "deprecated" })
@@ -33,7 +33,7 @@ trigger "query" "detect_and_correct_lambda_functions_without_graviton" {
 }
 
 pipeline "detect_and_correct_lambda_functions_without_graviton" {
-  title         = "Detect & Correct Lambda Functions Without Graviton"
+  title         = "Detect and correct Lambda functions without graviton"
   description   = "Detects Lambda functions without graviton processor and runs your chosen action."
   documentation = file("./lambda/docs/detect_and_correct_lambda_functions_without_graviton.md")
   tags          = merge(local.lambda_common_tags, {
@@ -170,8 +170,8 @@ pipeline "correct_lambda_functions_without_graviton" {
 }
 
 pipeline "correct_one_lambda_function_without_graviton" {
-  title         = "Correct One Lambda Function without graviton"
-  description   = "Runs corrective action on an Lambda function without graviton."
+  title         = "Correct one Lambda function without graviton"
+  description   = "Runs corrective action on a Lambda function without graviton."
   documentation = file("./lambda/docs/correct_one_lambda_function_without_graviton.md")
   tags          = merge(local.lambda_common_tags, { class = "deprecated" })
 

@@ -51,4 +51,5 @@ locals {
   aws_pipeline_delete_elasticache_cluster   = aws.pipeline.delete_elasticache_cluster
   aws_pipeline_delete_eks_node_group        = aws.pipeline.delete_eks_node_group
   aws_pipeline_delete_lambda_function       = aws.pipeline.delete_lambda_function
+  aws_pipeline_terminate_emr_clusters       = aws.pipeline.terminate_emr_clusters
 }
