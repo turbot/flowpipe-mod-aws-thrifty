@@ -1,5 +1,5 @@
 locals {
-  ec2_instances_older_generation_query = <<-EOQ
+  ec2_instances_of_older_generation_query = <<-EOQ
   select
     concat(instance_id, ' [', region, '/', account_id, ']') as title,
     instance_id,
@@ -12,25 +12,25 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_ec2_instances_older_generation" {
-  title       = "Detect & correct EC2 instances older generation"
+trigger "query" "detect_and_correct_ec2_instances_of_older_generation" {
+  title       = "Detect & correct EC2 instances of older generation"
   description = "Detects older generation EC2 instances and runs your chosen action."
 
-  enabled  = var.ec2_instances_older_generation_trigger_enabled
-  schedule = var.ec2_instances_older_generation_trigger_schedule
+  enabled  = var.ec2_instances_of_older_generation_trigger_enabled
+  schedule = var.ec2_instances_of_older_generation_trigger_schedule
   database = var.database
-  sql      = local.ec2_instances_older_generation_query
+  sql      = local.ec2_instances_of_older_generation_query
 
   capture "insert" {
-    pipeline = pipeline.correct_ec2_instances_older_generation
+    pipeline = pipeline.correct_ec2_instances_of_older_generation
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_ec2_instances_older_generation" {
-  title       = "Detect & correct EC2 instances older generation"
+pipeline "detect_and_correct_ec2_instances_of_older_generation" {
+  title       = "Detect & correct EC2 instances of older generation"
   description = "Detects older generation EC2 instances and runs your chosen action."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "unused"
@@ -63,22 +63,22 @@ pipeline "detect_and_correct_ec2_instances_older_generation" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instances_older_generation_default_action
+    default     = var.ec2_instances_of_older_generation_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instances_older_generation_enabled_actions
+    default     = var.ec2_instances_of_older_generation_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.ec2_instances_older_generation_query
+    sql      = local.ec2_instances_of_older_generation_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_ec2_instances_older_generation
+    pipeline = pipeline.correct_ec2_instances_of_older_generation
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -90,8 +90,8 @@ pipeline "detect_and_correct_ec2_instances_older_generation" {
   }
 }
 
-pipeline "correct_ec2_instances_older_generation" {
-  title       = "Correct EC2 instances older generation"
+pipeline "correct_ec2_instances_of_older_generation" {
+  title       = "Correct EC2 instances of older generation"
   description = "Runs corrective action on a collection of older generation EC2 instances."
   // tags          = merge(local.ec2_common_tags, {
   //   class = "deprecated"
@@ -127,13 +127,13 @@ pipeline "correct_ec2_instances_older_generation" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instances_older_generation_default_action
+    default     = var.ec2_instances_of_older_generation_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instances_older_generation_enabled_actions
+    default     = var.ec2_instances_of_older_generation_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -165,7 +165,7 @@ pipeline "correct_ec2_instances_older_generation" {
 }
 
 pipeline "correct_one_ec2_instance_older_generation" {
-  title       = "Correct one EC2 instance older generation"
+  title       = "Correct one EC2 instance of older generation"
   description = "Runs corrective action on a older generation EC2 instance."
   // tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -210,13 +210,13 @@ pipeline "correct_one_ec2_instance_older_generation" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.ec2_instances_older_generation_default_action
+    default     = var.ec2_instances_of_older_generation_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.ec2_instances_older_generation_enabled_actions
+    default     = var.ec2_instances_of_older_generation_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -273,23 +273,23 @@ pipeline "correct_one_ec2_instance_older_generation" {
   }
 }
 
-variable "ec2_instances_older_generation_trigger_enabled" {
+variable "ec2_instances_of_older_generation_trigger_enabled" {
   type    = bool
   default = false
 }
 
-variable "ec2_instances_older_generation_trigger_schedule" {
+variable "ec2_instances_of_older_generation_trigger_schedule" {
   type    = string
   default = "15m"
 }
 
-variable "ec2_instances_older_generation_default_action" {
+variable "ec2_instances_of_older_generation_default_action" {
   type        = string
   description = "The default response to use when there are older generation EC2 instances."
   default     = "notify"
 }
 
-variable "ec2_instances_older_generation_enabled_actions" {
+variable "ec2_instances_of_older_generation_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
   default     = ["skip", "stop_instance", "terminate_instance"]
