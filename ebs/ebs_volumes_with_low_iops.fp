@@ -14,10 +14,10 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_with_low_iops" {
-  title       = "Detect & Correct EBS Volumes With Low IOPS"
+  title       = "Detect & correct EBS volumes with low IOPS"
   description = "Detects EBS volumes with low IOPS and runs your chosen action."
-  // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_iops_trigger.md")
-  // tags          = merge(local.ebs_common_tags, { class = "managed" })
+  documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_iops_trigger.md")
+  tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   enabled  = var.ebs_volumes_with_low_iops_trigger_enabled
   schedule = var.ebs_volumes_with_low_iops_trigger_schedule
@@ -33,10 +33,10 @@ trigger "query" "detect_and_correct_ebs_volumes_with_low_iops" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
-  title       = "Detect & Correct EBS Volumes With Low IOPS"
-  description = "Detects EBS volumes with low IOPS and runs your chosen action."
-   // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_iops.md")
-  tags          = merge(local.ebs_common_tags, { class = "managed" })
+  title         = "Detect & correct EBS volumes with low IOPS"
+  description   = "Detects EBS volumes with low IOPS and runs your chosen action."
+  documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_with_low_iops.md")
+  tags          = merge(local.ebs_common_tags, { class = "managed", type = "featured" })
 
   param "database" {
     type        = string
@@ -93,9 +93,9 @@ pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
 }
 
 pipeline "correct_ebs_volumes_with_low_iops" {
-  title         = "Correct EBS Volumes With Low IOPS"
+  title         = "Correct EBS volumes with low IOPS"
   description   = "Runs corrective action on a collection of EBS volumes with low IOPS."
-  // documentation = file("./ebs/docs/correct_ebs_volumes_with_low_iops.md")
+  documentation = file("./ebs/docs/correct_ebs_volumes_with_low_iops.md")
   tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "items" {
@@ -166,9 +166,9 @@ pipeline "correct_ebs_volumes_with_low_iops" {
 }
 
 pipeline "correct_one_ebs_volume_with_low_iops" {
-  title       = "Correct One EBS Volume With Low IOPS"
-  description = "Runs corrective action on an EBS volume with low IOPS."
-  // documentation = file("./ebs/docs/correct_one_ebs_volume_with_low_iops.md")
+  title         = "Correct one EBS volume with low IOPS"
+  description   = "Runs corrective action on an EBS volume with low IOPS."
+  documentation = file("./ebs/docs/correct_one_ebs_volume_with_low_iops.md")
   tags          = merge(local.ebs_common_tags, { class = "managed" })
 
   param "title" {
