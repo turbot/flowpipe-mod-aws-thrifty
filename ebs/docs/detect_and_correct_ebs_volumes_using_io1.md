@@ -1,10 +1,10 @@
-# Detect & correct EBS volumes using gp2
+# Detect & correct EBS volumes using io1
 
 ## Overview
 
-EBS gp2 volumes are more expensive and less performant than gp3 volumes.
+EBS io1 volumes are less reliable than io2 volumes for the same cost.
 
-This pipeline detects gp2 EBS volumes and then either sends a notification or attempts to perform a predefined corrective action.
+This pipeline detects io1 EBS volumes and then either sends a notification or attempts to perform a predefined corrective action.
 
 ## Getting Started
 
@@ -12,7 +12,7 @@ This control will work out-of-the-box with some sensible defaults (configurable 
 
 You should be able to simply run the following command in your terminal:
 ```sh
-flowpipe pipeline run detect_and_correct_ebs_volumes_using_gp2
+flowpipe pipeline run detect_and_correct_ebs_volumes_using_io1
 ```
 
 You should now receive notification messages for the detections in your configured [notifier](https://flowpipe.io/docs/reference/config-files/notifier).
@@ -34,7 +34,7 @@ flowpipe server
 
 You can then run the command below:
 ```sh
-flowpipe pipeline run detect_and_correct_ebs_volumes_using_gp2 --host local --arg='approvers=["default"]'
+flowpipe pipeline run detect_and_correct_ebs_volumes_using_io1 --host local --arg='approvers=["default"]'
 ```
 
 This will prompt for an action for each detected resource and then attempt to perform the chosen action upon receipt of input.
@@ -45,12 +45,12 @@ You can also decide to bypass asking for decision and just automatically apply t
 
 You can automatically apply a specific action without the need for running a Flowpipe Server and asking for a decision by setting the `default_action` parameter:
 ```sh
-flowpipe pipeline run detect_and_correct_ebs_volumes_using_gp2 --arg='default_action="update_to_gp3"'
+flowpipe pipeline run detect_and_correct_ebs_volumes_using_io1 --arg='default_action="update_to_io2"'
 ```
 
 However; if you have configured a non-empty list for your `approvers` variable, you will need to override it as below:
 ```sh
-flowpipe pipeline run detect_and_correct_ebs_volumes_using_gp2 --arg='approvers=[]' --arg='default_action="update_to_gp3"'
+flowpipe pipeline run detect_and_correct_ebs_volumes_using_io1 --arg='approvers=[]' --arg='default_action="update_to_io2"'
 ```
 
-This will attempt to apply the action to every detected item, if you're happy with this approach you could have this occur mmore frequently by either scheduling the command by yourself or enabling the associated [Query Trigger](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_ebs_volumes_using_gp2).
+This will attempt to apply the action to every detected item, if you're happy with this approach you could have this occur mmore frequently by either scheduling the command by yourself or enabling the associated [Query Trigger](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_ebs_volumes_using_io1).
