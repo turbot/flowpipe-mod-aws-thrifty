@@ -36,8 +36,8 @@ locals {
 trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
   title       = "Detect & Correct EMR Clusters Idle 30 Mins"
   description = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
-  // documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins_trigger.md")
-  // tags          = merge(local.emr_common_tags, { class = "unused" })
+  documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins_trigger.md")
+  tags          = merge(local.emr_common_tags, { class = "unused" })
 
   enabled  = var.emr_clusters_idle_30_mins_trigger_enabled
   schedule = var.emr_clusters_idle_30_mins_trigger_schedule
@@ -55,7 +55,7 @@ trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
 pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
   title         = "Detect & Correct EMR Clusters Idle 30 Mins"
   description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
-  // documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins.md")
+  documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins.md")
   tags          = merge(local.emr_common_tags, {
     class = "unused" 
   })
@@ -117,10 +117,10 @@ pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
 pipeline "correct_emr_clusters_idle_30_mins" {
   title         = "Correct EMR Clusters Idle 30 Mins"
   description   = "Runs corrective action on a collection of EMR clusters idle for more than 30 mins."
-  // documentation = file("./emr/docs/correct_emr_clusters_idle_30_mins.md")
-  // tags          = merge(local.emr_common_tags, { 
-  //   class = "unused" 
-  // })
+  documentation = file("./emr/docs/correct_emr_clusters_idle_30_mins.md")
+  tags          = merge(local.emr_common_tags, { 
+    class = "unused" 
+  })
 
   param "items" {
     type = list(object({
@@ -192,8 +192,8 @@ pipeline "correct_emr_clusters_idle_30_mins" {
 pipeline "correct_one_emr_cluster_idle_30_mins" {
   title         = "Correct One EMR Cluster Idle 30 Mins"
   description   = "Runs corrective action on an EMR cluster idle for more than 30 mins."
-  // documentation = file("./emr/docs/correct_one_emr_cluster_idle_30_mins.md")
-  // tags          = merge(local.emr_common_tags, { class = "unused" })
+  documentation = file("./emr/docs/correct_one_emr_cluster_idle_30_mins.md")
+  tags          = merge(local.emr_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
