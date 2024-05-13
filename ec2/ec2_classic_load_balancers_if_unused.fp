@@ -13,7 +13,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_classic_load_balancers_if_unused" {
-  title       = "Detect and correct EC2 classic load balancers if unused"
+  title       = "Detect & correct EC2 classic load balancers if unused"
   description = "Identifies EC2 classic load balancers that are unused and executes the chosen action."
 
   enabled  = var.ec2_classic_load_balancers_if_unused_trigger_enabled
@@ -30,7 +30,7 @@ trigger "query" "detect_and_correct_ec2_classic_load_balancers_if_unused" {
 }
 
 pipeline "detect_and_correct_ec2_classic_load_balancers_if_unused" {
-  title       = "Detect and correct EC2 classic load balancers if unused"
+  title       = "Detect & correct EC2 classic load balancers if unused"
   description = "Identifies EC2 classic load balancers that are unused and executes corrective actions."
 
   param "database" {

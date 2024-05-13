@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
-  title       = "Detect and correct EC2 instances exceeding max age"
+  title       = "Detect & correct EC2 instances exceeding max age"
   description = "Identifies EC2 instances exceeding max age and executes the chosen action."
 
   enabled  = var.ec2_instances_exceeding_max_age_trigger_enabled
@@ -31,7 +31,7 @@ trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
 }
 
 pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
-  title       = "Detect and correct EC2 instances exceeding max age"
+  title       = "Detect & correct EC2 instances exceeding max age"
   description = "Identifies EC2 instances exceeding max age and executes corrective actions."
 
   param "database" {
