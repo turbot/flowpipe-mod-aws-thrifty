@@ -4,7 +4,7 @@ Pipelines to detect and correct misconfigurations leading to AWS savings opportu
 
 ## Documentation
 
-- **[Pipelines →](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines)**
+- **[Pipelines →](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines)**
 
 ## Getting Started
 
