@@ -307,6 +307,9 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
 }
 
 pipeline "snapshot_and_delete_ebs_volume" {
+  title       = "Snapshot & Delete EBS Volume"
+  description = "A utility pipeline which snapshots and deletes an EBS volume."
+
   param "region" {
     type        = string
     description = local.description_region
