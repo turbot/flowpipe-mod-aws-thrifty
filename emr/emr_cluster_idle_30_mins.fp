@@ -264,9 +264,9 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           success_msg = "Skipped EMR cluster ${param.title}."
           error_msg   = "Error skipping EMR cluster ${param.title}."
         },
-        "terminate_cluster" = {
-          label  = "Terminate Cluster"
-          value  = "terminate_cluster"
+        "delete_cluster" = {
+          label  = "Delete Cluster"
+          value  = "delete_cluster"
           style  = local.style_alert
           pipeline_ref  = local.aws_pipeline_terminate_emr_clusters
           pipeline_args = {
@@ -304,6 +304,6 @@ variable "emr_clusters_idle_30_mins_default_action" {
 
 variable "emr_clusters_idle_30_mins_enabled_actions" {
   type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "terminate_cluster"]
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_cluster"]
 }

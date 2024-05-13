@@ -329,7 +329,6 @@ variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
   default     = ["skip", "apply_policy"]
 }
 
-// TODO: Change to an array of objects (contents of 'Rules') - let lib mod wrap it; no JSONified strings!
 variable "s3_buckets_without_lifecycle_policy_default_policy" {
   type        = string
   description = "The default S3 bucket lifecycle policy to apply"
