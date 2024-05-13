@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_large" {
-  title       = "Detect and correct EC2 instances large"
+  title       = "Detect & correct EC2 instances large"
   description = "Identifies large EC2 instances and executes the chosen action."
 
   enabled  = var.ec2_instances_large_trigger_enabled

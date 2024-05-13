@@ -45,7 +45,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_eks_node_groups_without_graviton" {
-  title         = "Detect and correct EKS node groups without graviton"
+  title         = "Detect & correct EKS node groups without graviton"
   description   = "Detects EKS node groups without graviton processor and responds with your chosen action."
   documentation = file("./eks/docs/detect_and_correct_eks_node_groups_without_graviton_trigger.md")
   tags          = merge(local.eks_common_tags, { class = "deprecated" })
@@ -64,7 +64,7 @@ trigger "query" "detect_and_correct_eks_node_groups_without_graviton" {
 }
 
 pipeline "detect_and_correct_eks_node_groups_without_graviton" {
-  title         = "Detect and correct EKS node groups without graviton"
+  title         = "Detect & correct EKS node groups without graviton"
   description   = "Detects EKS node groups without graviton processor and responds with your chosen action."
   documentation = file("./eks/docs/detect_and_correct_eks_node_groups_without_graviton.md")
   tags          = merge(local.eks_common_tags, { class = "deprecated", type = "featured" })

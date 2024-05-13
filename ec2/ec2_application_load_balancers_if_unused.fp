@@ -23,7 +23,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_application_load_balancers_if_unused" {
-  title       = "Detect and correct EC2 application load balancers if unused"
+  title       = "Detect & correct EC2 application load balancers if unused"
   description = "Identifies unused EC2 application load balancers and executes the chosen action."
 
   enabled  = var.ec2_application_load_balancers_if_unused_trigger_enabled
@@ -40,7 +40,7 @@ trigger "query" "detect_and_correct_ec2_application_load_balancers_if_unused" {
 }
 
 pipeline "detect_and_correct_ec2_application_load_balancers_if_unused" {
-  title       = "Detect and correct EC2 application load balancers if unused"
+  title       = "Detect & correct EC2 application load balancers if unused"
   description = "Identifies unused EC2 application load balancers and executes corrective actions."
 
   param "database" {
