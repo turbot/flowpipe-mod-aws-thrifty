@@ -14,8 +14,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_lambda_functions_without_graviton" {
-  title       = "Detect and correct Lambda functions without graviton"
-  description = "Detects Lambda functions without graviton processor and runs your chosen action."
+  title         = "Detect and correct Lambda functions without graviton"
+  description   = "Detects Lambda functions without graviton processor and runs your chosen action."
   documentation = file("./lambda/docs/detect_and_correct_lambda_functions_without_graviton_trigger.md")
   tags          = merge(local.lambda_common_tags, { class = "deprecated" })
 
@@ -36,9 +36,7 @@ pipeline "detect_and_correct_lambda_functions_without_graviton" {
   title         = "Detect and correct Lambda functions without graviton"
   description   = "Detects Lambda functions without graviton processor and runs your chosen action."
   documentation = file("./lambda/docs/detect_and_correct_lambda_functions_without_graviton.md")
-  tags          = merge(local.lambda_common_tags, {
-    class = "deprecated" 
-  })
+  tags          = merge(local.lambda_common_tags, { class = "deprecated", type = "featured" })
 
   param "database" {
     type        = string
@@ -156,15 +154,15 @@ pipeline "correct_lambda_functions_without_graviton" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_lambda_function_without_graviton
     args            = {
-      title                      = each.value.title
-      name                       = each.value.name
-      region                     = each.value.region
-      cred                       = each.value.cred
-      notifier                   = param.notifier
-      notification_level         = param.notification_level
-      approvers                  = param.approvers
-      default_action             = param.default_action
-      enabled_actions            = param.enabled_actions
+      title              = each.value.title
+      name               = each.value.name
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -286,5 +284,5 @@ variable "lambda_functions_without_graviton_default_action" {
 variable "lambda_functions_without_graviton_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete_snapshot"]
+  default     = ["skip", "delete_function"]
 }
