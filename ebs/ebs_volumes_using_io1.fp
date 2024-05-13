@@ -93,7 +93,7 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
 
 pipeline "correct_ebs_volumes_using_io1" {
   title         = "Correct EBS volumes using io1"
-  description   = "Executes corrective action on a collection of EBS volumes using io1."
+  description   = "Runs corrective action on a collection of EBS volumes using io1."
   documentation = file("./ebs/docs/correct_ebs_volumes_using_io1.md")
   tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 
@@ -166,7 +166,7 @@ pipeline "correct_ebs_volumes_using_io1" {
 
 pipeline "correct_one_ebs_volume_using_io1" {
   title         = "Correct one EBS volume using io1"
-  description   = "Executes corrective action on a single EBS volume using io1."
+  description   = "Runs corrective action on a single EBS volume using io1."
   documentation = file("./ebs/docs/correct_one_ebs_volume_using_io1.md")
   tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 

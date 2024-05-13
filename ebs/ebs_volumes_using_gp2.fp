@@ -166,7 +166,7 @@ pipeline "correct_ebs_volumes_using_gp2" {
 
 pipeline "correct_one_ebs_volume_using_gp2" {
   title         = "Correct one EBS volume using gp2"
-  description   = "Executes corrective action on an EBS volume using gp2."
+  description   = "Runs corrective action on an EBS volume using gp2."
   documentation = file("./ebs/docs/correct_one_ebs_volume_using_gp2.md")
   tags          = merge(local.ebs_common_tags, { class = "deprecated" })
 

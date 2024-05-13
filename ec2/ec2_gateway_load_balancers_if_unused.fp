@@ -24,7 +24,7 @@ locals {
 
 trigger "query" "detect_and_correct_ec2_gateway_load_balancers_if_unused" {
   title       = "Detect & correct EC2 gateway load balancers if unused"
-  description = "Identifies EC2 gateway load balancers that are unused and executes the chosen action."
+  description = "Detects unused EC2 gayeway load balancers and runs your chosen action."
 
   enabled  = var.ec2_gateway_load_balancers_if_unused_trigger_enabled
   schedule = var.ec2_gateway_load_balancers_if_unused_trigger_schedule
@@ -41,7 +41,7 @@ trigger "query" "detect_and_correct_ec2_gateway_load_balancers_if_unused" {
 
 pipeline "detect_and_correct_ec2_gateway_load_balancers_if_unused" {
   title       = "Detect & correct EC2 gateway load balancers if unused"
-  description = "Identifies EC2 gateway load balancers that are unused and executes corrective actions."
+  description = "Detects unused EC2 gayeway load balancers and runs your chosen action."
 
   param "database" {
     type        = string
@@ -166,7 +166,7 @@ pipeline "correct_ec2_gateway_load_balancers_if_unused" {
 
 pipeline "correct_one_ec2_gateway_load_balancer_if_unused" {
   title       = "Correct one EC2 gateway load balancer if unused"
-  description = "Executes corrective action on a single EC2 gateway load balancer if unused."
+  description = "Runs corrective action on a single EC2 gateway load balancer if unused."
 
   param "title" {
     type        = string

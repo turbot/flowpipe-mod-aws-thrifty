@@ -164,7 +164,7 @@ pipeline "correct_ec2_instances_large" {
 
 pipeline "correct_one_ec2_instance_large" {
   title       = "Correct one EC2 instance large"
-  description = "Executes corrective action on a single large EC2 instance."
+  description = "Runs corrective action on a single large EC2 instance."
 
   param "title" {
     type        = string
