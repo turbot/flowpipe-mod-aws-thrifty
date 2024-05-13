@@ -13,8 +13,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_if_unattached" {
-  title         = "Detect & Correct EBS Volumes If Unattached"
-  description   = "Detects EBS volumes which are unattached and runs your chosen action."
+  title       = "Detect & Correct EBS Volumes If Unattached"
+  description = "Detects EBS volumes which are unattached and runs your chosen action."
   // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_if_unattached_trigger.md")
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
@@ -32,10 +32,10 @@ trigger "query" "detect_and_correct_ebs_volumes_if_unattached" {
 }
 
 pipeline "detect_and_correct_ebs_volumes_if_unattached" {
-  title         = "Detect & Correct EBS Volumes If Unattached"
-  description   = "Detects EBS volumes which are unattached and runs your chosen action."
+  title       = "Detect & Correct EBS Volumes If Unattached"
+  description = "Detects EBS volumes which are unattached and runs your chosen action."
   // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_if_unattached.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -92,10 +92,10 @@ pipeline "detect_and_correct_ebs_volumes_if_unattached" {
 }
 
 pipeline "correct_ebs_volumes_if_unattached" {
-  title         = "Correct EBS Volumes If Unattached"
-  description   = "Runs corrective action on a collection of EBS volumes which are unattached."
+  title       = "Correct EBS Volumes If Unattached"
+  description = "Runs corrective action on a collection of EBS volumes which are unattached."
   // documentation = file("./ebs/docs/correct_ebs_volumes_if_unattached.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -165,10 +165,10 @@ pipeline "correct_ebs_volumes_if_unattached" {
 }
 
 pipeline "correct_one_ebs_volume_if_unattached" {
-  title         = "Correct One EBS Volume If Unattached"
-  description   = "Runs corrective action on an EBS volume unattached."
+  title       = "Correct One EBS Volume If Unattached"
+  description = "Runs corrective action on an EBS volume unattached."
   // documentation = file("./ebs/docs/correct_one_ebs_volume_if_unattached.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
@@ -243,11 +243,11 @@ pipeline "correct_one_ebs_volume_if_unattached" {
           success_msg = "Skipped EBS volume ${param.title}."
           error_msg   = "Error skipping EBS volume ${param.title}."
         },
-        "delete_volume" = {
-          label        = "Delete Volume"
-          value        = "delete_volume"
+        "snapshot_and_delete_volume" = {
+          label        = "Snapshot & Delete Volume"
+          value        = "snapshot_and_delete_volume"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+          pipeline_ref = pipeline.snapshot_and_delete_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region

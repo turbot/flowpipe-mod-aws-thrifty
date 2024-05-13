@@ -32,8 +32,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
-  title         = "Detect & Correct EBS Volumes Attached To Stopped Instances"
-  description   = "Detects EBS volumes attached to stopped instances and runs your chosen action."
+  title       = "Detect & Correct EBS Volumes Attached To Stopped Instances"
+  description = "Detects EBS volumes attached to stopped instances and runs your chosen action."
   // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_attached_to_stopped_instances_trigger.md")
   // tags          = merge(local.ebs_common_tags, { class = "unused" })
 
@@ -54,7 +54,7 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
   title       = "Detect & Correct EBS Volumes Attached To Stopped Instances"
   description = "Detects EBS volumes attached to stopped instances and runs your chosen action."
   // documentation = file("./ebs/docs/detect_and_correct_ebs_volumes_attached_to_stopped_instances.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags = merge(local.ebs_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -111,10 +111,10 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
-  title         = "Correct EBS Volumes Attached To Stopped Instances"
-  description   = "Runs corrective action on a collection of EBS volumes attached to stopped instances."
+  title       = "Correct EBS Volumes Attached To Stopped Instances"
+  description = "Runs corrective action on a collection of EBS volumes attached to stopped instances."
   // documentation = file("./ebs/docs/correct_ebs_volumes_attached_to_stopped_instances.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags = merge(local.ebs_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -184,10 +184,10 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
 }
 
 pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
-  title         = "Correct One EBS Volume Attached To Stopped Instance"
-  description   = "Runs corrective action on an EBS volume attached to a stopped instance."
+  title       = "Correct One EBS Volume Attached To Stopped Instance"
+  description = "Runs corrective action on an EBS volume attached to a stopped instance."
   // documentation = file("./ebs/docs/correct_one_ebs_volume_attached_to_stopped_instance.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags = merge(local.ebs_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
@@ -275,11 +275,11 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           success_msg = "Detached EBS volume ${param.title} from the instance."
           error_msg   = "Error detaching EBS volume ${param.title} from the instance."
         },
-        "delete_volume" = {
-          label        = "Delete Volume"
-          value        = "delete_volume"
+        "snapshot_and_delete_volume" = {
+          label        = "Snapshot & Delete Volume"
+          value        = "snapshot_and_delete_volume"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+          pipeline_ref = pipeline.snapshot_and_delete_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
@@ -289,6 +289,42 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           error_msg   = "Error deleting EBS Volume ${param.title}."
         }
       }
+    }
+  }
+}
+
+pipeline "snapshot_and_delete_ebs_volume" {
+  param "region" {
+    type        = string
+    description = local.description_region
+  }
+
+  param "cred" {
+    type        = string
+    description = local.description_credential
+  }
+
+  param "volume_id" {
+    type        = string
+    description = "The ID of the EBS volume."
+  }
+
+  step "pipeline" "create_ebs_snapshot" {
+    pipeline = local.aws_pipeline_create_ebs_snapshot
+    args = {
+      region    = param.region
+      cred      = param.cred
+      volume_id = param.volume_id
+    }
+  }
+
+  step "pipeline" "delete_ebs_volume" {
+    depends_on = [step.pipeline.create_ebs_snapshot]
+    pipeline   = local.aws_pipeline_delete_ebs_volume
+    args = {
+      region    = param.region
+      cred      = param.cred
+      volume_id = param.volume_id
     }
   }
 }
