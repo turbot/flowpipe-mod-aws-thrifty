@@ -1,10 +1,12 @@
 # AWS Thrifty Mod for Flowpipe
 
-Pipelines to detect & correct misconfigurations leading to AWS savings opportunities.
+Pipelines to detect and correct misconfigurations leading to AWS savings opportunities.
 
 ## Getting Started
 
 ### Installation
+
+> Note: Docker daemon will need to be installed and running to apply any of the corrective actions via the [AWS Libary Mod](https://github.com/turbot/flowpipe-mod-aws). Please see [Install Docker Engine](https://docs.docker.com/engine/install/) for more information.
 
 Install [Flowpipe](https://flowpipe.io/downloads), or use Brew:
 
@@ -23,7 +25,9 @@ steampipe plugin install aws
 
 Steampipe will automatically use your default AWS credentials. Optionally, you can [setup multiple accounts](https://hub.steampipe.io/plugins/turbot/aws#multi-account-connections) or [customize AWS credentials](https://hub.steampipe.io/plugins/turbot/aws#configuring-aws-credentials).
 
-Finally, clone the mod:
+Additionally, it is recommended to use the [Credential Import](https://flowpipe.io/docs/reference/config-files/credential_import) functionality of Flowpipe to import the AWS credentials used from Steampipe, however, these will need to have permissions to perform corrective actions.
+
+Clone the mod:
 
 ```sh
 mkdir aws-thrifty
@@ -35,16 +39,18 @@ git clone git@github.com:turbot/flowpipe-mod-aws-thrifty.git
 
 Several pipelines have [input variables](https://flowpipe.io/docs/build/mod-variables#input-variables) that can be configured to better match your environment and requirements.
 
-Each variable has a default defined in it's source file, e.g, `s3/s3.fp` (or `variables.fp` for more generic variables), but these can be overwritten in several ways:
+Each variable has a default defined in its source file, e.g, `s3/s3_buckets_without_lifecycle_policy.fp` (or `variables.fp` for more generic variables), but these can be overwritten in several ways:
 
 The easiest approach is to setup your vars file, starting with the sample:
 
 ```sh
 cp thrifty.fpvars.example thrifty.fpvars
 vi thrifty.fpvars
+
+flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --var-file=thrifty.fpvars
 ```
 
-Alternatively you can pass variables on the command line:
+Alternatively, you can pass variables on the command line:
 
 ```sh
 flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --var=ebs_snapshot_age_max_days=10
@@ -59,18 +65,44 @@ flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 
 For more information, please see [Passing Input Variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables)
 
-### Running Your First Detection
+### Running Detect and Correct Pipelines
 
-Once you've configured your variables, you can get started by simply running one of the available pipelines:
+To run your first detection, you'll need to ensure your Steampipe server is up and running:
+```sh
+steampipe service start
+```
 
+To find your desired detection, you can filter the `pipeline list` output:
+```sh
+flowpipe pipeline list | grep "detect_and_correct"
+```
+
+Then run your chosen pipeline:
 ```sh
 flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 ```
 
-Each detection has a corresponding [Query Trigger](https://flowpipe.io/docs/flowpipe-hcl/trigger/query), by default - these are `Disabled` so that you can customize which you wish to enable and the frequency of their running. <!-- TODO: Get link to .fptriggers docs once available -->
+By default the above approach would find the relevant resources and then send a message to your configured [notifier](https://flowpipe.io/docs/reference/config-files/notifier).
 
+However;  you can request via an [Input Step](https://flowpipe.io/docs/build/input) a corrective action to run against each detection result; this behavior is achieved by setting `approvers` either as a variable or for a one-off approach, by passing `approvers` as an argument.
 
-<!-- TODO: Mention how to obtain human input - link out for setup/instructions/tutorials -->
+> Note: This approach requires running `flowpipe server` as it uses an `input` step.
+
+```sh
+flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --host local --arg='approvers=["default"]'
+```
+
+If you're happy to just apply the same action against all detected items, you can apply them without the `input` step by overriding the `default_action` argument (or the detection specific variable).
+```sh
+flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --arg='default_action="delete_snapshot"'
+```
+
+However; if you have configured a non-empty list for your `approvers` variable, you will need to override it as below:
+```sh
+flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --arg='approvers=[]' --arg='default_action="delete_snapshot"'
+```
+
+Finally, each detection pipeline has a corresponding [Query Trigger](https://flowpipe.io/docs/flowpipe-hcl/trigger/query), these are disabled by default allowing for you to configure only those which are required, see the [docs](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers) for more information.
 
 ## Open Source & Contributing
 
