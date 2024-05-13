@@ -263,24 +263,26 @@ pipeline "correct_one_secretsmanager_secret_if_unused" {
 }
 
 variable "secretsmanager_secrets_if_unused_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = local.description_trigger_enabled
 }
 
 variable "secretsmanager_secrets_if_unused_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = local.description_trigger_enabled
 }
 
 variable "secretsmanager_secrets_if_unused_default_action" {
   type        = string
-  description = "The default response to use when secrets manager secrets are unused."
+  description = local.description_default_action
   default     = "notify"
 }
 
 variable "secretsmanager_secrets_if_unused_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = local.description_enabled_actions
   default     = ["skip", "delete_secret"]
 }
 

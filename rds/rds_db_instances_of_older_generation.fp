@@ -262,23 +262,25 @@ pipeline "correct_one_rds_db_instance_of_older_generation" {
 }
 
 variable "rds_db_instances_of_older_generation_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = local.description_trigger_enabled
 }
 
 variable "rds_db_instances_of_older_generation_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = local.description_trigger_enabled
 }
 
 variable "rds_db_instances_of_older_generation_default_action" {
   type        = string
-  description = "The default response to use when there are older generation RDS DB instances."
+  description = local.description_default_action
   default     = "notify"
 }
 
 variable "rds_db_instances_of_older_generation_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = local.description_enabled_actions
   default     = ["skip", "delete_instance"]
 }

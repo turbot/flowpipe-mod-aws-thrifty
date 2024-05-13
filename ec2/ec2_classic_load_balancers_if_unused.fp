@@ -250,23 +250,25 @@ pipeline "correct_one_ec2_classic_load_balancer_if_unused" {
 }
 
 variable "ec2_classic_load_balancers_if_unused_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = local.description_trigger_enabled
 }
 
 variable "ec2_classic_load_balancers_if_unused_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = local.description_trigger_enabled
 }
 
 variable "ec2_classic_load_balancers_if_unused_default_action" {
   type        = string
-  description = "The default response to use for unused EC2 classic load balancers."
+  description = local.description_default_action
   default     = "notify"
 }
 
 variable "ec2_classic_load_balancers_if_unused_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = local.description_enabled_actions
   default     = ["skip", "delete_load_balancer"]
 }

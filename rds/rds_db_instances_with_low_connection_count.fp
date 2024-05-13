@@ -279,23 +279,25 @@ pipeline "correct_one_rds_db_instance_with_low_connection_count" {
 }
 
 variable "rds_db_instances_with_low_connection_count_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = local.description_trigger_enabled
 }
 
 variable "rds_db_instances_with_low_connection_count_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = local.description_trigger_enabled
 }
 
 variable "rds_db_instances_with_low_connection_count_default_action" {
   type        = string
-  description = "The default response to use when there are RDS DB instances with low connection count."
+  description = local.description_default_action
   default     = "notify"
 }
 
 variable "rds_db_instances_with_low_connection_count_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = local.description_enabled_actions
   default     = ["skip", "delete_instance"]
 }

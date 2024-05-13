@@ -263,23 +263,25 @@ pipeline "correct_one_ebs_volume_using_io1" {
 }
 
 variable "ebs_volumes_using_io1_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = local.description_trigger_enabled
 }
 
 variable "ebs_volumes_using_io1_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = local.description_trigger_enabled
 }
 
 variable "ebs_volumes_using_io1_default_action" {
   type        = string
-  description = "The default response to use when EBS volumes are using io1."
+  description = local.description_default_action
   default     = "notify"
 }
 
 variable "ebs_volumes_using_io1_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = local.description_enabled_actions
   default     = ["skip", "update_to_io2"]
 }

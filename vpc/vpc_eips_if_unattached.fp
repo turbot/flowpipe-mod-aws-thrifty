@@ -266,23 +266,25 @@ pipeline "correct_one_vpc_eip_if_unattached" {
 }
 
 variable "vpc_eips_if_unattached_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = local.description_trigger_enabled
 }
 
 variable "vpc_eips_if_unattached_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = local.description_trigger_enabled
 }
 
 variable "vpc_eips_if_unattached_default_action" {
   type        = string
-  description = "The default response to use when elastic IP addresses are unattached."
+  description = local.description_default_action
   default     = "notify"
 }
 
 variable "vpc_eips_if_unattached_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = local.description_enabled_actions
   default     = ["skip", "release"]
 }

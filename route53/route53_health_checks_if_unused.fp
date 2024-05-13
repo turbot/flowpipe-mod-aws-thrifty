@@ -273,18 +273,20 @@ pipeline "correct_one_route53_health_check_if_unused" {
 }
 
 variable "route53_health_checks_if_unused_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = local.description_trigger_enabled
 }
 
 variable "route53_health_checks_if_unused_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = local.description_trigger_enabled
 }
 
 variable "route53_health_checks_if_unused_default_action" {
   type        = string
-  description = "The default response to use for unused Route53 health checks."
+  description = local.description_default_action
   default     = "notify"
 }
 

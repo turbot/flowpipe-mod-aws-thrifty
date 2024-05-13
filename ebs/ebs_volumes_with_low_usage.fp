@@ -306,24 +306,26 @@ pipeline "correct_one_ebs_volume_with_low_usage" {
 }
 
 variable "ebs_volumes_with_low_usage_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = local.description_trigger_enabled
 }
 
 variable "ebs_volumes_with_low_usage_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = local.description_trigger_enabled
 }
 
 variable "ebs_volumes_with_low_usage_default_action" {
   type        = string
-  description = "The default response to use when EBS volumes read/write ops are less than the specified average read/write ops."
+  description = local.description_default_action
   default     = "notify"
 }
 
 variable "ebs_volumes_with_low_usage_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = local.description_enabled_actions
   default     = ["skip", "delete_volume"]
 }
 
