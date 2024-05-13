@@ -36,7 +36,7 @@ pipeline "detect_and_correct_ec2_instances_without_graviton" {
   title       = "Detect & correct EC2 instances without graviton"
   description = "Detects EC2 instances without graviton processor and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_instances_without_graviton.md")
-  tags          = merge(local.ec2_common_tags, { class = "deprecated" })
+  tags          = merge(local.ec2_common_tags, { class = "deprecated", type = "featured" })
 
   param "database" {
     type        = string

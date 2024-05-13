@@ -36,7 +36,7 @@ pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
   title       = "Detect & correct EC2 instances exceeding max age"
   description = "Detects EC2 instances exceeding max age and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_instances_exceeding_max_age.md")
-  tags          = merge(local.ec2_common_tags, { class = "unused" })
+  tags          = merge(local.ec2_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string

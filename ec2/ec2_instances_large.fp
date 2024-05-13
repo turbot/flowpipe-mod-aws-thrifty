@@ -36,7 +36,7 @@ pipeline "detect_and_correct_ec2_instances_large" {
   title       = "Detect & correct EC2 instances large"
   description = "Detects large EC2 instances and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_instances_large.md")
-  tags          = merge(local.ec2_common_tags, { class = "unused" })
+  tags          = merge(local.ec2_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string

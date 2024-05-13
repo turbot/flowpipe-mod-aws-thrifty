@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ec2_classic_load_balancers_if_unused" {
   title       = "Detect & correct EC2 classic load balancers if unused"
   description = "Detects unused EC2 classic load balancers and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_classic_load_balancers_if_unused.md")
-  tags          = merge(local.ec2_common_tags, { class = "unused" })
+  tags          = merge(local.ec2_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string

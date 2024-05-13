@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ec2_instances_of_older_generation" {
   title       = "Detect & correct EC2 instances of older generation"
   description = "Detects older generation EC2 instances and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_instances_of_older_generation.md")
-  tags          = merge(local.ec2_common_tags, { class = "deprecated" })
+  tags          = merge(local.ec2_common_tags, { class = "deprecated", type = "featured" })
 
   param "database" {
     type        = string
