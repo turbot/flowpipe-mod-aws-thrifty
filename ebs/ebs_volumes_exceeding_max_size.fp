@@ -277,24 +277,24 @@ pipeline "correct_one_ebs_volume_exceeding_max_size" {
 variable "ebs_volumes_exceeding_max_size_trigger_enabled" {
   type        = bool
   default     = false
-  description = local.description_trigger_enabled
+  description = "If true, the trigger is enabled."
 }
 
 variable "ebs_volumes_exceeding_max_size_trigger_schedule" {
   type        = string
   default     = "15m"
-  description = local.description_trigger_enabled
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "ebs_volumes_exceeding_max_size_default_action" {
   type        = string
-  description = local.description_default_action
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "ebs_volumes_exceeding_max_size_enabled_actions" {
   type        = list(string)
-  description = local.description_enabled_actions
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete_volume", "snapshot_and_delete_volume"]
 }
 

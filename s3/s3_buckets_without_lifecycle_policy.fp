@@ -308,24 +308,24 @@ pipeline "mock_aws_pipeline_put_s3_lifecycle_policy" {
 variable "s3_buckets_without_lifecycle_policy_trigger_enabled" {
   type        = bool
   default     = false
-  description = local.description_trigger_enabled
+  description = "If true, the trigger is enabled."
 }
 
 variable "s3_buckets_without_lifecycle_policy_trigger_schedule" {
   type        = string
   default     = "15m"
-  description = local.description_trigger_enabled
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "s3_buckets_without_lifecycle_policy_default_action" {
   type        = string
-  description = local.description_default_action
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
   type        = list(string)
-  description = local.description_enabled_actions
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "apply_policy"]
 }
 

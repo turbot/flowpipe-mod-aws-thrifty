@@ -276,23 +276,23 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
 variable "vpc_nat_gateways_if_unused_trigger_enabled" {
   type        = bool
   default     = false
-  description = local.description_trigger_enabled
+  description = "If true, the trigger is enabled."
 }
 
 variable "vpc_nat_gateways_if_unused_trigger_schedule" {
   type        = string
   default     = "15m"
-  description = local.description_trigger_enabled
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "vpc_nat_gateways_if_unused_default_action" {
   type        = string
-  description = local.description_default_action
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "vpc_nat_gateways_if_unused_enabled_actions" {
   type        = list(string)
-  description = local.description_enabled_actions
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete"]
 }
