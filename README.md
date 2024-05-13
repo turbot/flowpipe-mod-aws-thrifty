@@ -2,30 +2,49 @@
 
 Pipelines to detect and correct misconfigurations leading to AWS savings opportunities.
 
+## Documentation
+
+- **[Pipelines →](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines)**
+
 ## Getting Started
+
+### Requirements
+
+Docker daemon must be installed and running. Please see [Install Docker Engine](https://docs.docker.com/engine/install/) for more information.
 
 ### Installation
 
-> Note: Docker daemon will need to be installed and running to apply any of the corrective actions via the [AWS Libary Mod](https://github.com/turbot/flowpipe-mod-aws). Please see [Install Docker Engine](https://docs.docker.com/engine/install/) for more information.
-
-Install [Flowpipe](https://flowpipe.io/downloads), or use Brew:
+Download and install Flowpipe (https://flowpipe.io/downloads) and Steampipe (https://steampipe.io/downloads). Or use Brew:
 
 ```sh
 brew install turbot/tap/flowpipe
+brew install turbot/tap/steampipe
 ```
 
-This mod also requires [Steampipe](https://steampipe.io) with the [AWS plugin](https://hub.steampipe.io/plugins/turbot/aws) as the data source. 
-
-Install [Steampipe](https://steampipe.io/downloads), or use Brew:
+Install the AWS plugin with [Steampipe](https://steampipe.io):
 
 ```sh
-brew install turbot/tap/steampipe
 steampipe plugin install aws
 ```
 
 Steampipe will automatically use your default AWS credentials. Optionally, you can [setup multiple accounts](https://hub.steampipe.io/plugins/turbot/aws#multi-account-connections) or [customize AWS credentials](https://hub.steampipe.io/plugins/turbot/aws#configuring-aws-credentials).
 
-Additionally, it is recommended to use the [Credential Import](https://flowpipe.io/docs/reference/config-files/credential_import) functionality of Flowpipe to import the AWS credentials used from Steampipe, however, these will need to have permissions to perform corrective actions.
+Create a `credential_import` resource to import your Steampipe AWS connections:
+
+```sh
+vi ~/.flowpipe/config/aws.fpc
+```
+
+```hcl
+credential_import "aws" {
+  source      = "~/.steampipe/config/aws.spc"
+  connections = ["*"]
+}
+```
+
+For more information on importing credentials, please see [Credential Import](https://flowpipe.io/docs/reference/config-files/credential_import).
+
+For more information on credentials in Flowpipe, please see [Managing Credentials](https://flowpipe.io/docs/run/credentials).
 
 Clone the mod:
 
@@ -33,6 +52,12 @@ Clone the mod:
 mkdir aws-thrifty
 cd aws-thrifty
 git clone git@github.com:turbot/flowpipe-mod-aws-thrifty.git
+```
+
+Install the dependencies:
+
+```sh
+flowpipe mod install
 ```
 
 ### Configure Variables
@@ -68,16 +93,19 @@ For more information, please see [Passing Input Variables](https://flowpipe.io/d
 ### Running Detect and Correct Pipelines
 
 To run your first detection, you'll need to ensure your Steampipe server is up and running:
+
 ```sh
 steampipe service start
 ```
 
 To find your desired detection, you can filter the `pipeline list` output:
+
 ```sh
 flowpipe pipeline list | grep "detect_and_correct"
 ```
 
 Then run your chosen pipeline:
+
 ```sh
 flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 ```
@@ -93,11 +121,13 @@ flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --host 
 ```
 
 If you're happy to just apply the same action against all detected items, you can apply them without the `input` step by overriding the `default_action` argument (or the detection specific variable).
+
 ```sh
 flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --arg='default_action="delete_snapshot"'
 ```
 
 However; if you have configured a non-empty list for your `approvers` variable, you will need to override it as below:
+
 ```sh
 flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --arg='approvers=[]' --arg='default_action="delete_snapshot"'
 ```
