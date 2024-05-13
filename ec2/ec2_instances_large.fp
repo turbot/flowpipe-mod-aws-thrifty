@@ -16,6 +16,8 @@ locals {
 trigger "query" "detect_and_correct_ec2_instances_large" {
   title       = "Detect & correct EC2 instances large"
   description = "Identifies large EC2 instances and executes the chosen action."
+  documentation = file("./ec2/docs/detect_and_correct_ec2_instances_large_trigger.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   enabled  = var.ec2_instances_large_trigger_enabled
   schedule = var.ec2_instances_large_trigger_schedule
@@ -33,9 +35,8 @@ trigger "query" "detect_and_correct_ec2_instances_large" {
 pipeline "detect_and_correct_ec2_instances_large" {
   title       = "Detect & correct EC2 instances large"
   description = "Detects large EC2 instances and runs your chosen action."
-  // tags          = merge(local.ec2_common_tags, {
-  //   class = "deprecated"
-  // })
+  documentation = file("./ec2/docs/detect_and_correct_ec2_instances_large.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -94,6 +95,8 @@ pipeline "detect_and_correct_ec2_instances_large" {
 pipeline "correct_ec2_instances_large" {
   title       = "Correct EC2 instances large"
   description = "Executes corrective actions on large EC2 instances."
+  documentation = file("./ec2/docs/correct_ec2_instances_large.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -165,6 +168,8 @@ pipeline "correct_ec2_instances_large" {
 pipeline "correct_one_ec2_instance_large" {
   title       = "Correct one EC2 instance large"
   description = "Runs corrective action on a single large EC2 instance."
+  documentation = file("./ec2/docs/correct_one_ec2_instance_large.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
