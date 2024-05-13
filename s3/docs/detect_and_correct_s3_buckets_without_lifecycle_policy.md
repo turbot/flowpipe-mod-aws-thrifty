@@ -57,4 +57,4 @@ However; if you have configured a non-empty list for your `approvers` variable, 
 flowpipe pipeline run detect_and_correct_s3_buckets_without_lifecycle_policy --arg='approvers=[]' --arg='default_action="apply_policy"'
 ```
 
-This will attempt to apply the action to every detected item, if you're happy with this approach you could have this occur mmore frequently by either scheduling the command by yourself or enabling the associated [Query Trigger](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_s3_buckets_without_lifecycle_policy).
+This will attempt to apply the action to every detected item, if you're happy with this approach you could have this occur mmore frequently by either scheduling the command by yourself or enabling the associated [Query Trigger](https://hub.flowpipe.io/mods/turbot/aws_thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_s3_buckets_without_lifecycle_policy).

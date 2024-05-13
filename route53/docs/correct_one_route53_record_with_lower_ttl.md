@@ -6,4 +6,4 @@ Route53 records with a lower TTL result in more DNS queries being received and a
 
 This pipeline allows you to specify a single record and then either send a notification or attempt to perform a predefined corrective action.
 
-Whilst it is possible to utilise this pipeline standalone, it is usually called from the [correct_route53_records_with_lower_ttl pipeline](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines/aws_thrifty.pipeline.correct_route53_records_with_lower_ttl).
+Whilst it is possible to utilise this pipeline standalone, it is usually called from the [correct_route53_records_with_lower_ttl pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.correct_route53_records_with_lower_ttl).

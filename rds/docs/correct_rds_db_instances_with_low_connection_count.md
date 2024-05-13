@@ -7,5 +7,5 @@ RDS instances can be costly to run, especially if they're rarely used, instances
 This pipeline allows you to specify a collection of instances and then either send notifications or attempt to perform a predefined corrective action upon the collection.
 
 Whilst it is possible to utilise this pipeline standalone, it is usually called from either:
-- [detect_and_correct_rds_db_instances_with_low_connection_count pipeline](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines/aws_thrifty.pipeline.detect_and_correct_rds_db_instances_with_low_connection_count)
-- [detect_and_correct_rds_db_instances_with_low_connection_count trigger](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_rds_db_instances_with_low_connection_count)
+- [detect_and_correct_rds_db_instances_with_low_connection_count pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.detect_and_correct_rds_db_instances_with_low_connection_count)
+- [detect_and_correct_rds_db_instances_with_low_connection_count trigger](https://hub.flowpipe.io/mods/turbot/aws_thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_rds_db_instances_with_low_connection_count)

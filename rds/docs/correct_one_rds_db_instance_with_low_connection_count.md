@@ -4,4 +4,4 @@ RDS instances can be costly to run, especially if they're rarely used, instances
 
 This pipeline allows you to specify a single instance and then either send a notification or attempt to perform a predefined corrective action.
 
-Whilst it is possible to utilise this pipeline standalone, it is usually called from the [correct_rds_db_instances_with_low_connection_count pipeline](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines/aws_thrifty.pipeline.correct_rds_db_instances_with_low_connection_count).
+Whilst it is possible to utilise this pipeline standalone, it is usually called from the [correct_rds_db_instances_with_low_connection_count pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.correct_rds_db_instances_with_low_connection_count).
