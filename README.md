@@ -1,6 +1,6 @@
 # AWS Thrifty Mod for Flowpipe
 
-Pipelines to detect & correct misconfigurations leading to AWS savings opportunities.
+Pipelines to detect and correct misconfigurations leading to AWS savings opportunities.
 
 ## Getting Started
 
@@ -39,7 +39,7 @@ git clone git@github.com:turbot/flowpipe-mod-aws-thrifty.git
 
 Several pipelines have [input variables](https://flowpipe.io/docs/build/mod-variables#input-variables) that can be configured to better match your environment and requirements.
 
-Each variable has a default defined in its source file, e.g, `s3/s3.fp` (or `variables.fp` for more generic variables), but these can be overwritten in several ways:
+Each variable has a default defined in its source file, e.g, `s3/s3_buckets_without_lifecycle_policy.fp` (or `variables.fp` for more generic variables), but these can be overwritten in several ways:
 
 The easiest approach is to setup your vars file, starting with the sample:
 
@@ -65,7 +65,7 @@ flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 
 For more information, please see [Passing Input Variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables)
 
-### Running Detect & Correct Pipelines
+### Running Detect and Correct Pipelines
 
 To run your first detection, you'll need to ensure your Steampipe server is up and running:
 ```sh
