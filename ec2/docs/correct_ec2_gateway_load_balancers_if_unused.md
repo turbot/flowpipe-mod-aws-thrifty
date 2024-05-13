@@ -8,5 +8,5 @@ This pipeline allows you to specify a collection of EC2 gateway load balancers w
 
 Whilst it is possible to utilize this pipeline standalone, it is usually called from either:
 
-- [detect_and_correct_ec2_gateway_load_balancers_if_unused pipeline](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines/aws_thrifty.pipeline.detect_and_correct_ec2_gateway_load_balancers_if_unused)
-- [detect_and_correct_ec2_gateway_load_balancers_if_unused trigger](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_ec2_gateway_load_balancers_if_unused)
+- [detect_and_correct_ec2_gateway_load_balancers_if_unused pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.detect_and_correct_ec2_gateway_load_balancers_if_unused)
+- [detect_and_correct_ec2_gateway_load_balancers_if_unused trigger](https://hub.flowpipe.io/mods/turbot/aws_thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_ec2_gateway_load_balancers_if_unused)

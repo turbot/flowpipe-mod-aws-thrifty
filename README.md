@@ -4,7 +4,7 @@ Pipelines to detect and correct misconfigurations leading to AWS savings opportu
 
 ## Documentation
 
-- **[Pipelines →](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines)**
+- **[Pipelines →](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines)**
 
 ## Getting Started
 
@@ -132,7 +132,7 @@ However; if you have configured a non-empty list for your `approvers` variable, 
 flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --arg='approvers=[]' --arg='default_action="delete_snapshot"'
 ```
 
-Finally, each detection pipeline has a corresponding [Query Trigger](https://flowpipe.io/docs/flowpipe-hcl/trigger/query), these are disabled by default allowing for you to configure only those which are required, see the [docs](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers) for more information.
+Finally, each detection pipeline has a corresponding [Query Trigger](https://flowpipe.io/docs/flowpipe-hcl/trigger/query), these are disabled by default allowing for you to configure only those which are required, see the [docs](https://hub.flowpipe.io/mods/turbot/aws_thrifty/triggers) for more information.
 
 ## Open Source & Contributing
 

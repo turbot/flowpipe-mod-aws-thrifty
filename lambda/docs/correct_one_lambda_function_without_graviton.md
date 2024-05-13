@@ -6,4 +6,4 @@ Lambda functions without graviton processor incur cost over time, so it's crucia
 
 This pipeline allows you to specify a single Lambda function without graviton processor and then either sends a notification or attempts to perform a predefined corrective action.
 
-While this pipeline can function independently, it is typically invoked from the [correct_lambda_functions_without_graviton pipeline](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines/aws_thrifty.pipeline.correct_lambda_functions_without_graviton).
+While this pipeline can function independently, it is typically invoked from the [correct_lambda_functions_without_graviton pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.correct_lambda_functions_without_graviton).

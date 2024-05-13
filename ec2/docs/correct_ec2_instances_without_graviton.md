@@ -7,5 +7,5 @@ EC2 instances without graviton processor incur cost over time, with graviton pro
 This pipeline allows you to specify a collection of EC2 instances without the graviton processor and then either sends notifications or attempts to perform a predefined corrective action upon the collection.
 
 While this pipeline can be used independently, it is typically invoked from either:
-- [detect_and_correct_ec2_instances_without_graviton pipeline](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines/aws_thrifty.pipeline.detect_and_correct_ec2_instances_without_graviton)
-- [detect_and_correct_ec2_instances_without_graviton trigger](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_ec2_instances_without_graviton)
+- [detect_and_correct_ec2_instances_without_graviton pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.detect_and_correct_ec2_instances_without_graviton)
+- [detect_and_correct_ec2_instances_without_graviton trigger](https://hub.flowpipe.io/mods/turbot/aws_thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_ec2_instances_without_graviton)

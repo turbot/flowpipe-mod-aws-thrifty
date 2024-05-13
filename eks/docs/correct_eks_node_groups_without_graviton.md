@@ -8,5 +8,5 @@ This pipeline allows you to specify a collection of non-Graviton EKS node groups
 
 Whilst it is possible to utilize this pipeline standalone, it is usually called from either:
 
-- [detect_and_correct_eks_node_groups_without_graviton pipeline](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines/aws_thrifty.pipeline.detect_and_correct_eks_node_groups_without_graviton)
-- [detect_and_correct_eks_node_groups_without_graviton trigger](https://hub.flowpipe.io/mods/turbot/aws-thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_eks_node_groups_without_graviton)
+- [detect_and_correct_eks_node_groups_without_graviton pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.detect_and_correct_eks_node_groups_without_graviton)
+- [detect_and_correct_eks_node_groups_without_graviton trigger](https://hub.flowpipe.io/mods/turbot/aws_thrifty/triggers/aws_thrifty.trigger.query.detect_and_correct_eks_node_groups_without_graviton)

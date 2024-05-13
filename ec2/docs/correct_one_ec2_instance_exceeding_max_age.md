@@ -6,4 +6,4 @@ EC2 instances can be quite costly to retain, it is also likely that after a cert
 
 This pipeline allows you to specify a single EC2 instance and then either send a notification or attempt to perform a predefined corrective action.
 
-Whilst it is possible to utilise this pipeline standalone, it is usually called from the [correct_ec2_instances_exceeding_max_age pipeline](https://hub.flowpipe.io/mods/turbot/aws-thrifty/pipelines/aws_thrifty.pipeline.correct_ec2_instances_exceeding_max_age).
+Whilst it is possible to utilise this pipeline standalone, it is usually called from the [correct_ec2_instances_exceeding_max_age pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.correct_ec2_instances_exceeding_max_age).
