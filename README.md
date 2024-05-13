@@ -25,7 +25,7 @@ steampipe plugin install aws
 
 Steampipe will automatically use your default AWS credentials. Optionally, you can [setup multiple accounts](https://hub.steampipe.io/plugins/turbot/aws#multi-account-connections) or [customize AWS credentials](https://hub.steampipe.io/plugins/turbot/aws#configuring-aws-credentials).
 
-Additionally it is recommended to use the [Credential Import](https://flowpipe.io/docs/reference/config-files/credential_import) functionality of Flowpipe to import the AWS credentials used from Steampipe, however these will need to have permissions to perform corrective actions.
+Additionally, it is recommended to use the [Credential Import](https://flowpipe.io/docs/reference/config-files/credential_import) functionality of Flowpipe to import the AWS credentials used from Steampipe, however, these will need to have permissions to perform corrective actions.
 
 Clone the mod:
 
@@ -39,7 +39,7 @@ git clone git@github.com:turbot/flowpipe-mod-aws-thrifty.git
 
 Several pipelines have [input variables](https://flowpipe.io/docs/build/mod-variables#input-variables) that can be configured to better match your environment and requirements.
 
-Each variable has a default defined in it's source file, e.g, `s3/s3.fp` (or `variables.fp` for more generic variables), but these can be overwritten in several ways:
+Each variable has a default defined in its source file, e.g, `s3/s3.fp` (or `variables.fp` for more generic variables), but these can be overwritten in several ways:
 
 The easiest approach is to setup your vars file, starting with the sample:
 
@@ -50,7 +50,7 @@ vi thrifty.fpvars
 flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --var-file=thrifty.fpvars
 ```
 
-Alternatively you can pass variables on the command line:
+Alternatively, you can pass variables on the command line:
 
 ```sh
 flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --var=ebs_snapshot_age_max_days=10
@@ -67,7 +67,7 @@ For more information, please see [Passing Input Variables](https://flowpipe.io/d
 
 ### Running Detect & Correct Pipelines
 
-In order to run your first detection, you'll need to ensure your Steampipe server is up and running:
+To run your first detection, you'll need to ensure your Steampipe server is up and running:
 ```sh
 steampipe service start
 ```
@@ -84,7 +84,7 @@ flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age
 
 By default the above approach would find the relevant resources and then send a message to your configured [notifier](https://flowpipe.io/docs/reference/config-files/notifier).
 
-However;  you can request via an [Input Step](https://flowpipe.io/docs/build/input) a corrective action to run against each individual detection result; this behavior is achieved by setting `approvers` either as a variable or for a one-off approach, by passing `approvers` as an argument.
+However;  you can request via an [Input Step](https://flowpipe.io/docs/build/input) a corrective action to run against each detection result; this behavior is achieved by setting `approvers` either as a variable or for a one-off approach, by passing `approvers` as an argument.
 
 > Note: This approach requires running `flowpipe server` as it uses an `input` step.
 
