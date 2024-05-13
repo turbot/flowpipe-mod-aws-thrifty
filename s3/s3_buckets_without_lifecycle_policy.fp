@@ -25,7 +25,7 @@ trigger "query" "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 
   capture "insert" {
     pipeline = pipeline.correct_s3_buckets_without_lifecycle_policy
-    args     = {
+    args = {
       items = self.inserted_rows
     }
   }
@@ -86,7 +86,7 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 
   step "pipeline" "respond" {
     pipeline = pipeline.correct_s3_buckets_without_lifecycle_policy
-    args     = {
+    args = {
       items              = step.query.detect.rows
       policy             = param.policy
       notifier           = param.notifier
@@ -156,14 +156,14 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.name => row }
+    value = { for row in param.items : row.name => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_s3_bucket_without_lifecycle_policy
-    args            = {
+    args = {
       title              = each.value.title
       name               = each.value.name
       region             = each.value.region
@@ -242,19 +242,19 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
-    args     = {
+    args = {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
       detect_msg         = "Detected S3 Bucket ${param.title} without a lifecycle policy."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
-          label  = "Skip"
-          value  = "skip"
-          style  = local.style_info
-          pipeline_ref  = local.pipeline_optional_message
+          label        = "Skip"
+          value        = "skip"
+          style        = local.style_info
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -264,10 +264,10 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
           error_msg   = ""
         }
         "apply_policy" = {
-          label  = "Apply Policy"
-          value  = "apply_policy"
-          style  = local.style_ok
-          pipeline_ref  = pipeline.mock_aws_pipeline_put_s3_lifecycle_policy // TODO: Replace with real pipeline when added to aws library mod.
+          label        = "Apply Policy"
+          value        = "apply_policy"
+          style        = local.style_ok
+          pipeline_ref = local.aws_pipeline_put_s3_lifecycle_policy
           pipeline_args = {
             bucket_name = param.name
             region      = param.region
@@ -279,29 +279,6 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
         }
       }
     }
-  }
-}
-
-// TODO: We can remove this mock pipeline once the real pipeline is added to the aws library mod.
-pipeline "mock_aws_pipeline_put_s3_lifecycle_policy" {
-  param "bucket_name" {
-    type = string
-  }
-
-  param "region" {
-    type = string
-  }
-
-  param "cred" {
-    type = string
-  }
-
-  param "policy" {
-    type = string
-  }
-
-  output "result" {
-    value = "Mocked: Put S3 Lifecycle Policy [Name: ${param.bucket_name}, Region: ${param.region}, Cred: ${param.cred}]\n${param.policy}"
   }
 }
 
@@ -327,47 +304,39 @@ variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
   default     = ["skip", "apply_policy"]
 }
 
-// TODO: Change to an array of objects (contents of 'Rules') - let lib mod wrap it; no JSONified strings!
 variable "s3_buckets_without_lifecycle_policy_default_policy" {
   type        = string
   description = "The default S3 bucket lifecycle policy to apply"
-  default     = <<-EOF
-{
-  "Rules": [
-    {
-      "ID": "Transition to STANDARD_IA after 90 days",
-      "Status": "Enabled",
-      "Filter": {},
-      "Transitions": [
-        {
-          "Days": 90,
-          "StorageClass": "STANDARD_IA"
+  default = jsonencode({
+    Rules = [
+      {
+        ID     = "Transition to STANDARD_IA after 90 days",
+        Prefix = "STANDARD_IA",
+        Status = "Enabled",
+        Transition = {
+          Days         = 90,
+          StorageClass = "STANDARD_IA"
         }
-      ]
-    },
-    {
-      "ID": "Transition to GLACIER after 180 days",
-      "Status": "Enabled",
-      "Filter": {},
-      "Transitions": [
-        {
-          "Days": 180,
-          "StorageClass": "GLACIER"
+      },
+      {
+        ID     = "Transition to GLACIER after 180 days",
+        Prefix = "GLACIER",
+        Status = "Enabled",
+        Transition = {
+          Days         = 180,
+          StorageClass = "GLACIER"
         }
-      ]
-    },
-    {
-      "ID": "Transition to DEEP_ARCHIVE after 365 days",
-      "Status": "Enabled",
-      "Filter": {},
-      "Transitions": [
-        {
-          "Days": 365,
-          "StorageClass": "DEEP_ARCHIVE"
+      },
+      {
+        ID     = "Transition to DEEP_ARCHIVE after 365 days",
+        Prefix = "DEEP_ARCHIVE",
+        Status = "Enabled",
+        Transition = {
+          Days         = 365,
+          StorageClass = "DEEP_ARCHIVE"
         }
-      ]
-    }
-  ]
+      }
+    ]
+  })
 }
-  EOF
 }
