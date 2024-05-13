@@ -2,4 +2,4 @@
 
 _What's new?_
 
-- Added 91 pipelines to detect and remediate unused and underutilized AWS resources, as well as deprecated resource configurations, to optimize costs. For usage information and a full list of pipelines, please see [AWS Thrifty Mod for Flowpipe](https://hub.flowpipe.io/mods/turbot/aws_thrifty).
+- Added 30 new 'detect and correct' pipelines to identify unused and underutilized AWS resources, as well as deprecated resource configurations. These pipelines also suggest potential remediation actions to optimize costs. For usage information and a full list of pipelines, please see [AWS Thrifty Mod](https://hub.flowpipe.io/mods/turbot/aws_thrifty).
