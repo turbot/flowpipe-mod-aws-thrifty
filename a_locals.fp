@@ -56,5 +56,5 @@ locals {
   aws_pipeline_delete_lambda_function       = aws.pipeline.delete_lambda_function
   aws_pipeline_terminate_emr_clusters       = aws.pipeline.terminate_emr_clusters
   aws_pipeline_create_ebs_snapshot          = aws.pipeline.create_ebs_snapshot
-  aws_pipeline_put_s3_lifecycle_policy      = aws.pipeline.put_s3_lifecycle_policy
+  aws_pipeline_put_s3_lifecycle_policy      = aws.pipeline.put_s3_bucket_lifecycle_policy
 }
