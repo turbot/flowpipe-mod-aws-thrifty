@@ -309,36 +309,43 @@ variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
 variable "s3_buckets_without_lifecycle_policy_default_policy" {
   type        = string
   description = "The default S3 bucket lifecycle policy to apply"
-  default = jsonencode({
-    Rules = [
-      {
-        ID     = "Transition to STANDARD_IA after 90 days",
-        Prefix = "STANDARD_IA",
-        Status = "Enabled",
-        Transition = {
-          Days         = 90,
-          StorageClass = "STANDARD_IA"
+  default     = <<-EOF
+{
+  "Rules": [
+    {
+      "ID": "Transition to STANDARD_IA after 90 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 90,
+          "StorageClass": "STANDARD_IA"
         }
-      },
-      {
-        ID     = "Transition to GLACIER after 180 days",
-        Prefix = "GLACIER",
-        Status = "Enabled",
-        Transition = {
-          Days         = 180,
-          StorageClass = "GLACIER"
+      ]
+    },
+    {
+      "ID": "Transition to GLACIER after 180 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 180,
+          "StorageClass": "GLACIER"
         }
-      },
-      {
-        ID     = "Transition to DEEP_ARCHIVE after 365 days",
-        Prefix = "DEEP_ARCHIVE",
-        Status = "Enabled",
-        Transition = {
-          Days         = 365,
-          StorageClass = "DEEP_ARCHIVE"
+      ]
+    },
+    {
+      "ID": "Transition to DEEP_ARCHIVE after 365 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 365,
+          "StorageClass": "DEEP_ARCHIVE"
         }
-      }
-    ]
-  })
+      ]
+    }
+  ]
 }
+  EOF
 }
