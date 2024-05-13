@@ -34,8 +34,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
-  title       = "Detect and correct EMR Clusters idle 30 mins"
-  description = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
+  title         = "Detect and correct EMR Clusters idle 30 mins"
+  description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins_trigger.md")
   tags          = merge(local.emr_common_tags, { class = "unused" })
 
@@ -264,9 +264,9 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           success_msg = "Skipped EMR cluster ${param.title}."
           error_msg   = "Error skipping EMR cluster ${param.title}."
         },
-        "terminate_cluster" = {
-          label  = "Terminate Cluster"
-          value  = "terminate_cluster"
+        "delete_cluster" = {
+          label  = "Delete Cluster"
+          value  = "delete_cluster"
           style  = local.style_alert
           pipeline_ref  = local.aws_pipeline_terminate_emr_clusters
           pipeline_args = {
@@ -303,5 +303,5 @@ variable "emr_clusters_idle_30_mins_default_action" {
 variable "emr_clusters_idle_30_mins_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "terminate_cluster"]
+  default     = ["skip", "delete_cluster"]
 }
