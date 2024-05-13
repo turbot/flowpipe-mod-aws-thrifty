@@ -11,7 +11,7 @@ This query trigger detects unattached EBS volumes and then either sends a notifi
 By default, this trigger is disabled, however it can be configred by [setting the below variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables)
 - `ebs_volumes_if_unattached_trigger_enabled` should be set to `true` as the default is `false`.
 - `ebs_volumes_if_unattached_trigger_schedule` should be set to your desired running [schedule](https://flowpipe.io/docs/flowpipe-hcl/trigger/schedule#more-examples)
-- `ebs_volumes_if_unattached_default_action` should be set to your desired action (i.e. `"notify"` for notifications or `"delete_volume"` to delete the volume).
+- `ebs_volumes_if_unattached_default_action` should be set to your desired action (i.e. `"notify"` for notifications or `"snapshot_and_delete_volume"` to snapshot and then delete the volume).
 
 Then starting the server:
 ```sh

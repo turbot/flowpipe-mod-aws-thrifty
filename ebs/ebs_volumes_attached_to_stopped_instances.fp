@@ -265,7 +265,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
         "detach_volume" = {
           label        = "Detach Volume"
           value        = "detach_volume"
-          style        = local.style_ok
+          style        = local.style_info
           pipeline_ref = local.aws_pipeline_detach_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
@@ -275,6 +275,19 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           success_msg = "Detached EBS volume ${param.title} from the instance."
           error_msg   = "Error detaching EBS volume ${param.title} from the instance."
         },
+        "delete_volume" = {
+          label        = "Delete Volume"
+          value        = "delete_volume"
+          style        = local.style_alert
+          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+          pipeline_args = {
+            volume_id = param.volume_id
+            region    = param.region
+            cred      = param.cred
+          }
+          success_msg = "Deleted EBS Volume ${param.title}."
+          error_msg   = "Error deleting EBS Volume ${param.title}."
+        }
         "snapshot_and_delete_volume" = {
           label        = "Snapshot & Delete Volume"
           value        = "snapshot_and_delete_volume"
@@ -285,8 +298,8 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
             region    = param.region
             cred      = param.cred
           }
-          success_msg = "Deleted EBS Volume ${param.title}."
-          error_msg   = "Error deleting EBS Volume ${param.title}."
+          success_msg = "Snapshotted & Deleted EBS Volume ${param.title}."
+          error_msg   = "Error snapshotting & deleting EBS Volume ${param.title}."
         }
       }
     }
@@ -348,5 +361,5 @@ variable "ebs_volumes_attached_to_stopped_instances_default_action" {
 variable "ebs_volumes_attached_to_stopped_instances_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "detach_volume", "delete_volume"]
+  default     = ["skip", "detach_volume", "delete_volume", "snapshot_and_delete_volume"]
 }
