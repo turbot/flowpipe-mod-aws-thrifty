@@ -253,8 +253,21 @@ pipeline "correct_one_ebs_volume_if_unattached" {
             region    = param.region
             cred      = param.cred
           }
-          success_msg = "Deleted EBS volume ${param.title}."
-          error_msg   = "Error deleting EBS volume ${param.title}."
+          success_msg = "Deleted EBS Volume ${param.title}."
+          error_msg   = "Error deleting EBS Volume ${param.title}."
+        }
+        "snapshot_and_delete_volume" = {
+          label        = "Snapshot & Delete Volume"
+          value        = "snapshot_and_delete_volume"
+          style        = local.style_alert
+          pipeline_ref = pipeline.snapshot_and_delete_ebs_volume
+          pipeline_args = {
+            volume_id = param.volume_id
+            region    = param.region
+            cred      = param.cred
+          }
+          success_msg = "Snapshotted & Deleted EBS Volume ${param.title}."
+          error_msg   = "Error snapshotting & deleting EBS Volume ${param.title}."
         }
       }
     }
@@ -280,5 +293,5 @@ variable "ebs_volumes_if_unattached_default_action" {
 variable "ebs_volumes_if_unattached_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete_volume"]
+  default     = ["skip", "delete_volume", "snapshot_and_delete_volume"]
 }
