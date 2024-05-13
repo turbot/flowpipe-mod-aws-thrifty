@@ -52,7 +52,7 @@ locals {
   from
     ebs_usage
   where
-    avg_max <= ${var.ebs_volumes_with_low_usage}::int
+    avg_max <= ${var.ebs_volumes_with_low_usage_min}::int
   EOQ
 }
 
@@ -327,7 +327,7 @@ variable "ebs_volumes_with_low_usage_enabled_actions" {
   default     = ["skip", "delete_volume"]
 }
 
-variable "ebs_volumes_with_low_usage" {
+variable "ebs_volumes_with_low_usage_min" {
   type        = number
   description = "The number of average read/write ops required for volumes to be considered infrequently used."
   default     = 100
