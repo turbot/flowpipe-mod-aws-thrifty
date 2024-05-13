@@ -1,0 +1,233 @@
+# Core options
+database           = "postgres:#steampipe@localhost:9193/steampipe"
+notifier           = "default"
+notification_level = "info"
+approvers          = []
+max_concurrency    = 1
+
+# EBS snapshots exceeding max age
+ebs_snapshots_exceeding_max_age_days             = 90
+ebs_snapshots_exceeding_max_age_trigger_enabled  = false
+ebs_snapshots_exceeding_max_age_trigger_schedule = "15m"
+ebs_snapshots_exceeding_max_age_default_action   = "notify"
+ebs_snapshots_exceeding_max_age_enabled_actions  = ["skip", "delete_snapshot"]
+
+# EBS volumes attached to stopped instances
+ebs_volumes_attached_to_stopped_instances_trigger_enabled  = false
+ebs_volumes_attached_to_stopped_instances_trigger_schedule = "15m"
+ebs_volumes_attached_to_stopped_instances_default_action   = "notify"
+ebs_volumes_attached_to_stopped_instances_enabled_actions  = ["skip", "detach_volume", "delete_volume", "snapshot_and_delete_volume"]
+
+# EBS volumes exceeding max size
+ebs_volumes_exceeding_max_size                  = 100
+ebs_volumes_exceeding_max_size_trigger_enabled  = false
+ebs_volumes_exceeding_max_size_trigger_schedule = "15m"
+ebs_volumes_exceeding_max_size_default_action   = "notify"
+ebs_volumes_exceeding_max_size_enabled_actions  = ["skip", "delete_volume", "snapshot_and_delete_volume"]
+
+# EBS volumes if unattached
+ebs_volumes_if_unattached_trigger_enabled  = false
+ebs_volumes_if_unattached_trigger_schedule = "15m"
+ebs_volumes_if_unattached_default_action   = "notify"
+ebs_volumes_if_unattached_enabled_actions  = ["skip", "delete_volume", "snapshot_and_delete_volume"]
+
+# EBS volumes using gp2
+ebs_volumes_using_gp2_trigger_enabled  = false
+ebs_volumes_using_gp2_trigger_schedule = "15m"
+ebs_volumes_using_gp2_default_action   = "notify"
+ebs_volumes_using_gp2_enabled_actions  = ["skip", "update_to_gp3"]
+
+# EBS volumes using io1
+ebs_volumes_using_io1_trigger_enabled  = false
+ebs_volumes_using_io1_trigger_schedule = "15m"
+ebs_volumes_using_io1_default_action   = "notify"
+ebs_volumes_using_io1_enabled_actions  = ["skip", "update_to_io2"]
+
+# EBS volumes with low IOPS
+ebs_volumes_with_low_iops_trigger_enabled  = false
+ebs_volumes_with_low_iops_trigger_schedule = "15m"
+ebs_volumes_with_low_iops_default_action   = "notify"
+ebs_volumes_with_low_iops_enabled_actions  = ["skip", "delete_volume"]
+
+# EBS volumes with low usage
+ebs_volumes_with_low_usage_min              = 100
+ebs_volumes_with_low_usage_trigger_enabled  = false
+ebs_volumes_with_low_usage_trigger_schedule = "15m"
+ebs_volumes_with_low_usage_default_action   = "notify"
+ebs_volumes_with_low_usage_enabled_actions  = ["skip", "delete_volume"]
+
+# EC2 application load balancers if unused
+ec2_application_load_balancers_if_unused_trigger_enabled  = false
+ec2_application_load_balancers_if_unused_trigger_schedule = "15m"
+ec2_application_load_balancers_if_unused_default_action   = "notify"
+ec2_application_load_balancers_if_unused_enabled_actions  = ["skip", "delete_load_balancer"]
+
+# EC2 classic load balancers if unused
+ec2_classic_load_balancers_if_unused_trigger_enabled  = false
+ec2_classic_load_balancers_if_unused_trigger_schedule = "15m"
+ec2_classic_load_balancers_if_unused_default_action   = "notify"
+ec2_classic_load_balancers_if_unused_enabled_actions  = ["skip", "delete_load_balancer"]
+
+# EC2 gateway load balancers if unused
+ec2_gateway_load_balancers_if_unused_trigger_enabled  = false
+ec2_gateway_load_balancers_if_unused_trigger_schedule = "15m"
+ec2_gateway_load_balancers_if_unused_default_action   = "notify"
+ec2_gateway_load_balancers_if_unused_enabled_actions  = ["skip", "delete_load_balancer"]
+
+# EC2 network load balancers if unused
+ec2_network_load_balancers_if_unused_trigger_enabled  = false
+ec2_network_load_balancers_if_unused_trigger_schedule = "15m"
+ec2_network_load_balancers_if_unused_default_action   = "notify"
+ec2_network_load_balancers_if_unused_enabled_actions  = ["skip", "delete_load_balancer"]
+
+# EC2 instances exceeding max age
+ec2_instances_exceeding_max_age_days             = 90
+ec2_instances_exceeding_max_age_trigger_enabled  = false
+ec2_instances_exceeding_max_age_trigger_schedule = "15m"
+ec2_instances_exceeding_max_age_default_action   = "notify"
+ec2_instances_exceeding_max_age_enabled_actions  = ["skip", "stop_instance", "terminate_instance"]
+
+# EC2 instances large
+ec2_instances_large_allowed_types    = ["%.nano", "%.micro", "%.small", "%.medium", "%.large", "%.xlarge", "%._xlarge"]
+ec2_instances_large_trigger_enabled  = false
+ec2_instances_large_trigger_schedule = "15m"
+ec2_instances_large_default_action   = "notify"
+ec2_instances_large_enabled_actions  = ["skip", "stop_instance", "terminate_instance"]
+
+# EC2 instances of older generation
+ec2_instances_of_older_generation_trigger_enabled  = false
+ec2_instances_of_older_generation_trigger_schedule = "15m"
+ec2_instances_of_older_generation_default_action   = "notify"
+ec2_instances_of_older_generation_enabled_actions  = ["skip", "stop_instance", "terminate_instance"]
+
+# EC2 instances without graviton
+ec2_instances_without_graviton_trigger_enabled  = false
+ec2_instances_without_graviton_trigger_schedule = "15m"
+ec2_instances_without_graviton_default_action   = "notify"
+ec2_instances_without_graviton_enabled_actions  = ["skip", "stop_instance", "terminate_instance"]
+
+# EKS node groups without graviton
+eks_node_groups_without_graviton_trigger_enabled  = false
+eks_node_groups_without_graviton_trigger_schedule = "15m"
+eks_node_groups_without_graviton_default_action   = "notify"
+eks_node_groups_without_graviton_enabled_actions  = ["skip", "delete_node_group"]
+
+# Elasticache clusters exceeding max age
+elasticache_clusters_exceeding_max_age_days             = 90
+elasticache_clusters_exceeding_max_age_trigger_enabled  = false
+elasticache_clusters_exceeding_max_age_trigger_schedule = "15m"
+elasticache_clusters_exceeding_max_age_default_action   = "notify"
+elasticache_clusters_exceeding_max_age_enabled_actions  = ["skip", "delete_cluster"]
+
+# EMR Clusters idle 30 mins
+emr_clusters_idle_30_mins_trigger_enabled  = false
+emr_clusters_idle_30_mins_trigger_schedule = "15m"
+emr_clusters_idle_30_mins_default_action   = "notify"
+emr_clusters_idle_30_mins_enabled_actions  = ["skip", "delete_cluster"]
+
+# Lambda functions without graviton
+lambda_functions_without_graviton_trigger_enabled  = false
+lambda_functions_without_graviton_trigger_schedule = "15m"
+lambda_functions_without_graviton_default_action   = "notify"
+lambda_functions_without_graviton_enabled_actions  = ["skip", "delete_function"]
+
+# RDS DB instances exceeding max age
+rds_db_instances_exceeding_max_age_days             = 90
+rds_db_instances_exceeding_max_age_trigger_enabled  = false
+rds_db_instances_exceeding_max_age_trigger_schedule = "15m"
+rds_db_instances_exceeding_max_age_default_action   = "notify"
+rds_db_instances_exceeding_max_age_enabled_actions  = ["skip", "delete_instance"]
+
+# RDS DB instances of older generation
+rds_db_instances_of_older_generation_trigger_enabled  = false
+rds_db_instances_of_older_generation_trigger_schedule = "15m"
+rds_db_instances_of_older_generation_default_action   = "notify"
+rds_db_instances_of_older_generation_enabled_actions  = ["skip", "delete_instance"]
+
+# RDS DB instances with low connection count
+rds_db_instances_with_low_connection_count_trigger_enabled  = false
+rds_db_instances_with_low_connection_count_trigger_schedule = "15m"
+rds_db_instances_with_low_connection_count_default_action   = "notify"
+rds_db_instances_with_low_connection_count_enabled_actions  = ["skip", "delete_instance"]
+
+# RDS DB instances without graviton processor
+rds_db_instances_without_graviton_trigger_enabled  = false
+rds_db_instances_without_graviton_trigger_schedule = "15m"
+rds_db_instances_without_graviton_default_action   = "notify"
+rds_db_instances_without_graviton_enabled_actions  = ["skip", "delete_instance"]
+
+# Route53 health checks if unused
+route53_health_checks_if_unused_trigger_enabled  = false
+route53_health_checks_if_unused_trigger_schedule = "15m"
+route53_health_checks_if_unused_default_action   = "notify"
+route53_health_checks_if_unused_enabled_actions  = ["skip", "delete_health_check"]
+
+# Route53 records with lower TTL
+route53_records_with_lower_ttl_trigger_enabled  = false
+route53_records_with_lower_ttl_trigger_schedule = "15m"
+route53_records_with_lower_ttl_default_action   = "notify"
+route53_records_with_lower_ttl_enabled_actions  = ["skip", "update_ttl"]
+
+# S3 buckets without lifecycle policy
+s3_buckets_without_lifecycle_policy_default_policy = <<-EOF
+{
+  "Rules": [
+    {
+      "ID": "Transition to STANDARD_IA after 90 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 90,
+          "StorageClass": "STANDARD_IA"
+        }
+      ]
+    },
+    {
+      "ID": "Transition to GLACIER after 180 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 180,
+          "StorageClass": "GLACIER"
+        }
+      ]
+    },
+    {
+      "ID": "Transition to DEEP_ARCHIVE after 365 days",
+      "Status": "Enabled",
+      "Filter": {},
+      "Transitions": [
+        {
+          "Days": 365,
+          "StorageClass": "DEEP_ARCHIVE"
+        }
+      ]
+    }
+  ]
+}
+EOF
+s3_buckets_without_lifecycle_policy_trigger_enabled  = false
+s3_buckets_without_lifecycle_policy_trigger_schedule = "15m"
+s3_buckets_without_lifecycle_policy_default_action   = "notify"
+s3_buckets_without_lifecycle_policy_enabled_actions  = ["skip", "apply_policy"]
+
+# SecretsManager secrets if unused
+secretsmanager_secrets_if_unused_days = 90
+secretsmanager_secrets_if_unused_trigger_enabled  = false
+secretsmanager_secrets_if_unused_trigger_schedule = "15m"
+secretsmanager_secrets_if_unused_default_action   = "notify"
+secretsmanager_secrets_if_unused_enabled_actions  = ["skip", "delete_secret"]
+
+# VPC EIPs if unattached
+vpc_eips_if_unattached_trigger_enabled  = false
+vpc_eips_if_unattached_trigger_schedule = "15m"
+vpc_eips_if_unattached_default_action   = "notify"
+vpc_eips_if_unattached_enabled_actions  = ["skip", "release"]
+
+# VPC NAT gateways if unused
+vpc_nat_gateways_if_unused_trigger_enabled  = false
+vpc_nat_gateways_if_unused_trigger_schedule = "15m"
+vpc_nat_gateways_if_unused_default_action   = "notify"
+vpc_nat_gateways_if_unused_enabled_actions  = ["skip", "delete"]

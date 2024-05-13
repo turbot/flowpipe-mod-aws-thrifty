@@ -13,7 +13,7 @@ variable "notifier" {
 variable "notification_level" {
   type        = string
   description = "The verbosity level of notification messages to send. Valid options are 'verbose', 'info', 'error'."
-  default     = "verbose"
+  default     = "info"
 }
 
 variable "approvers" {
