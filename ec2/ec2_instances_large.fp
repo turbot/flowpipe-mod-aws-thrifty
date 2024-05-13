@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_large" {
-  title       = "Detect and correct EC2 instances large"
+  title       = "Detect & correct EC2 instances large"
   description = "Identifies large EC2 instances and executes the chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_instances_large_trigger.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
@@ -167,7 +167,7 @@ pipeline "correct_ec2_instances_large" {
 
 pipeline "correct_one_ec2_instance_large" {
   title       = "Correct one EC2 instance large"
-  description = "Executes corrective action on a single large EC2 instance."
+  description = "Runs corrective action on a single large EC2 instance."
   documentation = file("./ec2/docs/correct_one_ec2_instance_large.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -276,13 +276,15 @@ pipeline "correct_one_ec2_instance_large" {
 }
 
 variable "ec2_instances_large_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "ec2_instances_large_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "ec2_instances_large_allowed_types" {
@@ -293,12 +295,12 @@ variable "ec2_instances_large_allowed_types" {
 
 variable "ec2_instances_large_default_action" {
   type        = string
-  description = "The default response to use when EC2 instances are larger than the specified types."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "ec2_instances_large_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "stop_instance", "terminate_instance"]
 }

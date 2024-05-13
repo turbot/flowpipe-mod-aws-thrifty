@@ -290,23 +290,25 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
 }
 
 variable "route53_records_with_lower_ttl_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "route53_records_with_lower_ttl_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "route53_records_with_lower_ttl_default_action" {
   type        = string
-  description = "The default response to use when Route53 records have a TTL lower than expected."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "route53_records_with_lower_ttl_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "update_ttl"]
 }

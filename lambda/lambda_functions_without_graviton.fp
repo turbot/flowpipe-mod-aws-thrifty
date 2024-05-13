@@ -14,7 +14,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_lambda_functions_without_graviton" {
-  title         = "Detect and correct Lambda functions without graviton"
+  title         = "Detect & correct Lambda functions without graviton"
   description   = "Detects Lambda functions without graviton processor and runs your chosen action."
   documentation = file("./lambda/docs/detect_and_correct_lambda_functions_without_graviton_trigger.md")
   tags          = merge(local.lambda_common_tags, { class = "deprecated" })
@@ -33,7 +33,7 @@ trigger "query" "detect_and_correct_lambda_functions_without_graviton" {
 }
 
 pipeline "detect_and_correct_lambda_functions_without_graviton" {
-  title         = "Detect and correct Lambda functions without graviton"
+  title         = "Detect & correct Lambda functions without graviton"
   description   = "Detects Lambda functions without graviton processor and runs your chosen action."
   documentation = file("./lambda/docs/detect_and_correct_lambda_functions_without_graviton.md")
   tags          = merge(local.lambda_common_tags, { class = "deprecated", type = "featured" })
@@ -266,23 +266,25 @@ pipeline "correct_one_lambda_function_without_graviton" {
 
 // Variable definitions
 variable "lambda_functions_without_graviton_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "lambda_functions_without_graviton_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "lambda_functions_without_graviton_default_action" {
   type        = string
-  description = "The default action to take for Lambda functions without graviton processor."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "lambda_functions_without_graviton_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete_function"]
 }

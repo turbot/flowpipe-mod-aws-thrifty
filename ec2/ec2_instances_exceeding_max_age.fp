@@ -14,8 +14,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
-  title       = "Detect and correct EC2 instances exceeding max age"
-  description = "Identifies EC2 instances exceeding max age and executes the chosen action."
+  title       = "Detect & correct EC2 instances exceeding max age"
+  description = "Detects EC2 instances exceeding max age and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_instances_exceeding_max_age_trigger.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -33,8 +33,8 @@ trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
 }
 
 pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
-  title       = "Detect and correct EC2 instances exceeding max age"
-  description = "Identifies EC2 instances exceeding max age and executes corrective actions."
+  title       = "Detect & correct EC2 instances exceeding max age"
+  description = "Detects EC2 instances exceeding max age and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_instances_exceeding_max_age.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -157,7 +157,7 @@ pipeline "correct_ec2_instances_exceeding_max_age" {
 
 pipeline "correct_one_ec2_instance_exceeding_max_age" {
   title       = "Correct one EC2 instance exceeding max age"
-  description = "Executes corrective action on a single EC2 instance exceeding max age."
+  description = "Runs corrective action on a single EC2 instance exceeding max age."
   documentation = file("./ec2/docs/correct_one_ec2_instance_exceeding_max_age.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -266,24 +266,26 @@ pipeline "correct_one_ec2_instance_exceeding_max_age" {
 }
 
 variable "ec2_instances_exceeding_max_age_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "ec2_instances_exceeding_max_age_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "ec2_instances_exceeding_max_age_default_action" {
   type        = string
-  description = "The default response to use when EC2 instances are older than the maximum number of days."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "ec2_instances_exceeding_max_age_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "stop_instance", "terminate_instance"]
 }
 

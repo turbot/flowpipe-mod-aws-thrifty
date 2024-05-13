@@ -34,7 +34,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
-  title       = "Detect and correct EMR Clusters idle 30 mins"
+  title       = "Detect & correct EMR Clusters idle 30 mins"
   description = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins_trigger.md")
   tags          = merge(local.emr_common_tags, { class = "unused" })
@@ -53,7 +53,7 @@ trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
 }
 
 pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
-  title         = "Detect and correct EMR Clusters idle 30 mins"
+  title         = "Detect & correct EMR Clusters idle 30 mins"
   description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins.md")
   tags          = merge(local.emr_common_tags, { class = "unused", type = "featured" })
@@ -264,9 +264,9 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           success_msg = "Skipped EMR cluster ${param.title}."
           error_msg   = "Error skipping EMR cluster ${param.title}."
         },
-        "terminate_cluster" = {
-          label  = "Terminate Cluster"
-          value  = "terminate_cluster"
+        "delete_cluster" = {
+          label  = "Delete Cluster"
+          value  = "delete_cluster"
           style  = local.style_alert
           pipeline_ref  = local.aws_pipeline_terminate_emr_clusters
           pipeline_args = {
@@ -285,23 +285,25 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
 // Variable definitions
 
 variable "emr_clusters_idle_30_mins_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "emr_clusters_idle_30_mins_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "emr_clusters_idle_30_mins_default_action" {
   type        = string
-  description = "The default response to use for EMR clusters of previous generation instances."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "emr_clusters_idle_30_mins_enabled_actions" {
   type        = list(string)
   description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "terminate_cluster"]
+  default     = ["skip", "delete_cluster"]
 }

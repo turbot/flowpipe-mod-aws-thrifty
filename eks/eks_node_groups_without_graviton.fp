@@ -45,7 +45,7 @@ locals {
 }
 
 trigger "query" "detect_and_correct_eks_node_groups_without_graviton" {
-  title         = "Detect and correct EKS node groups without graviton"
+  title         = "Detect & correct EKS node groups without graviton"
   description   = "Detects EKS node groups without graviton processor and responds with your chosen action."
   documentation = file("./eks/docs/detect_and_correct_eks_node_groups_without_graviton_trigger.md")
   tags          = merge(local.eks_common_tags, { class = "deprecated" })
@@ -64,7 +64,7 @@ trigger "query" "detect_and_correct_eks_node_groups_without_graviton" {
 }
 
 pipeline "detect_and_correct_eks_node_groups_without_graviton" {
-  title         = "Detect and correct EKS node groups without graviton"
+  title         = "Detect & correct EKS node groups without graviton"
   description   = "Detects EKS node groups without graviton processor and responds with your chosen action."
   documentation = file("./eks/docs/detect_and_correct_eks_node_groups_without_graviton.md")
   tags          = merge(local.eks_common_tags, { class = "deprecated", type = "featured" })
@@ -302,23 +302,25 @@ pipeline "correct_one_eks_node_group_without_graviton" {
 }
 
 variable "eks_node_groups_without_graviton_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "eks_node_groups_without_graviton_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "eks_node_groups_without_graviton_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete_node_group"]
 }
 
 variable "eks_node_groups_without_graviton_default_action" {
   type        = string
-  description = "The default response to use for EKS node groups without graviton."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }

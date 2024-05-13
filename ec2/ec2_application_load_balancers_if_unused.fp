@@ -23,10 +23,11 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_application_load_balancers_if_unused" {
-  title       = "Detect and correct EC2 application load balancers if unused"
-  description = "Identifies unused EC2 application load balancers and executes the chosen action."
+  title       = "Detect & correct EC2 application load balancers if unused"
+  description = "Detects unused EC2 application load balancers and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_application_load_balancers_if_unused_trigger.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
+
 
   enabled  = var.ec2_application_load_balancers_if_unused_trigger_enabled
   schedule = var.ec2_application_load_balancers_if_unused_trigger_schedule
@@ -42,10 +43,11 @@ trigger "query" "detect_and_correct_ec2_application_load_balancers_if_unused" {
 }
 
 pipeline "detect_and_correct_ec2_application_load_balancers_if_unused" {
-  title       = "Detect and correct EC2 application load balancers if unused"
-  description = "Identifies unused EC2 application load balancers and executes corrective actions."
+  title       = "Detect & correct EC2 application load balancers if unused"
+  description = "Detects unused EC2 application load balancers and runs your chosen action."
   documentation = file("./ec2/docs/detect_and_correct_ec2_application_load_balancers_if_unused.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
+
 
   param "database" {
     type        = string
@@ -172,7 +174,7 @@ pipeline "correct_ec2_application_load_balancers_if_unused" {
 
 pipeline "correct_one_ec2_application_load_balancer_if_unused" {
   title       = "Correct one EC2 application load balancer if unused"
-  description = "Executes corrective action on a single EC2 application load balancer if unused."
+  description = "Runs corrective action on a single EC2 application load balancer if unused."
   documentation = file("./ec2/docs/correct_one_ec2_application_load_balancer_if_unused.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -268,23 +270,25 @@ pipeline "correct_one_ec2_application_load_balancer_if_unused" {
 }
 
 variable "ec2_application_load_balancers_if_unused_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "ec2_application_load_balancers_if_unused_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "ec2_application_load_balancers_if_unused_default_action" {
   type        = string
-  description = "The default response to use for unused EC2 application load balancers."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "ec2_application_load_balancers_if_unused_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete_load_balancer"]
 }

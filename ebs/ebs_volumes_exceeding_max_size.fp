@@ -81,12 +81,12 @@ pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ebs_volumes_exceeding_max_size
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action           = param.default_action
-      enabled_actions          = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -223,12 +223,12 @@ pipeline "correct_one_ebs_volume_exceeding_max_size" {
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected EBS volume ${param.title} exceeding maximum size."
-      default_action           = param.default_action
-      enabled_actions          = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected EBS volume ${param.title} exceeding maximum size."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
@@ -253,8 +253,21 @@ pipeline "correct_one_ebs_volume_exceeding_max_size" {
             region    = param.region
             cred      = param.cred
           }
-          success_msg = "Deleted EBS volume ${param.title}."
-          error_msg   = "Error deleting EBS volume ${param.title}."
+          success_msg = "Deleted EBS Volume ${param.title}."
+          error_msg   = "Error deleting EBS Volume ${param.title}."
+        }
+        "snapshot_and_delete_volume" = {
+          label        = "Snapshot & Delete Volume"
+          value        = "snapshot_and_delete_volume"
+          style        = local.style_alert
+          pipeline_ref = pipeline.snapshot_and_delete_ebs_volume
+          pipeline_args = {
+            volume_id = param.volume_id
+            region    = param.region
+            cred      = param.cred
+          }
+          success_msg = "Snapshotted & Deleted EBS Volume ${param.title}."
+          error_msg   = "Error snapshotting & deleting EBS Volume ${param.title}."
         }
       }
     }
@@ -262,25 +275,27 @@ pipeline "correct_one_ebs_volume_exceeding_max_size" {
 }
 
 variable "ebs_volumes_exceeding_max_size_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "ebs_volumes_exceeding_max_size_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "ebs_volumes_exceeding_max_size_default_action" {
   type        = string
-  description = "The default action to take for EBS volumes exceeding maximum size."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "ebs_volumes_exceeding_max_size_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete_volume"]
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "delete_volume", "snapshot_and_delete_volume"]
 }
 
 variable "ebs_volumes_exceeding_max_size" {
