@@ -9,7 +9,7 @@ This query trigger identifies EMR clusters idle for more than 30 mins and then e
 By default, this trigger is disabled, but it can be configured by [setting the following variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables):
 - `emr_clusters_idle_30_mins_trigger_enabled` should be set to `true` as the default is `false`.
 - `emr_clusters_idle_30_mins_trigger_schedule` should be set to your preferred [schedule](https://flowpipe.io/docs/flowpipe-hcl/trigger/schedule#more-examples).
-- `emr_clusters_idle_30_mins_default_action` should be set to the desired action (e.g., `"notify"` for notifications or `"delete_cluster"` to delete the function).
+- `emr_clusters_idle_30_mins_default_action` should be set to the desired action (e.g., `"notify"` for notifications or `"terminate_cluster"` to terminate the cluster).
 
 Then starting the server:
 ```sh

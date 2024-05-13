@@ -56,9 +56,7 @@ pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
   title         = "Detect and correct EMR Clusters idle 30 mins"
   description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins.md")
-  tags          = merge(local.emr_common_tags, {
-    class = "unused" 
-  })
+  tags          = merge(local.emr_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
     type        = string
@@ -118,9 +116,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
   title         = "Correct EMR Clusters idle 30 mins"
   description   = "Runs corrective action on a collection of EMR clusters idle for more than 30 mins."
   documentation = file("./emr/docs/correct_emr_clusters_idle_30_mins.md")
-  tags          = merge(local.emr_common_tags, { 
-    class = "unused" 
-  })
+  tags          = merge(local.emr_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -176,15 +172,15 @@ pipeline "correct_emr_clusters_idle_30_mins" {
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_emr_cluster_idle_30_mins
     args            = {
-      title                      = each.value.title
-      id                         = each.value.id
-      region                     = each.value.region
-      cred                       = each.value.cred
-      notifier                   = param.notifier
-      notification_level         = param.notification_level
-      approvers                  = param.approvers
-      default_action             = param.default_action
-      enabled_actions            = param.enabled_actions
+      title              = each.value.title
+      id                 = each.value.id
+      region             = each.value.region
+      cred               = each.value.cred
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -275,8 +271,8 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           pipeline_ref  = local.aws_pipeline_terminate_emr_clusters
           pipeline_args = {
             cluster_ids = [param.id]
-            region       = param.region
-            cred         = param.cred
+            region      = param.region
+            cred        = param.cred
           }
           success_msg = "Deleted EMR cluster ${param.title}."
           error_msg   = "Error deleting EMR cluster ${param.title}."
