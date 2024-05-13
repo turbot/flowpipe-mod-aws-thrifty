@@ -81,12 +81,12 @@ pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
   step "pipeline" "respond" {
     pipeline = pipeline.correct_ebs_volumes_exceeding_max_size
     args = {
-      items                    = step.query.detect.rows
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      default_action           = param.default_action
-      enabled_actions          = param.enabled_actions
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -223,12 +223,12 @@ pipeline "correct_one_ebs_volume_exceeding_max_size" {
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected EBS volume ${param.title} exceeding maximum size."
-      default_action           = param.default_action
-      enabled_actions          = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected EBS volume ${param.title} exceeding maximum size."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"
@@ -243,11 +243,11 @@ pipeline "correct_one_ebs_volume_exceeding_max_size" {
           success_msg = "Skipped EBS volume ${param.title}."
           error_msg   = "Error skipping EBS volume ${param.title}."
         },
-        "delete_volume" = {
-          label        = "Delete Volume"
-          value        = "delete_volume"
+        "snapshot_and_delete_volume" = {
+          label        = "Snapshot & Delete Volume"
+          value        = "snapshot_and_delete_volume"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+          pipeline_ref = pipeline.snapshot_and_delete_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region

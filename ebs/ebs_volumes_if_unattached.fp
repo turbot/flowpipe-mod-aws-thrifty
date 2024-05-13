@@ -243,11 +243,11 @@ pipeline "correct_one_ebs_volume_if_unattached" {
           success_msg = "Skipped EBS volume ${param.title}."
           error_msg   = "Error skipping EBS volume ${param.title}."
         },
-        "delete_volume" = {
-          label        = "Delete Volume"
-          value        = "delete_volume"
+        "snapshot_and_delete_volume" = {
+          label        = "Snapshot & Delete Volume"
+          value        = "snapshot_and_delete_volume"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+          pipeline_ref = pipeline.snapshot_and_delete_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
