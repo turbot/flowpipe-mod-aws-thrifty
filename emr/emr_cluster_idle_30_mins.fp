@@ -34,8 +34,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
-  title         = "Detect and correct EMR Clusters idle 30 mins"
-  description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
+  title       = "Detect & correct EMR Clusters idle 30 mins"
+  description = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins_trigger.md")
   tags          = merge(local.emr_common_tags, { class = "unused" })
 
@@ -53,7 +53,7 @@ trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
 }
 
 pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
-  title         = "Detect and correct EMR Clusters idle 30 mins"
+  title         = "Detect & correct EMR Clusters idle 30 mins"
   description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./emr/docs/detect_and_correct_emr_clusters_idle_30_mins.md")
   tags          = merge(local.emr_common_tags, { class = "unused", type = "featured" })
