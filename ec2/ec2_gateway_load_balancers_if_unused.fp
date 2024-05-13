@@ -24,7 +24,7 @@ locals {
 
 trigger "query" "detect_and_correct_ec2_gateway_load_balancers_if_unused" {
   title       = "Detect & correct EC2 gateway load balancers if unused"
-  description = "Identifies EC2 gateway load balancers that are unused and executes the chosen action."
+  description = "Detects unused EC2 gayeway load balancers and runs your chosen action."
 
   enabled  = var.ec2_gateway_load_balancers_if_unused_trigger_enabled
   schedule = var.ec2_gateway_load_balancers_if_unused_trigger_schedule
@@ -41,7 +41,7 @@ trigger "query" "detect_and_correct_ec2_gateway_load_balancers_if_unused" {
 
 pipeline "detect_and_correct_ec2_gateway_load_balancers_if_unused" {
   title       = "Detect & correct EC2 gateway load balancers if unused"
-  description = "Identifies EC2 gateway load balancers that are unused and executes corrective actions."
+  description = "Detects unused EC2 gayeway load balancers and runs your chosen action."
 
   param "database" {
     type        = string
@@ -166,7 +166,7 @@ pipeline "correct_ec2_gateway_load_balancers_if_unused" {
 
 pipeline "correct_one_ec2_gateway_load_balancer_if_unused" {
   title       = "Correct one EC2 gateway load balancer if unused"
-  description = "Executes corrective action on a single EC2 gateway load balancer if unused."
+  description = "Runs corrective action on a single EC2 gateway load balancer if unused."
 
   param "title" {
     type        = string
@@ -260,23 +260,25 @@ pipeline "correct_one_ec2_gateway_load_balancer_if_unused" {
 }
 
 variable "ec2_gateway_load_balancers_if_unused_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "ec2_gateway_load_balancers_if_unused_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "ec2_gateway_load_balancers_if_unused_default_action" {
   type        = string
-  description = "The default response to use for unused EC2 gateway load balancers."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "ec2_gateway_load_balancers_if_unused_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete_load_balancer"]
 }

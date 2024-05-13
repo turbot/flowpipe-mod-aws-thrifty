@@ -104,6 +104,7 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
       region      = string
       cred        = string
     }))
+    description = local.description_items
   }
 
   param "notifier" {
@@ -262,24 +263,26 @@ pipeline "correct_one_ebs_snapshot_exceeding_max_age" {
 }
 
 variable "ebs_snapshots_exceeding_max_age_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "ebs_snapshots_exceeding_max_age_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "ebs_snapshots_exceeding_max_age_default_action" {
   type        = string
-  description = "The default action to take for EBS snapshots exceeding maximum age."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
 variable "ebs_snapshots_exceeding_max_age_enabled_actions" {
   type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
+  description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete_snapshot"]
 }
 

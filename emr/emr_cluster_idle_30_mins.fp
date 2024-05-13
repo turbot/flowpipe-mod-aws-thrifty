@@ -285,18 +285,20 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
 // Variable definitions
 
 variable "emr_clusters_idle_30_mins_trigger_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
 }
 
 variable "emr_clusters_idle_30_mins_trigger_schedule" {
-  type    = string
-  default = "15m"
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
 }
 
 variable "emr_clusters_idle_30_mins_default_action" {
   type        = string
-  description = "The default response to use for EMR clusters of previous generation instances."
+  description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
