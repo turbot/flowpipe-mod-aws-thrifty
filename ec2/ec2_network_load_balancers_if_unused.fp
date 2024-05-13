@@ -25,6 +25,8 @@ locals {
 trigger "query" "detect_and_correct_ec2_network_load_balancers_if_unused" {
   title       = "Detect & correct EC2 network load balancers if unused"
   description = "Detects EC2 network load balancers that are unused (not serving any targets) and runs your chosen action."
+  documentation = file("./ec2/docs/detect_and_correct_ec2_network_load_balancers_if_unused_trigger.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   enabled  = var.ec2_network_load_balancers_if_unused_trigger_enabled
   schedule = var.ec2_network_load_balancers_if_unused_trigger_schedule
@@ -42,6 +44,8 @@ trigger "query" "detect_and_correct_ec2_network_load_balancers_if_unused" {
 pipeline "detect_and_correct_ec2_network_load_balancers_if_unused" {
   title       = "Detect & correct EC2 network load balancers if unused"
   description = "Detects EC2 network load balancers that are unused (not serving any targets) and runs your chosen action."
+  documentation = file("./ec2/docs/detect_and_correct_ec2_network_load_balancers_if_unused.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -100,6 +104,8 @@ pipeline "detect_and_correct_ec2_network_load_balancers_if_unused" {
 pipeline "correct_ec2_network_load_balancers_if_unused" {
   title       = "Correct EC2 network load balancers if unused"
   description = "Runs corrective action on a collection of EC2 network load balancers that are unused (not serving any targets)."
+  documentation = file("./ec2/docs/correct_ec2_network_load_balancers_if_unused.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -171,6 +177,8 @@ pipeline "correct_ec2_network_load_balancers_if_unused" {
 pipeline "correct_one_ec2_network_load_balancer_if_unused" {
   title       = "Correct one EC2 network load balancer if unused"
   description = "Runs corrective action on an EC2 network load balancer that is unused (not serving any targets)."
+  documentation = file("./ec2/docs/correct_one_ec2_network_load_balancer_if_unused.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
     type        = string

@@ -15,6 +15,8 @@ locals {
 trigger "query" "detect_and_correct_ec2_instances_of_older_generation" {
   title       = "Detect & correct EC2 instances of older generation"
   description = "Detects older generation EC2 instances and runs your chosen action."
+  documentation = file("./ec2/docs/detect_and_correct_ec2_instances_of_older_generation.md")
+  tags          = merge(local.ec2_common_tags, { class = "deprecated" })
 
   enabled  = var.ec2_instances_of_older_generation_trigger_enabled
   schedule = var.ec2_instances_of_older_generation_trigger_schedule
@@ -32,9 +34,8 @@ trigger "query" "detect_and_correct_ec2_instances_of_older_generation" {
 pipeline "detect_and_correct_ec2_instances_of_older_generation" {
   title       = "Detect & correct EC2 instances of older generation"
   description = "Detects older generation EC2 instances and runs your chosen action."
-  // tags          = merge(local.ec2_common_tags, {
-  //   class = "unused"
-  // })
+  documentation = file("./ec2/docs/detect_and_correct_ec2_instances_of_older_generation.md")
+  tags          = merge(local.ec2_common_tags, { class = "deprecated" })
 
   param "database" {
     type        = string
@@ -93,9 +94,8 @@ pipeline "detect_and_correct_ec2_instances_of_older_generation" {
 pipeline "correct_ec2_instances_of_older_generation" {
   title       = "Correct EC2 instances of older generation"
   description = "Runs corrective action on a collection of older generation EC2 instances."
-  // tags          = merge(local.ec2_common_tags, {
-  //   class = "deprecated"
-  // })
+  documentation = file("./ec2/docs/correct_ec2_instances_of_older_generation.md")
+  tags          = merge(local.ec2_common_tags, { class = "deprecated" })
 
   param "items" {
     type = list(object({
@@ -167,7 +167,8 @@ pipeline "correct_ec2_instances_of_older_generation" {
 pipeline "correct_one_ec2_instance_older_generation" {
   title       = "Correct one EC2 instance of older generation"
   description = "Runs corrective action on a older generation EC2 instance."
-  // tags          = merge(local.ec2_common_tags, { class = "unused" })
+  documentation = file("./ec2/docs/correct_one_ec2_instance_older_generation.md")
+  tags          = merge(local.ec2_common_tags, { class = "deprecated" })
 
   param "title" {
     type        = string

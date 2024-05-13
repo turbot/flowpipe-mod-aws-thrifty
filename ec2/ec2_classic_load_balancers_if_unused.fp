@@ -15,6 +15,8 @@ locals {
 trigger "query" "detect_and_correct_ec2_classic_load_balancers_if_unused" {
   title       = "Detect and correct EC2 classic load balancers if unused"
   description = "Identifies EC2 classic load balancers that are unused and executes the chosen action."
+  documentation = file("./ec2/docs/detect_and_correct_ec2_classic_load_balancers_if_unused_trigger.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   enabled  = var.ec2_classic_load_balancers_if_unused_trigger_enabled
   schedule = var.ec2_classic_load_balancers_if_unused_trigger_schedule
@@ -32,6 +34,8 @@ trigger "query" "detect_and_correct_ec2_classic_load_balancers_if_unused" {
 pipeline "detect_and_correct_ec2_classic_load_balancers_if_unused" {
   title       = "Detect and correct EC2 classic load balancers if unused"
   description = "Identifies EC2 classic load balancers that are unused and executes corrective actions."
+  documentation = file("./ec2/docs/detect_and_correct_ec2_classic_load_balancers_if_unused.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -90,6 +94,8 @@ pipeline "detect_and_correct_ec2_classic_load_balancers_if_unused" {
 pipeline "correct_ec2_classic_load_balancers_if_unused" {
   title       = "Correct EC2 classic load balancers if unused"
   description = "Executes corrective actions on EC2 classic load balancers if unused."
+  documentation = file("./ec2/docs/correct_ec2_classic_load_balancers_if_unused.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -157,6 +163,8 @@ pipeline "correct_ec2_classic_load_balancers_if_unused" {
 pipeline "correct_one_ec2_classic_load_balancer_if_unused" {
   title       = "Correct one EC2 classic load balancer if unused"
   description = "Executes corrective action on a single EC2 classic load balancer if unused."
+  documentation = file("./ec2/docs/correct_one_ec2_classic_load_balancer_if_unused.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
     type        = string

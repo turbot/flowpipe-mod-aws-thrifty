@@ -16,6 +16,8 @@ locals {
 trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
   title       = "Detect and correct EC2 instances exceeding max age"
   description = "Identifies EC2 instances exceeding max age and executes the chosen action."
+  documentation = file("./ec2/docs/detect_and_correct_ec2_instances_exceeding_max_age_trigger.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   enabled  = var.ec2_instances_exceeding_max_age_trigger_enabled
   schedule = var.ec2_instances_exceeding_max_age_trigger_schedule
@@ -33,6 +35,8 @@ trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
 pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
   title       = "Detect and correct EC2 instances exceeding max age"
   description = "Identifies EC2 instances exceeding max age and executes corrective actions."
+  documentation = file("./ec2/docs/detect_and_correct_ec2_instances_exceeding_max_age.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "database" {
     type        = string
@@ -91,6 +95,8 @@ pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
 pipeline "correct_ec2_instances_exceeding_max_age" {
   title       = "Correct EC2 instances exceeding max age"
   description = "Executes corrective actions on EC2 instances exceeding max age."
+  documentation = file("./ec2/docs/correct_ec2_instances_exceeding_max_age.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "items" {
     type = list(object({
@@ -152,6 +158,8 @@ pipeline "correct_ec2_instances_exceeding_max_age" {
 pipeline "correct_one_ec2_instance_exceeding_max_age" {
   title       = "Correct one EC2 instance exceeding max age"
   description = "Executes corrective action on a single EC2 instance exceeding max age."
+  documentation = file("./ec2/docs/correct_one_ec2_instance_exceeding_max_age.md")
+  tags          = merge(local.ec2_common_tags, { class = "unused" })
 
   param "title" {
     type        = string
