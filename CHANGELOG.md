@@ -1,3 +1,9 @@
+## v0.2.0 [2024-05-17]
+
+_What's new?_
+
+- Added `Detect and Correct` pipeline for DynamoDB tables with stale data. ([#34](https://github.com/turbot/flowpipe-mod-aws-thrifty/pull/34))
+
 ## v0.1.0 [2024-05-13]
 
 _What's new?_
