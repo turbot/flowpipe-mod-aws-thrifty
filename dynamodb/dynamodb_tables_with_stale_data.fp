@@ -9,7 +9,7 @@ locals {
   from
     aws_dynamodb_table
   where
-    (current_timestamp - (${var.dynamodb_table_stale_data_max_days}::int || ' days')::interval) > (latest_stream_label::timestamp)
+    (current_timestamp - (${var.dynamodb_tables_with_stale_data_max_days}::int || ' days')::interval) > (latest_stream_label::timestamp)
   EOQ
 }
 
@@ -287,7 +287,7 @@ variable "dynamodb_tables_with_stale_data_enabled_actions" {
   default     = ["skip", "delete_table"]
 }
 
-variable "dynamodb_table_stale_data_max_days" {
+variable "dynamodb_tables_with_stale_data_max_days" {
   type        = number
   description = "The maximum number of days DynamoDB table stale data can be retained."
   default     = 90

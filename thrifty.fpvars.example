@@ -233,7 +233,7 @@ vpc_nat_gateways_if_unused_default_action   = "notify"
 vpc_nat_gateways_if_unused_enabled_actions  = ["skip", "delete"]
 
 # DynamoDB table with stale data
-dynamodb_table_stale_data_max_days = 90
+dynamodb_tables_with_stale_data_max_days = 90
 dynamodb_tables_with_stale_data_trigger_enabled  = false
 dynamodb_tables_with_stale_data_trigger_schedule = "15m"
 dynamodb_tables_with_stale_data_default_action   = "notify"
