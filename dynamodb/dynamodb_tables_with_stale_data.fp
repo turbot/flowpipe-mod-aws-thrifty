@@ -1,6 +1,6 @@
 locals {
 
-  dynamodb_table_stale_data_query = <<-EOQ
+  dynamodb_tables_with_stale_data_query = <<-EOQ
   select
     concat(name, ' [', region, '/', account_id, ']') as title,
     name,
@@ -13,29 +13,29 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_dynamodb_table_with_stale_data" {
+trigger "query" "detect_and_correct_dynamodb_tables_with_stale_data" {
   title         = "Detect & correct DynamoDB table with stale data"
   description   = "Detects DynamoDB tables with stale data and runs your chosen action."
-  documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_table_with_stale_data_trigger.md")
+  documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_tables_with_stale_data_trigger.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
-  enabled  = var.dynamodb_table_with_stale_data_trigger_enabled
-  schedule = var.dynamodb_table_with_stale_data_trigger_schedule
+  enabled  = var.dynamodb_tables_with_stale_data_trigger_enabled
+  schedule = var.dynamodb_tables_with_stale_data_trigger_schedule
   database = var.database
-  sql      = local.dynamodb_table_stale_data_query
+  sql      = local.dynamodb_tables_with_stale_data_query
 
   capture "insert" {
-    pipeline = pipeline.correct_dynamodb_table_with_stale_data
+    pipeline = pipeline.correct_dynamodb_tables_with_stale_data
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_dynamodb_table_with_stale_data" {
+pipeline "detect_and_correct_dynamodb_tables_with_stale_data" {
   title         = "Detect & correct DynamoDB tables with stale data"
   description   = "Detects DynamoDB tables with stale data and runs your chosen action."
-  documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_table_with_stale_data.md")
+  documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_tables_with_stale_data.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
@@ -65,22 +65,22 @@ pipeline "detect_and_correct_dynamodb_table_with_stale_data" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.dynamodb_table_with_stale_data_default_action
+    default     = var.dynamodb_tables_with_stale_data_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.dynamodb_table_with_stale_data_enabled_actions
+    default     = var.dynamodb_tables_with_stale_data_enabled_actions
   }
 
   step "query" "detect" {
     database = param.database
-    sql      = local.dynamodb_table_stale_data_query
+    sql      = local.dynamodb_tables_with_stale_data_query
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_dynamodb_table_with_stale_data
+    pipeline = pipeline.correct_dynamodb_tables_with_stale_data
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -92,10 +92,10 @@ pipeline "detect_and_correct_dynamodb_table_with_stale_data" {
   }
 }
 
-pipeline "correct_dynamodb_table_with_stale_data" {
+pipeline "correct_dynamodb_tables_with_stale_data" {
   title         = "Correct DynamoDB table with stale data"
   description   = "Runs corrective action on a collection of DynamoDB table with stale data."
-  documentation = file("./dynamodb/docs/correct_dynamodb_table_with_stale_data.md")
+  documentation = file("./dynamodb/docs/correct_dynamodb_tables_with_stale_data.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
   param "items" {
@@ -129,13 +129,13 @@ pipeline "correct_dynamodb_table_with_stale_data" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.dynamodb_table_with_stale_data_default_action
+    default     = var.dynamodb_tables_with_stale_data_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.dynamodb_table_with_stale_data_enabled_actions
+    default     = var.dynamodb_tables_with_stale_data_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -213,13 +213,13 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.dynamodb_table_with_stale_data_default_action
+    default     = var.dynamodb_tables_with_stale_data_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.dynamodb_table_with_stale_data_enabled_actions
+    default     = var.dynamodb_tables_with_stale_data_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -263,25 +263,25 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
   }
 }
 
-variable "dynamodb_table_with_stale_data_trigger_enabled" {
+variable "dynamodb_tables_with_stale_data_trigger_enabled" {
   type        = bool
   default     = false
   description = "If true, the trigger is enabled."
 }
 
-variable "dynamodb_table_with_stale_data_trigger_schedule" {
+variable "dynamodb_tables_with_stale_data_trigger_schedule" {
   type        = string
   default     = "15m"
   description = "The schedule on which to run the trigger if enabled."
 }
 
-variable "dynamodb_table_with_stale_data_default_action" {
+variable "dynamodb_tables_with_stale_data_default_action" {
   type        = string
   description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
-variable "dynamodb_table_with_stale_data_enabled_actions" {
+variable "dynamodb_tables_with_stale_data_enabled_actions" {
   type        = list(string)
   description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete_table"]
