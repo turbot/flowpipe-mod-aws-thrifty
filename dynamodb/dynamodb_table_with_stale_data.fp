@@ -9,7 +9,7 @@ locals {
   from
     aws_dynamodb_table
   where
-    (current_timestamp - (${var.dynamodb_table_stale_data_max_days}::int || ' days')::interval) > (latest_stream_label::timestamptz)
+    (current_timestamp - (${var.dynamodb_table_stale_data_max_days}::int || ' days')::interval) > (latest_stream_label::timestamp)
   EOQ
 }
 
@@ -228,7 +228,7 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected DynamoDB table with stale data  ${param.title}."
+      detect_msg         = "Detected DynamoDB table ${param.title} with stale data."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {

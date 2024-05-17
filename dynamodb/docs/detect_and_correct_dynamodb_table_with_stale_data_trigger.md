@@ -11,7 +11,7 @@ This query trigger detects unused health checks and then either sends a notifica
 By default, this trigger is disabled, however it can be configred by [setting the below variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables)
 - `dynamodb_table_with_stale_data_trigger_enabled` should be set to `true` as the default is `false`.
 - `dynamodb_table_with_stale_data_trigger_schedule` should be set to your desired running [schedule](https://flowpipe.io/docs/flowpipe-hcl/trigger/schedule#more-examples)
-- `dynamodb_table_with_stale_data_default_action` should be set to your desired action (i.e. `"notify"` for notifications or `"delete_table"` to delete the snapshot).
+- `dynamodb_table_with_stale_data_default_action` should be set to your desired action (i.e. `"notify"` for notifications or `"delete_table"` to delete the table).
 
 Then starting the server:
 ```sh
