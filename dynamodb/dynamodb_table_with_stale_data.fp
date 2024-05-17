@@ -14,8 +14,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_dynamodb_table_with_stale_data" {
-  title         = "Detect & correct DynamoDB table stale data exceeding max age"
-  description   = "Detects DynamoDB tables stale data  exceeding max age and runs your chosen action."
+  title         = "Detect & correct DynamoDB table with stale data"
+  description   = "Detects DynamoDB tables with stale data and runs your chosen action."
   documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_table_with_stale_data_trigger.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
@@ -33,8 +33,8 @@ trigger "query" "detect_and_correct_dynamodb_table_with_stale_data" {
 }
 
 pipeline "detect_and_correct_dynamodb_table_with_stale_data" {
-  title         = "Detect & correct DynamoDB tables stale data exceeding max age"
-  description   = "Detects DynamoDB tables stale data exceeding max age and runs your chosen action."
+  title         = "Detect & correct DynamoDB tables with stale data"
+  description   = "Detects DynamoDB tables with stale data and runs your chosen action."
   documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_table_with_stale_data.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused", type = "featured" })
 
@@ -93,8 +93,8 @@ pipeline "detect_and_correct_dynamodb_table_with_stale_data" {
 }
 
 pipeline "correct_dynamodb_table_with_stale_data" {
-  title         = "Correct DynamoDB table stale data exceeding max age"
-  description   = "Runs corrective action on a collection of DynamoDB table stale data exceeding max age."
+  title         = "Correct DynamoDB table with stale data"
+  description   = "Runs corrective action on a collection of DynamoDB table with stale data."
   documentation = file("./dynamodb/docs/correct_dynamodb_table_with_stale_data.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
@@ -141,7 +141,7 @@ pipeline "correct_dynamodb_table_with_stale_data" {
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
     notifier = notifier[param.notifier]
-    text     = "Detected ${length(param.items)} DynamoDB table stale data exceeding maximum age."
+    text     = "Detected ${length(param.items)} DynamoDB table with stale data."
   }
 
   step "transform" "items_by_id" {
@@ -167,8 +167,8 @@ pipeline "correct_dynamodb_table_with_stale_data" {
 }
 
 pipeline "correct_one_dynamodb_table_with_stale_data" {
-  title         = "Correct one DynamoDB table stale data exceeding max age"
-  description   = "Runs corrective action on an DynamoDB table stale data exceeding max age."
+  title         = "Correct one DynamoDB table with stale data"
+  description   = "Runs corrective action on an DynamoDB table with stale data."
   documentation = file("./dynamodb/docs/correct_one_dynamodb_table_with_stale_data.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
@@ -228,7 +228,7 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected DynamoDB table stale data  ${param.title} exceeding maximum age."
+      detect_msg         = "Detected DynamoDB table with stale data  ${param.title}."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {
@@ -240,7 +240,7 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped DynamoDB table ${param.title} exceeding maximum age."
+            text     = "Skipped DynamoDB table ${param.title} with stale data."
           }
           success_msg = ""
           error_msg   = ""

@@ -1,4 +1,4 @@
-# Correct one DynamoDB table stale data exceeding max age
+# Correct one DynamoDB table with stale data
 
 ## Overview
 
