@@ -6,4 +6,4 @@ DynamoDB tables can be quite costly to retain, it is also likely that after a ce
 
 This pipeline allows you to specify a single DynamoDB tables and then either send a notification or attempt to perform a predefined corrective action.
 
-Whilst it is possible to utilise this pipeline standalone, it is usually called from the [correct_dynamodb_table_stale_data_exceeding_max_age pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.correct_dynamodb_table_stale_data_exceeding_max_age).
+Whilst it is possible to utilise this pipeline standalone, it is usually called from the [correct_dynamodb_table_with_stale_data pipeline](https://hub.flowpipe.io/mods/turbot/aws_thrifty/pipelines/aws_thrifty.pipeline.correct_dynamodb_table_with_stale_data).

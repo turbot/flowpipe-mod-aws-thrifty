@@ -13,29 +13,29 @@ locals {
   EOQ
 }
 
-trigger "query" "detect_and_correct_dynamodb_table_stale_data_exceeding_max_age" {
+trigger "query" "detect_and_correct_dynamodb_table_with_stale_data" {
   title         = "Detect & correct DynamoDB table stale data exceeding max age"
   description   = "Detects DynamoDB tables stale data  exceeding max age and runs your chosen action."
-  documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_table_stale_data_exceeding_max_age_trigger.md")
+  documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_table_with_stale_data_trigger.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
-  enabled  = var.dynamodb_table_stale_data_exceeding_max_age_trigger_enabled
-  schedule = var.dynamodb_table_stale_data_exceeding_max_age_trigger_schedule
+  enabled  = var.dynamodb_table_with_stale_data_trigger_enabled
+  schedule = var.dynamodb_table_with_stale_data_trigger_schedule
   database = var.database
   sql      = local.dynamodb_table_stale_data_query
 
   capture "insert" {
-    pipeline = pipeline.correct_dynamodb_table_stale_data_exceeding_max_age
+    pipeline = pipeline.correct_dynamodb_table_with_stale_data
     args = {
       items = self.inserted_rows
     }
   }
 }
 
-pipeline "detect_and_correct_dynamodb_table_stale_data_exceeding_max_age" {
+pipeline "detect_and_correct_dynamodb_table_with_stale_data" {
   title         = "Detect & correct DynamoDB tables stale data exceeding max age"
   description   = "Detects DynamoDB tables stale data exceeding max age and runs your chosen action."
-  documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_table_stale_data_exceeding_max_age.md")
+  documentation = file("./dynamodb/docs/detect_and_correct_dynamodb_table_with_stale_data.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused", type = "featured" })
 
   param "database" {
@@ -65,13 +65,13 @@ pipeline "detect_and_correct_dynamodb_table_stale_data_exceeding_max_age" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.dynamodb_table_stale_data_exceeding_max_age_default_action
+    default     = var.dynamodb_table_with_stale_data_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.dynamodb_table_stale_data_exceeding_max_age_enabled_actions
+    default     = var.dynamodb_table_with_stale_data_enabled_actions
   }
 
   step "query" "detect" {
@@ -80,7 +80,7 @@ pipeline "detect_and_correct_dynamodb_table_stale_data_exceeding_max_age" {
   }
 
   step "pipeline" "respond" {
-    pipeline = pipeline.correct_dynamodb_table_stale_data_exceeding_max_age
+    pipeline = pipeline.correct_dynamodb_table_with_stale_data
     args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
@@ -92,10 +92,10 @@ pipeline "detect_and_correct_dynamodb_table_stale_data_exceeding_max_age" {
   }
 }
 
-pipeline "correct_dynamodb_table_stale_data_exceeding_max_age" {
+pipeline "correct_dynamodb_table_with_stale_data" {
   title         = "Correct DynamoDB table stale data exceeding max age"
   description   = "Runs corrective action on a collection of DynamoDB table stale data exceeding max age."
-  documentation = file("./dynamodb/docs/correct_dynamodb_table_stale_data_exceeding_max_age.md")
+  documentation = file("./dynamodb/docs/correct_dynamodb_table_with_stale_data.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
   param "items" {
@@ -129,13 +129,13 @@ pipeline "correct_dynamodb_table_stale_data_exceeding_max_age" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.dynamodb_table_stale_data_exceeding_max_age_default_action
+    default     = var.dynamodb_table_with_stale_data_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.dynamodb_table_stale_data_exceeding_max_age_enabled_actions
+    default     = var.dynamodb_table_with_stale_data_enabled_actions
   }
 
   step "message" "notify_detection_count" {
@@ -151,7 +151,7 @@ pipeline "correct_dynamodb_table_stale_data_exceeding_max_age" {
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
-    pipeline        = pipeline.correct_one_dynamodb_table_stale_data_exceeding_max_age
+    pipeline        = pipeline.correct_one_dynamodb_table_with_stale_data
     args = {
       title              = each.value.title
       name               = each.value.name
@@ -166,10 +166,10 @@ pipeline "correct_dynamodb_table_stale_data_exceeding_max_age" {
   }
 }
 
-pipeline "correct_one_dynamodb_table_stale_data_exceeding_max_age" {
+pipeline "correct_one_dynamodb_table_with_stale_data" {
   title         = "Correct one DynamoDB table stale data exceeding max age"
   description   = "Runs corrective action on an DynamoDB table stale data exceeding max age."
-  documentation = file("./dynamodb/docs/correct_one_dynamodb_table_stale_data_exceeding_max_age.md")
+  documentation = file("./dynamodb/docs/correct_one_dynamodb_table_with_stale_data.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
   param "title" {
@@ -213,13 +213,13 @@ pipeline "correct_one_dynamodb_table_stale_data_exceeding_max_age" {
   param "default_action" {
     type        = string
     description = local.description_default_action
-    default     = var.dynamodb_table_stale_data_exceeding_max_age_default_action
+    default     = var.dynamodb_table_with_stale_data_default_action
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
-    default     = var.dynamodb_table_stale_data_exceeding_max_age_enabled_actions
+    default     = var.dynamodb_table_with_stale_data_enabled_actions
   }
 
   step "pipeline" "respond" {
@@ -263,25 +263,25 @@ pipeline "correct_one_dynamodb_table_stale_data_exceeding_max_age" {
   }
 }
 
-variable "dynamodb_table_stale_data_exceeding_max_age_trigger_enabled" {
+variable "dynamodb_table_with_stale_data_trigger_enabled" {
   type        = bool
   default     = false
   description = "If true, the trigger is enabled."
 }
 
-variable "dynamodb_table_stale_data_exceeding_max_age_trigger_schedule" {
+variable "dynamodb_table_with_stale_data_trigger_schedule" {
   type        = string
   default     = "15m"
   description = "The schedule on which to run the trigger if enabled."
 }
 
-variable "dynamodb_table_stale_data_exceeding_max_age_default_action" {
+variable "dynamodb_table_with_stale_data_default_action" {
   type        = string
   description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
 }
 
-variable "dynamodb_table_stale_data_exceeding_max_age_enabled_actions" {
+variable "dynamodb_table_with_stale_data_enabled_actions" {
   type        = list(string)
   description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete_table"]
