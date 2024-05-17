@@ -169,7 +169,7 @@ pipeline "correct_dynamodb_table_stale_data_exceeding_max_age" {
 pipeline "correct_one_dynamodb_table_stale_data_exceeding_max_age" {
   title         = "Correct one DynamoDB table stale data exceeding max age"
   description   = "Runs corrective action on an DynamoDB table stale data exceeding max age."
-  // documentation = file("./dynamodb/docs/correct_one_dynamodb_table_stale_data_exceeding_max_age.md")
+  documentation = file("./dynamodb/docs/correct_one_dynamodb_table_stale_data_exceeding_max_age.md")
   tags          = merge(local.dynamodb_common_tags, { class = "unused" })
 
   param "title" {
@@ -228,7 +228,7 @@ pipeline "correct_one_dynamodb_table_stale_data_exceeding_max_age" {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
-      detect_msg         = "Detected Dynamodb table stale data  ${param.title} exceeding maximum age."
+      detect_msg         = "Detected DynamoDB table stale data  ${param.title} exceeding maximum age."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
       actions = {
@@ -240,7 +240,7 @@ pipeline "correct_one_dynamodb_table_stale_data_exceeding_max_age" {
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
-            text     = "Skipped Dynamodb table ${param.title} exceeding maximum age."
+            text     = "Skipped DynamoDB table ${param.title} exceeding maximum age."
           }
           success_msg = ""
           error_msg   = ""
@@ -255,8 +255,8 @@ pipeline "correct_one_dynamodb_table_stale_data_exceeding_max_age" {
             region      = param.region
             cred        = param.cred
           }
-          success_msg = "Deleted Dynamodb table ${param.title}."
-          error_msg   = "Error deleting Dynamodb table ${param.title}."
+          success_msg = "Deleted DynamoDB table ${param.title}."
+          error_msg   = "Error deleting DynamoDB table ${param.title}."
         }
       }
     }
