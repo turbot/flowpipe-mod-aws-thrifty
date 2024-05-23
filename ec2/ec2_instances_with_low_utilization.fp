@@ -53,7 +53,7 @@ locals {
         where
           fd.instance_family = c.instance_family
         and
-          fd.weight < (select weight from family_details where instance_type = c.instance_type)
+          fd.weight < (select weight from family_details where instance_type = c.instance_type limit 1)
         order by fd.weight desc
         limit 1),'') as suggested_type,
       region,
