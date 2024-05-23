@@ -57,5 +57,6 @@ locals {
   aws_pipeline_stop_ec2_instances           = aws.pipeline.stop_ec2_instances
   aws_pipeline_terminate_ec2_instances      = aws.pipeline.terminate_ec2_instances
   aws_pipeline_terminate_emr_clusters       = aws.pipeline.terminate_emr_clusters
+  aws_pipeline_update_ec2_instance_type     = pipeline.mock_update_ec2_instance_type // aws.pipeline.update_ec2_instance_type
   aws_pipeline_update_route53_record        = aws.pipeline.update_route53_record
 }
