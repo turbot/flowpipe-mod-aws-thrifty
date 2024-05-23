@@ -319,9 +319,9 @@ pipeline "correct_one_ec2_instance_with_low_utilization" {
     value = merge(
       step.transform.build_non_optional_actions.value,
       param.suggested_type == "" ? {} : {
-        "update_instance_type" = {
-          label        = "Update to ${param.suggested_type}"
-          value        = "update_instance_type"
+        "downgrade_instance_type" = {
+          label        = "Downgrade to ${param.suggested_type}"
+          value        = "downgrade_instance_type"
           style        = local.style_ok
           pipeline_ref = local.aws_pipeline_update_ec2_instance_type
           pipeline_args = {
@@ -330,8 +330,8 @@ pipeline "correct_one_ec2_instance_with_low_utilization" {
             region        = param.region
             cred          = param.cred
           }
-          success_msg = "Updated EC2 instance ${param.title} from ${param.current_type} to ${param.suggested_type}."
-          error_msg   = "Error updating EC2 instance ${param.title} type to ${param.suggested_type}."
+          success_msg = "Downgraded EC2 instance ${param.title} from ${param.current_type} to ${param.suggested_type}."
+          error_msg   = "Error downgrading EC2 instance ${param.title} type to ${param.suggested_type}."
         }
       }
     )
@@ -378,7 +378,7 @@ variable "ec2_instances_with_low_utilization_default_action" {
 variable "ec2_instances_with_low_utilization_enabled_actions" {
   type        = list(string)
   description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "stop_instance", "update_instance_type"]
+  default     = ["skip", "stop_instance", "downgrade_instance_type"]
 }
 
 pipeline "mock_update_ec2_instance_type" {
