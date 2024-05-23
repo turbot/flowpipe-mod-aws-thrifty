@@ -21,38 +21,40 @@ locals {
         i.region,
         i.account_id,
         i._ctx->'connection_name' as cred,
-        split_part(i.instance_type, '.', 1) as instance_family,
-        (it.v_cpu_info->'DefaultVCpus')::int as vcpu_count
+        split_part(i.instance_type, '.', 1) as instance_family
       from
         ec2_instance_utilization u
       left join
         aws_ec2_instance i
       on
         u.instance_id = i.instance_id
-      join
-        aws_ec2_instance_type it
-      on
-        i.instance_type = it.instance_type
     )
     ,distinct_families as (
       select distinct instance_family from ec2_instance_current
     )
     ,family_details as (
-      select instance_family, instance_type, (v_cpu_info->'DefaultVCpus')::int as vcpu_count
+      select
+        instance_family,
+        instance_type,
+        rank() over (
+          partition by instance_family
+          order by (v_cpu_info->'DefaultVCpus')::int asc, (memory_info->'SizeInMiB')::bigint asc
+        ) as weight
       from distinct_families
       join aws_ec2_instance_type on instance_type like instance_family || '.%'
     )
     select
-      concat(instance_id,' (', title, ') [', region, '/', account_id, ']') as title,
+      concat(instance_id,' (', title, ') [', instance_type, '/', region, '/', account_id, ']') as title,
       instance_id,
       instance_type as current_type,
-      coalesce((select instance_type
+      coalesce((
+        select instance_type
         from family_details fd
         where
           fd.instance_family = c.instance_family
         and
-          fd.vcpu_count < c.vcpu_count
-        order by fd.vcpu_count desc
+          fd.weight < (select weight from family_details where instance_type = c.instance_type)
+        order by fd.weight desc
         limit 1),'') as suggested_type,
       region,
       cred
