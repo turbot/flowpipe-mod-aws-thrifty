@@ -8,7 +8,7 @@ This query trigger detects non-graviton based instances and then either sends a 
 
 ### Getting Started
 
-By default, this trigger is disabled, however it can be configred by [setting the below variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables)
+By default, this trigger is disabled, however it can be configured by [setting the below variables](https://flowpipe.io/docs/build/mod-variables#passing-input-variables)
 - `rds_db_instances_without_graviton_trigger_enabled` should be set to `true` as the default is `false`.
 - `rds_db_instances_without_graviton_trigger_schedule` should be set to your desired running [schedule](https://flowpipe.io/docs/flowpipe-hcl/trigger/schedule#more-examples)
 - `rds_db_instances_without_graviton_default_action` should be set to your desired action (i.e. `"notify"` for notifications or `"delete_instance"` to delete the instance).
