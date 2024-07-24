@@ -1,3 +1,9 @@
+## v0.3.0 [2024-07-24]
+
+_What's new?_
+
+- The mod has been updated to run in the [Wizard mode](https://hub.flowpipe.io/mods/turbot/aws_thrifty#wizard) by default.
+
 ## v0.2.0 [2024-05-17]
 
 _What's new?_
