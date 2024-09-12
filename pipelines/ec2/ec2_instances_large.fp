@@ -14,8 +14,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_large" {
-  title       = "Detect & correct EC2 instances large"
-  description = "Identifies large EC2 instances and executes the chosen action."
+  title         = "Detect & correct EC2 instances large"
+  description   = "Identifies large EC2 instances and executes the chosen action."
   documentation = file("./pipelines/ec2/docs/detect_and_correct_ec2_instances_large_trigger.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -33,10 +33,10 @@ trigger "query" "detect_and_correct_ec2_instances_large" {
 }
 
 pipeline "detect_and_correct_ec2_instances_large" {
-  title       = "Detect & correct EC2 instances large"
-  description = "Detects large EC2 instances and runs your chosen action."
+  title         = "Detect & correct EC2 instances large"
+  description   = "Detects large EC2 instances and runs your chosen action."
   documentation = file("./pipelines/ec2/docs/detect_and_correct_ec2_instances_large.md")
-  tags          = merge(local.ec2_common_tags, { class = "unused", type = "featured" })
+  tags          = merge(local.ec2_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
     type        = string
@@ -93,8 +93,8 @@ pipeline "detect_and_correct_ec2_instances_large" {
 }
 
 pipeline "correct_ec2_instances_large" {
-  title       = "Correct EC2 instances large"
-  description = "Executes corrective actions on large EC2 instances."
+  title         = "Correct EC2 instances large"
+  description   = "Executes corrective actions on large EC2 instances."
   documentation = file("./pipelines/ec2/docs/correct_ec2_instances_large.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -166,8 +166,8 @@ pipeline "correct_ec2_instances_large" {
 }
 
 pipeline "correct_one_ec2_instance_large" {
-  title       = "Correct one EC2 instance large"
-  description = "Runs corrective action on a single large EC2 instance."
+  title         = "Correct one EC2 instance large"
+  description   = "Runs corrective action on a single large EC2 instance."
   documentation = file("./pipelines/ec2/docs/correct_one_ec2_instance_large.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 

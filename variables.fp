@@ -2,6 +2,20 @@ variable "database" {
   type        = string
   description = "Steampipe database connection string."
   default     = "postgres://steampipe@localhost:9193/steampipe"
+
+  tags        = {
+    folder = "Advanced/Global"
+  }
+}
+
+variable "max_concurrency" {
+  type        = number
+  description = "The maximum concurrency to use for responding to detection items."
+  default     = 1
+
+  tags        = {
+    folder = "Advanced/Global"
+  }
 }
 
 variable "notifier" {
@@ -20,10 +34,4 @@ variable "approvers" {
   type        = list(string)
   description = "List of notifiers to be used for obtaining action/approval decisions, when empty list will perform the default response associated with the detection."
   default     = ["default"]
-}
-
-variable "max_concurrency" {
-  type        = number
-  description = "The maximum concurrency to use for responding to detection items."
-  default     = 1
 }

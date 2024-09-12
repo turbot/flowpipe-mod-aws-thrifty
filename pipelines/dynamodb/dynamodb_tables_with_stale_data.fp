@@ -36,7 +36,7 @@ pipeline "detect_and_correct_dynamodb_tables_with_stale_data" {
   title         = "Detect & correct DynamoDB tables with stale data"
   description   = "Detects DynamoDB tables with stale data and runs your chosen action."
   documentation = file("./pipelines/dynamodb/docs/detect_and_correct_dynamodb_tables_with_stale_data.md")
-  tags          = merge(local.dynamodb_common_tags, { class = "unused", type = "featured" })
+  tags          = merge(local.dynamodb_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
     type        = string
@@ -100,10 +100,10 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
 
   param "items" {
     type = list(object({
-      title       = string
-      name        = string
-      region      = string
-      cred        = string
+      title  = string
+      name   = string
+      region = string
+      cred   = string
     }))
     description = local.description_items
   }
@@ -251,9 +251,9 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
           style        = local.style_alert
           pipeline_ref = local.aws_pipeline_delete_dynamodb_table
           pipeline_args = {
-            table_name  = param.name
-            region      = param.region
-            cred        = param.cred
+            table_name = param.name
+            region     = param.region
+            cred       = param.cred
           }
           success_msg = "Deleted DynamoDB table ${param.title}."
           error_msg   = "Error deleting DynamoDB table ${param.title}."

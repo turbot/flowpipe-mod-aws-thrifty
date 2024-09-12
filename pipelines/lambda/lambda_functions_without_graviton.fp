@@ -26,7 +26,7 @@ trigger "query" "detect_and_correct_lambda_functions_without_graviton" {
 
   capture "insert" {
     pipeline = pipeline.correct_lambda_functions_without_graviton
-    args     = {
+    args = {
       items = self.inserted_rows
     }
   }
@@ -36,7 +36,7 @@ pipeline "detect_and_correct_lambda_functions_without_graviton" {
   title         = "Detect & correct Lambda functions without graviton"
   description   = "Detects Lambda functions without graviton processor and runs your chosen action."
   documentation = file("./pipelines/lambda/docs/detect_and_correct_lambda_functions_without_graviton.md")
-  tags          = merge(local.lambda_common_tags, { class = "deprecated", type = "featured" })
+  tags          = merge(local.lambda_common_tags, { class = "deprecated", type = "recommended" })
 
   param "database" {
     type        = string
@@ -81,13 +81,13 @@ pipeline "detect_and_correct_lambda_functions_without_graviton" {
 
   step "pipeline" "respond" {
     pipeline = pipeline.correct_lambda_functions_without_graviton
-    args     = {
-      items               = step.query.detect.rows
-      notifier            = param.notifier
-      notification_level  = param.notification_level
-      approvers           = param.approvers
-      default_action      = param.default_action
-      enabled_actions     = param.enabled_actions
+    args = {
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -96,16 +96,16 @@ pipeline "correct_lambda_functions_without_graviton" {
   title         = "Correct Lambda functions without graviton"
   description   = "Runs corrective action on a collection of Lambda functions without graviton."
   documentation = file("./pipelines/lambda/docs/correct_lambda_functions_without_graviton.md")
-  tags          = merge(local.lambda_common_tags, { 
-    class = "deprecated" 
+  tags = merge(local.lambda_common_tags, {
+    class = "deprecated"
   })
 
   param "items" {
     type = list(object({
-      title       = string
-      name        = string
-      region      = string
-      cred        = string
+      title  = string
+      name   = string
+      region = string
+      cred   = string
     }))
   }
 
@@ -146,14 +146,14 @@ pipeline "correct_lambda_functions_without_graviton" {
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.name => row }
+    value = { for row in param.items : row.name => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_lambda_function_without_graviton
-    args            = {
+    args = {
       title              = each.value.title
       name               = each.value.name
       region             = each.value.region
@@ -225,19 +225,19 @@ pipeline "correct_one_lambda_function_without_graviton" {
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
-    args     = {
+    args = {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
       detect_msg         = "Detected Lambda function ${param.title} without graviton."
       default_action     = param.default_action
       enabled_actions    = param.enabled_actions
-      actions   = {
+      actions = {
         "skip" = {
-          label  = "Skip"
-          value  = "skip"
-          style  = local.style_info
-          pipeline_ref  = local.pipeline_optional_message
+          label        = "Skip"
+          value        = "skip"
+          style        = local.style_info
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -247,10 +247,10 @@ pipeline "correct_one_lambda_function_without_graviton" {
           error_msg   = "Error skipping Lambda function ${param.title}."
         },
         "delete_function" = {
-          label  = "Delete Function"
-          value  = "delete_function"
-          style  = local.style_alert
-          pipeline_ref  = local.aws_pipeline_delete_lambda_function
+          label        = "Delete Function"
+          value        = "delete_function"
+          style        = local.style_alert
+          pipeline_ref = local.aws_pipeline_delete_lambda_function
           pipeline_args = {
             function_name = [param.name]
             region        = param.region

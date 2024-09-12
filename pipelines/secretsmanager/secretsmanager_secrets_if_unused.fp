@@ -13,8 +13,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_secretsmanager_secrets_if_unused" {
-  title       = "Detect & correct SecretsManager secrets if unused"
-  description = "Detects SecretsManager secrets that are unused (not accessed in last n days) and runs your chosen action."
+  title         = "Detect & correct SecretsManager secrets if unused"
+  description   = "Detects SecretsManager secrets that are unused (not accessed in last n days) and runs your chosen action."
   documentation = file("./pipelines/secretsmanager/docs/detect_and_correct_secretsmanager_secrets_if_unused_trigger.md")
   tags          = merge(local.secretsmanager_common_tags, { class = "unused" })
 
@@ -25,7 +25,7 @@ trigger "query" "detect_and_correct_secretsmanager_secrets_if_unused" {
 
   capture "insert" {
     pipeline = pipeline.correct_secretsmanager_secrets_if_unused
-    args     = {
+    args = {
       items = self.inserted_rows
     }
   }
@@ -35,7 +35,7 @@ pipeline "detect_and_correct_secretsmanager_secrets_if_unused" {
   title         = "Detect & correct SecretsManager secrets if unused"
   description   = "Detects SecretsManager secrets that are unused (not accessed in last n days) and runs your chosen action."
   documentation = file("./pipelines/secretsmanager/docs/detect_and_correct_secretsmanager_secrets_if_unused.md")
-  tags          = merge(local.secretsmanager_common_tags, { class = "unused", type = "featured" })
+  tags          = merge(local.secretsmanager_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
     type        = string
@@ -80,7 +80,7 @@ pipeline "detect_and_correct_secretsmanager_secrets_if_unused" {
 
   step "pipeline" "respond" {
     pipeline = pipeline.correct_secretsmanager_secrets_if_unused
-    args     = {
+    args = {
       items              = step.query.detect.rows
       notifier           = param.notifier
       notification_level = param.notification_level
@@ -150,7 +150,7 @@ pipeline "correct_secretsmanager_secrets_if_unused" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_secretsmanager_secret_if_unused
-    args            = {
+    args = {
       title              = each.value.title
       name               = each.value.name
       region             = each.value.region
@@ -222,13 +222,13 @@ pipeline "correct_one_secretsmanager_secret_if_unused" {
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
-    args     = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_if_unused_days} days."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+    args = {
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected SecretsManager secret ${param.title} unused for ${var.secretsmanager_secrets_if_unused_days} days."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"

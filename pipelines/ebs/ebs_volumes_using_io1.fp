@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ebs_volumes_using_io1" {
   title         = "Detect & correct EBS volumes using io1"
   description   = "Detects EBS volumes using io1 and runs the chosen corrective action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_volumes_using_io1.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated", type = "featured" })
+  tags          = merge(local.ebs_common_tags, { class = "deprecated", type = "recommended" })
 
   param "database" {
     type        = string

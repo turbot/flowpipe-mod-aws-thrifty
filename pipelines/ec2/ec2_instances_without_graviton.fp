@@ -14,8 +14,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_instances_without_graviton" {
-  title       = "Detect & correct EC2 instances without graviton"
-  description = "Detects EC2 instances without graviton processor and runs your chosen action."
+  title         = "Detect & correct EC2 instances without graviton"
+  description   = "Detects EC2 instances without graviton processor and runs your chosen action."
   documentation = file("./pipelines/ec2/docs/detect_and_correct_ec2_instances_without_graviton_trigger.md")
   tags          = merge(local.ec2_common_tags, { class = "deprecated" })
 
@@ -33,10 +33,10 @@ trigger "query" "detect_and_correct_ec2_instances_without_graviton" {
 }
 
 pipeline "detect_and_correct_ec2_instances_without_graviton" {
-  title       = "Detect & correct EC2 instances without graviton"
-  description = "Detects EC2 instances without graviton processor and runs your chosen action."
+  title         = "Detect & correct EC2 instances without graviton"
+  description   = "Detects EC2 instances without graviton processor and runs your chosen action."
   documentation = file("./pipelines/ec2/docs/detect_and_correct_ec2_instances_without_graviton.md")
-  tags          = merge(local.ec2_common_tags, { class = "deprecated", type = "featured" })
+  tags          = merge(local.ec2_common_tags, { class = "deprecated", type = "recommended" })
 
   param "database" {
     type        = string
@@ -93,8 +93,8 @@ pipeline "detect_and_correct_ec2_instances_without_graviton" {
 }
 
 pipeline "correct_ec2_instances_without_graviton" {
-  title       = "Correct EC2 instances without graviton"
-  description = "Runs corrective action on a collection of EC2 instances without graviton processor."
+  title         = "Correct EC2 instances without graviton"
+  description   = "Runs corrective action on a collection of EC2 instances without graviton processor."
   documentation = file("./pipelines/ec2/docs/correct_ec2_instances_without_graviton.md")
   tags          = merge(local.ec2_common_tags, { class = "deprecated" })
 
@@ -166,8 +166,8 @@ pipeline "correct_ec2_instances_without_graviton" {
 }
 
 pipeline "correct_one_ec2_instance_without_graviton" {
-  title       = "Correct one EC2 instance without graviton"
-  description = "Runs corrective action on an EC2 instance without graviton processor."
+  title         = "Correct one EC2 instance without graviton"
+  description   = "Runs corrective action on an EC2 instance without graviton processor."
   documentation = file("./pipelines/ec2/docs/correct_one_ec2_instance_without_graviton.md")
   tags          = merge(local.ec2_common_tags, { class = "deprecated" })
 

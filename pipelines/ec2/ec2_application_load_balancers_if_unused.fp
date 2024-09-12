@@ -23,8 +23,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_ec2_application_load_balancers_if_unused" {
-  title       = "Detect & correct EC2 application load balancers if unused"
-  description = "Detects unused EC2 application load balancers and runs your chosen action."
+  title         = "Detect & correct EC2 application load balancers if unused"
+  description   = "Detects unused EC2 application load balancers and runs your chosen action."
   documentation = file("./pipelines/ec2/docs/detect_and_correct_ec2_application_load_balancers_if_unused_trigger.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -43,10 +43,10 @@ trigger "query" "detect_and_correct_ec2_application_load_balancers_if_unused" {
 }
 
 pipeline "detect_and_correct_ec2_application_load_balancers_if_unused" {
-  title       = "Detect & correct EC2 application load balancers if unused"
-  description = "Detects unused EC2 application load balancers and runs your chosen action."
+  title         = "Detect & correct EC2 application load balancers if unused"
+  description   = "Detects unused EC2 application load balancers and runs your chosen action."
   documentation = file("./pipelines/ec2/docs/detect_and_correct_ec2_application_load_balancers_if_unused.md")
-  tags          = merge(local.ec2_common_tags, { class = "unused", type = "featured" })
+  tags          = merge(local.ec2_common_tags, { class = "unused", type = "recommended" })
 
 
   param "database" {
@@ -104,8 +104,8 @@ pipeline "detect_and_correct_ec2_application_load_balancers_if_unused" {
 }
 
 pipeline "correct_ec2_application_load_balancers_if_unused" {
-  title       = "Correct EC2 application load balancers if unused"
-  description = "Executes corrective actions on EC2 application load balancers if unused."
+  title         = "Correct EC2 application load balancers if unused"
+  description   = "Executes corrective actions on EC2 application load balancers if unused."
   documentation = file("./pipelines/ec2/docs/correct_ec2_application_load_balancers_if_unused.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 
@@ -173,8 +173,8 @@ pipeline "correct_ec2_application_load_balancers_if_unused" {
 }
 
 pipeline "correct_one_ec2_application_load_balancer_if_unused" {
-  title       = "Correct one EC2 application load balancer if unused"
-  description = "Runs corrective action on a single EC2 application load balancer if unused."
+  title         = "Correct one EC2 application load balancer if unused"
+  description   = "Runs corrective action on a single EC2 application load balancer if unused."
   documentation = file("./pipelines/ec2/docs/correct_one_ec2_application_load_balancer_if_unused.md")
   tags          = merge(local.ec2_common_tags, { class = "unused" })
 

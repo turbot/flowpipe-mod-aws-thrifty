@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ebs_volumes_exceeding_max_size" {
   title         = "Detect & correct EBS volumes exceeding max size"
   description   = "Detects EBS volumes exceeding maximum size and runs your chosen action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_volumes_exceeding_max_size.md")
-  tags          = merge(local.ebs_common_tags, { class = "managed", type = "featured" })
+  tags          = merge(local.ebs_common_tags, { class = "managed", type = "recommended" })
 
   param "database" {
     type        = string

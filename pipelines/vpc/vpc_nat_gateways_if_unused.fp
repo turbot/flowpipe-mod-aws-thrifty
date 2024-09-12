@@ -46,7 +46,7 @@ pipeline "detect_and_correct_vpc_nat_gateways_if_unused" {
   title         = "Detect & correct VPC NAT gateways if unused"
   description   = "Detects unused NAT gateways and runs your chosen action."
   documentation = file("./pipelines/vpc/docs/detect_and_correct_vpc_nat_gateways_if_unused.md")
-  tags          = merge(local.vpc_common_tags, { class = "unused", type = "featured" })
+  tags          = merge(local.vpc_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
     type        = string

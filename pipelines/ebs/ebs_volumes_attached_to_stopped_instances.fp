@@ -54,7 +54,7 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
   title         = "Detect & correct EBS volumes attached to stopped instances"
   description   = "Detects EBS volumes attached to stopped instances and runs your chosen action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_volumes_attached_to_stopped_instances.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused", type = "featured" })
+  tags          = merge(local.ebs_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
     type        = string

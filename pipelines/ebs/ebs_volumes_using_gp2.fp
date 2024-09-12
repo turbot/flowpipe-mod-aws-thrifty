@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ebs_volumes_using_gp2" {
   title         = "Detect & correct EBS volumes using gp2"
   description   = "Detects EBS volumes using gp2 and performs the chosen action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated", type = "featured" })
+  tags          = merge(local.ebs_common_tags, { class = "deprecated", type = "recommended" })
 
   param "database" {
     type        = string
@@ -223,12 +223,12 @@ pipeline "correct_one_ebs_volume_using_gp2" {
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier                 = param.notifier
-      notification_level       = param.notification_level
-      approvers                = param.approvers
-      detect_msg               = "Detected EBS volume ${param.title} using gp2."
-      default_action  = param.default_action
-      enabled_actions = param.enabled_actions
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      detect_msg         = "Detected EBS volume ${param.title} using gp2."
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
           label        = "Skip"

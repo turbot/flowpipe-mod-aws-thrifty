@@ -35,7 +35,7 @@ pipeline "detect_and_correct_rds_db_instances_of_older_generation" {
   title         = "Detect & correct RDS DB instances of older generation"
   description   = "Detects older generation RDS DB instances and runs your chosen action."
   documentation = file("./pipelines/rds/docs/detect_and_correct_rds_db_instances_of_older_generation.md")
-  tags          = merge(local.rds_common_tags, { class = "deprecated", type = "featured" })
+  tags          = merge(local.rds_common_tags, { class = "deprecated", type = "recommended" })
 
   param "database" {
     type        = string

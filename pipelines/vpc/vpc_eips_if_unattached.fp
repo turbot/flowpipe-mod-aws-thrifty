@@ -35,7 +35,7 @@ pipeline "detect_and_correct_vpc_eips_if_unattached" {
   title         = "Detect & correct VPC EIPs if unattached"
   description   = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
   documentation = file("./pipelines/vpc/docs/detect_and_correct_vpc_eips_if_unattached.md")
-  tags          = merge(local.vpc_common_tags, { class = "unused", type = "featured" })
+  tags          = merge(local.vpc_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
     type        = string
@@ -235,10 +235,10 @@ pipeline "correct_one_vpc_eip_if_unattached" {
       enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
-          label         = "Skip"
-          value         = "skip"
-          style         = local.style_info
-          pipeline_ref  = local.pipeline_optional_message
+          label        = "Skip"
+          value        = "skip"
+          style        = local.style_info
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -248,10 +248,10 @@ pipeline "correct_one_vpc_eip_if_unattached" {
           error_msg   = ""
         },
         "release" = {
-          label         = "Release"
-          value         = "release"
-          style         = local.style_ok
-          pipeline_ref  = local.aws_pipeline_release_eip
+          label        = "Release"
+          value        = "release"
+          style        = local.style_ok
+          pipeline_ref = local.aws_pipeline_release_eip
           pipeline_args = {
             allocation_id = param.allocation_id
             region        = param.region

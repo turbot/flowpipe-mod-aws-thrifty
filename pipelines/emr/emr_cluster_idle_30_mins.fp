@@ -34,8 +34,8 @@ locals {
 }
 
 trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
-  title       = "Detect & correct EMR Clusters idle 30 mins"
-  description = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
+  title         = "Detect & correct EMR Clusters idle 30 mins"
+  description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./pipelines/emr/docs/detect_and_correct_emr_clusters_idle_30_mins_trigger.md")
   tags          = merge(local.emr_common_tags, { class = "unused" })
 
@@ -46,7 +46,7 @@ trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
 
   capture "insert" {
     pipeline = pipeline.correct_emr_clusters_idle_30_mins
-    args     = {
+    args = {
       items = self.inserted_rows
     }
   }
@@ -56,7 +56,7 @@ pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
   title         = "Detect & correct EMR Clusters idle 30 mins"
   description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./pipelines/emr/docs/detect_and_correct_emr_clusters_idle_30_mins.md")
-  tags          = merge(local.emr_common_tags, { class = "unused", type = "featured" })
+  tags          = merge(local.emr_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
     type        = string
@@ -101,13 +101,13 @@ pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
 
   step "pipeline" "respond" {
     pipeline = pipeline.correct_emr_clusters_idle_30_mins
-    args     = {
-      items                     = step.query.detect.rows
-      notifier                  = param.notifier
-      notification_level        = param.notification_level
-      approvers                 = param.approvers
-      default_action            = param.default_action
-      enabled_actions  = param.enabled_actions
+    args = {
+      items              = step.query.detect.rows
+      notifier           = param.notifier
+      notification_level = param.notification_level
+      approvers          = param.approvers
+      default_action     = param.default_action
+      enabled_actions    = param.enabled_actions
     }
   }
 }
@@ -120,10 +120,10 @@ pipeline "correct_emr_clusters_idle_30_mins" {
 
   param "items" {
     type = list(object({
-      title       = string
-      id          = string
-      region      = string
-      cred        = string
+      title  = string
+      id     = string
+      region = string
+      cred   = string
     }))
   }
 
@@ -164,14 +164,14 @@ pipeline "correct_emr_clusters_idle_30_mins" {
   }
 
   step "transform" "items_by_id" {
-    value = {for row in param.items : row.id => row }
+    value = { for row in param.items : row.id => row }
   }
 
   step "pipeline" "correct_item" {
     for_each        = step.transform.items_by_id.value
     max_concurrency = var.max_concurrency
     pipeline        = pipeline.correct_one_emr_cluster_idle_30_mins
-    args            = {
+    args = {
       title              = each.value.title
       id                 = each.value.id
       region             = each.value.region
@@ -243,7 +243,7 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
 
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
-    args     = {
+    args = {
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -252,10 +252,10 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
       enabled_actions    = param.enabled_actions
       actions = {
         "skip" = {
-          label         = "Skip"
-          value         = "skip"
-          style         = local.style_info
-          pipeline_ref  = local.pipeline_optional_message
+          label        = "Skip"
+          value        = "skip"
+          style        = local.style_info
+          pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -265,10 +265,10 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           error_msg   = "Error skipping EMR cluster ${param.title}."
         },
         "delete_cluster" = {
-          label  = "Delete Cluster"
-          value  = "delete_cluster"
-          style  = local.style_alert
-          pipeline_ref  = local.aws_pipeline_terminate_emr_clusters
+          label        = "Delete Cluster"
+          value        = "delete_cluster"
+          style        = local.style_alert
+          pipeline_ref = local.aws_pipeline_terminate_emr_clusters
           pipeline_args = {
             cluster_ids = [param.id]
             region      = param.region

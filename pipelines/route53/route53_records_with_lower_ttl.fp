@@ -38,7 +38,7 @@ pipeline "detect_and_correct_route53_records_with_lower_ttl" {
   title         = "Detect & correct Route53 records with lower TTL"
   description   = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
   documentation = file("./pipelines/route53/docs/detect_and_correct_route53_records_with_lower_ttl.md")
-  tags          = merge(local.route53_common_tags, { class = "higher", type = "featured" })
+  tags          = merge(local.route53_common_tags, { class = "higher", type = "recommended" })
 
   param "database" {
     type        = string
@@ -174,8 +174,8 @@ pipeline "correct_route53_records_with_lower_ttl" {
 }
 
 pipeline "correct_one_route53_record_with_lower_ttl" {
-  title       = "Correct one Route53 record with lower TTL"
-  description = "Runs corrective action on a Route53 record with TTL lower than 3600 seconds."
+  title         = "Correct one Route53 record with lower TTL"
+  description   = "Runs corrective action on a Route53 record with TTL lower than 3600 seconds."
   documentation = file("./pipelines/route53/docs/correct_one_route53_record_with_lower_ttl.md")
   tags          = merge(local.route53_common_tags, { class = "higher" })
 
