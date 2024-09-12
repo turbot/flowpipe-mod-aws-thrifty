@@ -266,6 +266,9 @@ variable "ebs_volumes_using_io1_trigger_enabled" {
   type        = bool
   default     = false
   description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/EBS"
+  }
 }
 
 variable "ebs_volumes_using_io1_trigger_schedule" {

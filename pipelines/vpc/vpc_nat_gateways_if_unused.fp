@@ -277,22 +277,34 @@ variable "vpc_nat_gateways_if_unused_trigger_enabled" {
   type        = bool
   default     = false
   description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/VPC"
+  }
 }
 
 variable "vpc_nat_gateways_if_unused_trigger_schedule" {
   type        = string
   default     = "15m"
   description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/VPC"
+  }
 }
 
 variable "vpc_nat_gateways_if_unused_default_action" {
   type        = string
   description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
+  tags = {
+    folder = "Advanced/VPC"
+  }
 }
 
 variable "vpc_nat_gateways_if_unused_enabled_actions" {
   type        = list(string)
   description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "delete"]
+  tags = {
+    folder = "Advanced/VPC"
+  }
 }
