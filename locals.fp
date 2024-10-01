@@ -21,6 +21,7 @@ locals {
 locals {
   description_database         = "Database connection string."
   description_approvers        = "List of notifiers to be used for obtaining action/approval decisions."
+  description_connection       = "Name of the AWS connection to be used for any authenticated actions."
   description_credential       = "Name of the credential to be used for any authenticated actions."
   description_region           = "AWS Region of the resource(s)."
   description_title            = "Title of the resource, to be used as a display name."
@@ -52,7 +53,6 @@ locals {
   aws_pipeline_delete_secretsmanager_secret = aws.pipeline.delete_secretsmanager_secret
   aws_pipeline_detach_ebs_volume            = aws.pipeline.detach_ebs_volume
   aws_pipeline_modify_ebs_volume            = aws.pipeline.modify_ebs_volume
-  aws_pipeline_put_s3_lifecycle_policy      = aws.pipeline.put_s3_bucket_lifecycle_policy
   aws_pipeline_release_eip                  = aws.pipeline.release_eip
   aws_pipeline_stop_ec2_instances           = aws.pipeline.stop_ec2_instances
   aws_pipeline_terminate_ec2_instances      = aws.pipeline.terminate_ec2_instances
