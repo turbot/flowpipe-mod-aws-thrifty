@@ -125,10 +125,10 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   tags          = merge(local.s3_common_tags, { class = "managed", type = "recommended" })
 
   param "database" {
-    type        = connection.steampipe_pg
+    type        = connection.steampipe
     #type        = string
     description = local.description_database
-    default     = connection.steampipe_pg.default
+    default     = connection.steampipe.default
     # TODO: Switch back to var once they support the new types
     #default     = var.database
   }
