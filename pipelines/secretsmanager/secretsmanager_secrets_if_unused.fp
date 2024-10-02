@@ -38,13 +38,13 @@ pipeline "detect_and_correct_secretsmanager_secrets_if_unused" {
   tags          = merge(local.secretsmanager_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
-    type        = string
+    type        = connection.steampipe
     description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -56,7 +56,7 @@ pipeline "detect_and_correct_secretsmanager_secrets_if_unused" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -107,7 +107,7 @@ pipeline "correct_secretsmanager_secrets_if_unused" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -119,7 +119,7 @@ pipeline "correct_secretsmanager_secrets_if_unused" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -191,7 +191,7 @@ pipeline "correct_one_secretsmanager_secret_if_unused" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -203,7 +203,7 @@ pipeline "correct_one_secretsmanager_secret_if_unused" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }

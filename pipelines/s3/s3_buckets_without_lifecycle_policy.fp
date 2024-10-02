@@ -8,7 +8,8 @@ locals {
   from
     aws_s3_bucket
   where
-    lifecycle_rules is null;
+    name = 'cody-test-actor-1'
+    and lifecycle_rules is null;
   EOQ
 }
 
@@ -126,11 +127,8 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 
   param "database" {
     type        = connection.steampipe_pg
-    #type        = string
     description = local.description_database
-    default     = connection.steampipe_pg.default
-    # TODO: Switch back to var once they support the new types
-    #default     = var.database
+    default     = var.database
   }
 
   param "policy" {
@@ -142,9 +140,8 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   param "notifier" {
     type        = notifier
     description = local.description_notifier
-    default     = notifier.default
-    # TODO: Switch back to var once they support the new types
-    #default     = var.notifier
+    #default     = notifier.default
+    default     = var.notifier
   }
 
   param "notification_level" {
@@ -156,9 +153,8 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    default     = [notifier.default]
-    # TODO: Switch back to var once they support the new types
-    #default     = var.approvers
+    #default     = [notifier.default]
+    default     = var.approvers
   }
 
   param "default_action" {
@@ -216,9 +212,8 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   param "notifier" {
     type        = notifier
     description = local.description_notifier
-    default     = notifier.default
-    # TODO: Switch back to var once they support the new types
-    #default     = var.notifier
+    #default     = notifier.default
+    default     = var.notifier
   }
 
   param "notification_level" {
@@ -230,9 +225,8 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    default     = [notifier.default]
-    # TODO: Switch back to var once they support the new types
-    #default     = var.approvers
+    #default     = [notifier.default]
+    default     = var.approvers
   }
 
   param "default_action" {
@@ -311,9 +305,8 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   param "notifier" {
     type        = notifier
     description = local.description_notifier
-    default     = notifier.default
-    # TODO: Switch back to var once they support the new types
-    #default     = var.notifier
+    #default     = notifier.default
+    default     = var.notifier
   }
 
   param "notification_level" {
@@ -325,9 +318,8 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    default     = [notifier.default]
-    # TODO: Switch back to var once they support the new types
-    #default     = var.approvers
+    #default     = [notifier.default]
+    default     = var.approvers
   }
 
   param "default_action" {

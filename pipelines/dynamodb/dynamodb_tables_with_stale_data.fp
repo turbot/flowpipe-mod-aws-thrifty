@@ -39,13 +39,13 @@ pipeline "detect_and_correct_dynamodb_tables_with_stale_data" {
   tags          = merge(local.dynamodb_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
-    type        = string
+    type        = connection.steampipe
     description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -57,7 +57,7 @@ pipeline "detect_and_correct_dynamodb_tables_with_stale_data" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -109,7 +109,7 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -121,7 +121,7 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -193,7 +193,7 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -205,7 +205,7 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }

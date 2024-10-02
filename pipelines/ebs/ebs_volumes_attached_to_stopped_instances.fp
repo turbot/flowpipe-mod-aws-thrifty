@@ -57,13 +57,13 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
   tags          = merge(local.ebs_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
-    type        = string
+    type        = connection.steampipe
     description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -75,7 +75,7 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -126,7 +126,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -138,7 +138,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -210,7 +210,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -222,7 +222,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
