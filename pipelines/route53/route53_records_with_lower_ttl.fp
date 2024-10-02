@@ -41,13 +41,13 @@ pipeline "detect_and_correct_route53_records_with_lower_ttl" {
   tags          = merge(local.route53_common_tags, { class = "higher", type = "recommended" })
 
   param "database" {
-    type        = string
+    type        = connection.steampipe
     description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -59,7 +59,7 @@ pipeline "detect_and_correct_route53_records_with_lower_ttl" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -113,7 +113,7 @@ pipeline "correct_route53_records_with_lower_ttl" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -125,7 +125,7 @@ pipeline "correct_route53_records_with_lower_ttl" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -215,7 +215,7 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -227,7 +227,7 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }

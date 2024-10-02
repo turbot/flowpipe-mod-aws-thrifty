@@ -55,13 +55,13 @@ pipeline "detect_and_correct_rds_db_instances_with_low_connection_count" {
   tags          = merge(local.rds_common_tags, { class = "unused", type = "recommended" })
 
   param "database" {
-    type        = string
+    type        = connection.steampipe
     description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -73,7 +73,7 @@ pipeline "detect_and_correct_rds_db_instances_with_low_connection_count" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -124,7 +124,7 @@ pipeline "correct_rds_db_instances_with_low_connection_count" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -136,7 +136,7 @@ pipeline "correct_rds_db_instances_with_low_connection_count" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
@@ -208,7 +208,7 @@ pipeline "correct_one_rds_db_instance_with_low_connection_count" {
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -220,7 +220,7 @@ pipeline "correct_one_rds_db_instance_with_low_connection_count" {
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
