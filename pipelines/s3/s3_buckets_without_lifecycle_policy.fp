@@ -137,12 +137,14 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
     default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
+  /*
   param "notifier" {
     type        = notifier
     description = local.description_notifier
     #default     = notifier.default
     default     = var.notifier
   }
+  */
 
   param "notification_level" {
     type        = string
@@ -153,8 +155,8 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    #default     = [notifier.default]
-    default     = var.approvers
+    default     = [notifier.default]
+    #default     = var.approvers
   }
 
   param "default_action" {
@@ -179,7 +181,8 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
     args = {
       items              = step.query.detect.rows
       policy             = param.policy
-      notifier           = param.notifier
+      #notifier           = param.notifier
+      notifier           = notifier.default
       notification_level = param.notification_level
       approvers          = param.approvers
       default_action     = param.default_action
@@ -209,12 +212,14 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
     default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
+  /*
   param "notifier" {
     type        = notifier
     description = local.description_notifier
     #default     = notifier.default
     default     = var.notifier
   }
+  */
 
   param "notification_level" {
     type        = string
@@ -225,8 +230,8 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    #default     = [notifier.default]
-    default     = var.approvers
+    default     = [notifier.default]
+    #default     = var.approvers
   }
 
   param "default_action" {
@@ -243,7 +248,8 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_info
-    notifier = notifier[param.notifier]
+    #notifier = notifier[param.notifier]
+    notifier = notifier.default
     text     = "Detected ${length(param.items)} S3 Buckets without a lifecycle policy."
   }
 
@@ -261,7 +267,8 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
       region             = each.value.region
       conn               = each.value.conn
       policy             = param.policy
-      notifier           = param.notifier
+      #notifier           = param.notifier
+      notifier           = notifier.default
       notification_level = param.notification_level
       approvers          = param.approvers
       default_action     = param.default_action
@@ -302,12 +309,14 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
     default     = var.s3_buckets_without_lifecycle_policy_default_policy
   }
 
+  /*
   param "notifier" {
     type        = notifier
     description = local.description_notifier
     #default     = notifier.default
     default     = var.notifier
   }
+  */
 
   param "notification_level" {
     type        = string
@@ -318,8 +327,8 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    #default     = [notifier.default]
-    default     = var.approvers
+    default     = [notifier.default]
+    #default     = var.approvers
   }
 
   param "default_action" {
@@ -337,7 +346,8 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {
-      notifier           = param.notifier
+      notifier           = notifier.default
+      #notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
       detect_msg         = "Detected S3 Bucket ${param.title} without a lifecycle policy."
@@ -350,7 +360,8 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
           style        = local.style_info
           pipeline_ref = local.pipeline_optional_message
           pipeline_args = {
-            notifier = param.notifier
+            notifier = notifier.default
+            #notifier = param.notifier
             send     = param.notification_level == local.level_verbose
             text     = "Skipped S3 Bucket ${param.title} without a lifecycle policy."
           }
