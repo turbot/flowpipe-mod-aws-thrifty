@@ -8,7 +8,7 @@ locals {
   from
     aws_s3_bucket
   where
-    name = 'cody-test-actor-1'
+    name = 'mike-flowpipe-test'
     and lifecycle_rules is null;
   EOQ
 }
