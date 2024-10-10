@@ -6,7 +6,7 @@ locals {
     round(sum(maximum) / count(maximum)) as avg_max,
     region,
     account_id,
-    _ctx
+    sp_connection_name
   from
     aws_rds_db_instance_metric_connections_daily
   where
@@ -15,13 +15,13 @@ locals {
     db_instance_identifier,
     region,
     account_id,
-    _ctx
+    sp_connection_name
   )
   select
     concat(db_instance_identifier, ' [', region, '/', account_id, ']') as title,
     db_instance_identifier,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     rds_db_usage
   where

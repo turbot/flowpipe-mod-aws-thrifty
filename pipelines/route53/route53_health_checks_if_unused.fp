@@ -13,7 +13,7 @@ locals {
     concat(h.id, ' [', h.region, '/', h.account_id, ']') as title,
     h.id,
     h.region,
-    h._ctx ->> 'connection_name' as cred
+    h.sp_connection_name as conn
   from
     aws_route53_health_check as h
   left join

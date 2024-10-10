@@ -4,7 +4,7 @@ locals {
     concat(snapshot_id, ' [', region, '/', account_id, ']') as title,
     snapshot_id,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     aws_ebs_snapshot
   where

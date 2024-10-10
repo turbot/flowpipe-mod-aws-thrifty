@@ -35,7 +35,7 @@ locals {
     g.cluster_name,
     g.nodegroup_name,
     g.region,
-    g._ctx ->> 'connection_name' as cred
+    g.sp_connection_name as conn
   from
     aws_eks_node_group as g
     left join ami_architecture as a on a.node_group_arn = g.arn

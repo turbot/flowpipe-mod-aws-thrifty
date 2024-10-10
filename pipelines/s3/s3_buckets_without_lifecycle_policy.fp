@@ -9,7 +9,8 @@ locals {
     aws_s3_bucket
   where
     name = 'mike-flowpipe-test'
-    and lifecycle_rules is null;
+    and lifecycle_rules is null
+  limit 3;
   EOQ
 }
 

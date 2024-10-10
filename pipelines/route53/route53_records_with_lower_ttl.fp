@@ -7,7 +7,7 @@ locals {
     zone_id,
     type,
     records,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     aws_route53_record
   where

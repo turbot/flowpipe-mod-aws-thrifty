@@ -5,7 +5,7 @@ locals {
     concat(name, ' [', region, '/', account_id, ']') as title,
     name,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     aws_dynamodb_table
   where

@@ -4,7 +4,7 @@ locals {
     concat(instance_id, ' [', region, '/', account_id, ']') as title,
     instance_id,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     aws_ec2_instance
   where

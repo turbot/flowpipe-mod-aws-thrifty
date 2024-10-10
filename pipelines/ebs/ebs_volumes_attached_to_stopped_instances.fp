@@ -6,7 +6,7 @@ locals {
       i.instance_id,
       v.region,
       v.account_id,
-      v._ctx,
+      v.sp_connection_name,
       bool_or(i.instance_state = 'stopped') as has_stopped_instances
     from
       aws_ebs_volume as v
@@ -17,13 +17,13 @@ locals {
       i.instance_id,
       v.region,
       v.account_id,
-      v._ctx
+      v.sp_connection_name
   )
   select
     concat(volume_id, ' [', volume_type, '/', region, '/', account_id, ']') as title,
     volume_id,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     vols_and_instances
   where

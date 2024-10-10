@@ -23,7 +23,7 @@ locals {
       concat(i.id, ' [', i.region, '/', i.account_id, ']') as title,
       i.id,
       i.region,
-      i._ctx ->> 'connection_name' as cred
+      i.sp_connection_name as conn
     from
       aws_emr_cluster as i
       left join emr_cluster_isidle as u on u.id = i.id

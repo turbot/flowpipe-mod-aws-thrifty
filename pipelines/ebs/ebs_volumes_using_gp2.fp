@@ -4,7 +4,7 @@ locals {
     concat(volume_id, ' [', volume_type, '/', region, '/', account_id, '/', availability_zone, ']') as title,
     volume_id,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     aws_ebs_volume
   where

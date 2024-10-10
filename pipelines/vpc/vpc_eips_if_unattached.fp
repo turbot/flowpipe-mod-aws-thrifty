@@ -4,7 +4,7 @@ locals {
     concat(allocation_id, ' [', public_ip, '/', region, '/', account_id, ']') as title,
     allocation_id,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     aws_vpc_eip
   where

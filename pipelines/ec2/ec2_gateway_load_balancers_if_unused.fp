@@ -13,7 +13,7 @@ locals {
       concat(a.name, ' [', a.region, '/', a.account_id, ']') as title,
       a.arn,
       a.region,
-      a._ctx ->> 'connection_name' as cred
+      a.sp_connection_name as conn
     from
       aws_ec2_gateway_load_balancer a
       left join target_resource b on a.arn = b.load_balancer_arn

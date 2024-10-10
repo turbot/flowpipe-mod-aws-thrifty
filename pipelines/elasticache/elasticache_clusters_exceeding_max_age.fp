@@ -5,7 +5,7 @@ locals {
     select
       distinct c.replication_group_id as name,
       c.cache_cluster_create_time,
-      c._ctx,
+      c.sp_connection_name,
       c.region,
       c.account_id,
       'redis' as engine,
@@ -17,7 +17,7 @@ locals {
     select
       cache_cluster_id as name,
       cache_cluster_create_time,
-      _ctx,
+      sp_connection_name,
       region,
       account_id,
       engine,
@@ -32,7 +32,7 @@ locals {
     name,
     region,
     account_id,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     filter_clusters
   where

@@ -4,7 +4,7 @@ select
   concat(nat.nat_gateway_id, ' [', nat.region, '/', nat.account_id, ']') as title,
   nat.nat_gateway_id,
   nat.region,
-  nat._ctx ->> 'connection_name' as cred
+  nat.sp_connection_name as conn
 from
   aws_vpc_nat_gateway as nat
 left join
@@ -17,7 +17,7 @@ group by
   nat.nat_gateway_id,
   nat.region,
   nat.account_id,
-  nat._ctx ->> 'connection_name'
+  nat.sp_connection_name ->> 'connection_name'
 having
   sum(coalesce(dest.average, 0)) = 0;
   EOQ

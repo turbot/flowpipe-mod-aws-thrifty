@@ -3,7 +3,7 @@ locals {
   with ebs_usage as (
   select
     account_id,
-    _ctx,
+    sp_connection_name,
     region,
     volume_id,
     round(avg(max)) as avg_max
@@ -13,7 +13,7 @@ locals {
         select
           partition,
           account_id,
-          _ctx,
+          sp_connection_name,
           region,
           volume_id,
           cast(maximum as numeric) as max
@@ -27,7 +27,7 @@ locals {
         select
           partition,
           account_id,
-          _ctx,
+          sp_connection_name,
           region,
           volume_id,
           cast(maximum as numeric) as max
@@ -48,7 +48,7 @@ locals {
     concat(volume_id, ' [', region, '/', account_id, ']') as title,
     volume_id,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     ebs_usage
   where

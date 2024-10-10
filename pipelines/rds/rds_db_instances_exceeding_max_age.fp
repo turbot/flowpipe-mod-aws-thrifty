@@ -4,7 +4,7 @@ locals {
     concat(db_instance_identifier, ' [', region, '/', account_id, ']') as title,
     db_instance_identifier,
     region,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     aws_rds_db_instance
   where
