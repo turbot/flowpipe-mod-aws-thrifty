@@ -22,7 +22,6 @@ locals {
   description_database         = "Database connection string."
   description_approvers        = "List of notifiers to be used for obtaining action/approval decisions."
   description_connection       = "Name of the AWS connection to be used for any authenticated actions."
-  description_credential       = "Name of the credential to be used for any authenticated actions."
   description_region           = "AWS Region of the resource(s)."
   description_title            = "Title of the resource, to be used as a display name."
   description_max_concurrency  = "The maximum concurrency to use for responding to detection items."

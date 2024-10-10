@@ -293,7 +293,8 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   }
 
   param "conn" {
-    type        = connection.aws
+    type        = string
+    #type        = connection.aws
     description = local.description_connection
   }
 
@@ -366,7 +367,7 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
           pipeline_args = {
             bucket_name = param.name
             region      = param.region
-            conn        = param.conn
+            conn        = connection.aws[param.conn]
             policy      = param.policy
           }
           success_msg = "Applied lifecycle policy to S3 Bucket ${param.title}."
