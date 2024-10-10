@@ -144,7 +144,7 @@ pipeline "correct_route53_records_with_lower_ttl" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} Route53 records with lower TTL."
   }
 

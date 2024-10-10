@@ -138,7 +138,7 @@ pipeline "correct_ebs_volumes_exceeding_max_size" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} EBS volumes exceeding maximum size."
   }
 

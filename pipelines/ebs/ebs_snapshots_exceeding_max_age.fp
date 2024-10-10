@@ -139,7 +139,7 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} EBS snapshots exceeding maximum age."
   }
 

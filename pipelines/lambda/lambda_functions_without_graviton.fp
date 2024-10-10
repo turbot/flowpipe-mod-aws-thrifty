@@ -141,7 +141,7 @@ pipeline "correct_lambda_functions_without_graviton" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} Lambda functions without graviton."
   }
 

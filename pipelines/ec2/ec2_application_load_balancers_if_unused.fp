@@ -150,7 +150,7 @@ pipeline "correct_ec2_application_load_balancers_if_unused" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == "verbose"
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} unused EC2 application load balancers."
   }
 

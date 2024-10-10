@@ -166,7 +166,7 @@ pipeline "correct_elasticache_clusters_exceeding_max_age" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} Elasticache Clusters exceeding maximum age."
   }
 

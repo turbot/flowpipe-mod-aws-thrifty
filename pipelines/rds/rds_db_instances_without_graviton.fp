@@ -138,7 +138,7 @@ pipeline "correct_rds_db_instances_without_graviton" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} RDS DB instances without graviton processor."
   }
 

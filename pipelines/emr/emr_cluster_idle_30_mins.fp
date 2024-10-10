@@ -159,7 +159,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} EMR clusters idle for more than 30 mins."
   }
 

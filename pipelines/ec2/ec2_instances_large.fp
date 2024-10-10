@@ -139,7 +139,7 @@ pipeline "correct_ec2_instances_large" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} large EC2 instances."
   }
 

@@ -157,7 +157,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} EBS volumes attached to stopped instances."
   }
 

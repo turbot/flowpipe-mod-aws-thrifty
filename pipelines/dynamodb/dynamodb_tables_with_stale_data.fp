@@ -140,7 +140,7 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} DynamoDB table with stale data."
   }
 

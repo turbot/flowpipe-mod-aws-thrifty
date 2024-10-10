@@ -138,7 +138,7 @@ pipeline "correct_vpc_eips_if_unattached" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} elastic IP addresses unattached."
   }
 

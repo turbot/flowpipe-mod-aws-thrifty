@@ -138,7 +138,7 @@ pipeline "correct_rds_db_instances_of_older_generation" {
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} older generation RDS DB instances."
   }
 
