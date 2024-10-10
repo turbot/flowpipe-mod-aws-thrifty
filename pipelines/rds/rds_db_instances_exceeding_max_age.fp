@@ -185,9 +185,9 @@ pipeline "correct_one_rds_db_instance_exceeding_max_age" {
     description = local.description_region
   }
 
-  param "cred" {
-    type        = string
-    description = local.description_credential
+  param "conn" {
+    type        = connection.aws
+    description = local.description_connection
   }
 
   param "notifier" {

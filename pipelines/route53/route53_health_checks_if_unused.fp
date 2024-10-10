@@ -196,9 +196,9 @@ pipeline "correct_one_route53_health_check_if_unused" {
     description = local.description_region
   }
 
-  param "cred" {
-    type        = string
-    description = local.description_credential
+  param "conn" {
+    type        = connection.aws
+    description = local.description_connection
   }
 
   param "notifier" {

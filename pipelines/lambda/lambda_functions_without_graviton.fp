@@ -188,9 +188,9 @@ pipeline "correct_one_lambda_function_without_graviton" {
     description = local.description_region
   }
 
-  param "cred" {
-    type        = string
-    description = local.description_credential
+  param "conn" {
+    type        = connection.aws
+    description = local.description_connection
   }
 
   param "notifier" {

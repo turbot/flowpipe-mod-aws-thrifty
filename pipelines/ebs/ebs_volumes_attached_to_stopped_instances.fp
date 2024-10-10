@@ -204,9 +204,9 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
     description = local.description_region
   }
 
-  param "cred" {
-    type        = string
-    description = local.description_credential
+  param "conn" {
+    type        = connection.aws
+    description = local.description_connection
   }
 
   param "notifier" {
@@ -315,9 +315,9 @@ pipeline "snapshot_and_delete_ebs_volume" {
     description = local.description_region
   }
 
-  param "cred" {
-    type        = string
-    description = local.description_credential
+  param "conn" {
+    type        = connection.aws
+    description = local.description_connection
   }
 
   param "volume_id" {

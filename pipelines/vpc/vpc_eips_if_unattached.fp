@@ -189,9 +189,9 @@ pipeline "correct_one_vpc_eip_if_unattached" {
     description = local.description_region
   }
 
-  param "cred" {
-    type        = string
-    description = local.description_credential
+  param "conn" {
+    type        = connection.aws
+    description = local.description_connection
   }
 
   param "notifier" {
