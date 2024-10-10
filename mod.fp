@@ -14,7 +14,7 @@ mod "aws_thrifty" {
 
   require {
     mod "github.com/turbot/flowpipe-mod-aws" {
-      version = "1.0.0-rc.0"
+      version = "1.0.0-rc.1"
     }
     mod "github.com/turbot/flowpipe-mod-detect-correct" {
       version = "1.0.0-rc.0"
