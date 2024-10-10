@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ebs_volumes_using_gp2" {
   title         = "Detect & correct EBS volumes using gp2"
   description   = "Detects EBS volumes using gp2 and performs the chosen action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_volumes_using_gp2.md")
-  tags          = merge(local.ebs_common_tags, { class = "deprecated", type = "recommended" })
+  tags          = merge(local.ebs_common_tags, { class = "deprecated", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

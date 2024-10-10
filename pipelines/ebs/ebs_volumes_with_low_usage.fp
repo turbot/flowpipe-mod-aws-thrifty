@@ -79,7 +79,7 @@ pipeline "detect_and_correct_ebs_volumes_with_low_usage" {
   title         = "Detect & correct EBS volumes with low usage"
   description   = "Detects EBS volumes with low usage and runs your chosen action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_volumes_with_low_usage.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.ebs_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

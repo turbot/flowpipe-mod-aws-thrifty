@@ -35,7 +35,7 @@ pipeline "detect_and_correct_vpc_eips_if_unattached" {
   title         = "Detect & correct VPC EIPs if unattached"
   description   = "Detects unattached EIPs (Elastic IP addresses) and runs your chosen action."
   documentation = file("./pipelines/vpc/docs/detect_and_correct_vpc_eips_if_unattached.md")
-  tags          = merge(local.vpc_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.vpc_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

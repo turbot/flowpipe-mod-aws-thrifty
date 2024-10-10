@@ -63,7 +63,7 @@ pipeline "detect_and_correct_elasticache_clusters_exceeding_max_age" {
   title         = "Detect & correct Elasticache clusters exceeding max age"
   description   = "Detects Elasticache clusters exceeding max age and responds with your chosen action."
   documentation = file("./pipelines/elasticache/docs/detect_and_correct_elasticache_clusters_exceeding_max_age.md")
-  tags          = merge(local.elasticache_common_tags, { class = "managed", type = "recommended" })
+  tags          = merge(local.elasticache_common_tags, { class = "managed", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

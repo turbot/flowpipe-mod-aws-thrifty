@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ebs_snapshots_exceeding_max_age" {
   title         = "Detect & correct EBS snapshots exceeding max age"
   description   = "Detects EBS snapshots exceeding max age and runs your chosen action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_snapshots_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.ebs_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

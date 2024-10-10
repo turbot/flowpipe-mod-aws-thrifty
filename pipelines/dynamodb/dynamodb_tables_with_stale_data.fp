@@ -36,7 +36,7 @@ pipeline "detect_and_correct_dynamodb_tables_with_stale_data" {
   title         = "Detect & correct DynamoDB tables with stale data"
   description   = "Detects DynamoDB tables with stale data and runs your chosen action."
   documentation = file("./pipelines/dynamodb/docs/detect_and_correct_dynamodb_tables_with_stale_data.md")
-  tags          = merge(local.dynamodb_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.dynamodb_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

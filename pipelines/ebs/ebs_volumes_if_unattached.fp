@@ -35,7 +35,7 @@ pipeline "detect_and_correct_ebs_volumes_if_unattached" {
   title         = "Detect & correct EBS volumes if unattached"
   description   = "Detects EBS volumes which are unattached and runs your chosen action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_volumes_if_unattached.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.ebs_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

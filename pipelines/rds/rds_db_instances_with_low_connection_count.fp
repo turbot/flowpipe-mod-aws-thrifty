@@ -52,7 +52,7 @@ pipeline "detect_and_correct_rds_db_instances_with_low_connection_count" {
   title         = "Detect & correct RDS DB instances with low connection count"
   description   = "Detects RDS DB instances with low connection count and runs your chosen action."
   documentation = file("./pipelines/rds/docs/detect_and_correct_rds_db_instances_with_low_connection_count.md")
-  tags          = merge(local.rds_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.rds_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

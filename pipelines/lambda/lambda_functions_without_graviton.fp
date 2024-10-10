@@ -36,7 +36,7 @@ pipeline "detect_and_correct_lambda_functions_without_graviton" {
   title         = "Detect & correct Lambda functions without graviton"
   description   = "Detects Lambda functions without graviton processor and runs your chosen action."
   documentation = file("./pipelines/lambda/docs/detect_and_correct_lambda_functions_without_graviton.md")
-  tags          = merge(local.lambda_common_tags, { class = "deprecated", type = "recommended" })
+  tags          = merge(local.lambda_common_tags, { class = "deprecated", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

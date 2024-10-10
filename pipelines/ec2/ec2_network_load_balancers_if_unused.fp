@@ -45,7 +45,7 @@ pipeline "detect_and_correct_ec2_network_load_balancers_if_unused" {
   title         = "Detect & correct EC2 network load balancers if unused"
   description   = "Detects EC2 network load balancers that are unused (not serving any targets) and runs your chosen action."
   documentation = file("./pipelines/ec2/docs/detect_and_correct_ec2_network_load_balancers_if_unused.md")
-  tags          = merge(local.ec2_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.ec2_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

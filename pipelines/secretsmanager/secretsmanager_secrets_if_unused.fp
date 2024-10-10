@@ -35,7 +35,7 @@ pipeline "detect_and_correct_secretsmanager_secrets_if_unused" {
   title         = "Detect & correct SecretsManager secrets if unused"
   description   = "Detects SecretsManager secrets that are unused (not accessed in last n days) and runs your chosen action."
   documentation = file("./pipelines/secretsmanager/docs/detect_and_correct_secretsmanager_secrets_if_unused.md")
-  tags          = merge(local.secretsmanager_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.secretsmanager_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

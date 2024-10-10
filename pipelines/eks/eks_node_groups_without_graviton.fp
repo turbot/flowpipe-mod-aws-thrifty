@@ -67,7 +67,7 @@ pipeline "detect_and_correct_eks_node_groups_without_graviton" {
   title         = "Detect & correct EKS node groups without graviton"
   description   = "Detects EKS node groups without graviton processor and responds with your chosen action."
   documentation = file("./pipelines/eks/docs/detect_and_correct_eks_node_groups_without_graviton.md")
-  tags          = merge(local.eks_common_tags, { class = "deprecated", type = "recommended" })
+  tags          = merge(local.eks_common_tags, { class = "deprecated", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

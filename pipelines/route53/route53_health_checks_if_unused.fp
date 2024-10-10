@@ -46,7 +46,7 @@ pipeline "detect_and_correct_route53_health_checks_if_unused" {
   title         = "Detect & correct Route53 health checks if unused"
   description   = "Detects Route53 health checks that are not used by any Route53 records and runs your chosen action."
   documentation = file("./pipelines/route53/docs/detect_and_correct_route53_health_checks_if_unused.md")
-  tags          = merge(local.route53_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.route53_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

@@ -35,7 +35,7 @@ pipeline "detect_and_correct_rds_db_instances_exceeding_max_age" {
   title         = "Detect & correct RDS DB instances exceeding max age"
   description   = "Detects long running RDS DB instances and runs your chosen action."
   documentation = file("./pipelines/rds/docs/detect_and_correct_rds_db_instances_exceeding_max_age.md")
-  tags          = merge(local.rds_common_tags, { class = "managed", type = "recommended" })
+  tags          = merge(local.rds_common_tags, { class = "managed", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

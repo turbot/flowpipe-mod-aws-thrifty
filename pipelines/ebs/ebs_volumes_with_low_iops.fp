@@ -36,7 +36,7 @@ pipeline "detect_and_correct_ebs_volumes_with_low_iops" {
   title         = "Detect & correct EBS volumes with low IOPS"
   description   = "Detects EBS volumes with low IOPS and runs your chosen action."
   documentation = file("./pipelines/ebs/docs/detect_and_correct_ebs_volumes_with_low_iops.md")
-  tags          = merge(local.ebs_common_tags, { class = "managed", type = "recommended" })
+  tags          = merge(local.ebs_common_tags, { class = "managed", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

@@ -38,7 +38,7 @@ pipeline "detect_and_correct_route53_records_with_lower_ttl" {
   title         = "Detect & correct Route53 records with lower TTL"
   description   = "Detects Route53 records with TTL lower than 3600 seconds and runs your chosen action."
   documentation = file("./pipelines/route53/docs/detect_and_correct_route53_records_with_lower_ttl.md")
-  tags          = merge(local.route53_common_tags, { class = "higher", type = "recommended" })
+  tags          = merge(local.route53_common_tags, { class = "higher", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe

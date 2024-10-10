@@ -56,7 +56,7 @@ pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
   title         = "Detect & correct EMR Clusters idle 30 mins"
   description   = "Detects EMR clusters idle for more than 30 mins and runs your chosen action."
   documentation = file("./pipelines/emr/docs/detect_and_correct_emr_clusters_idle_30_mins.md")
-  tags          = merge(local.emr_common_tags, { class = "unused", type = "recommended" })
+  tags          = merge(local.emr_common_tags, { class = "unused", recommended = "true" })
 
   param "database" {
     type        = connection.steampipe
