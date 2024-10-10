@@ -102,7 +102,7 @@ pipeline "correct_ebs_volumes_using_io1" {
       title     = string
       volume_id = string
       region    = string
-      cred      = string
+      conn      = string
     }))
   }
 
@@ -154,7 +154,7 @@ pipeline "correct_ebs_volumes_using_io1" {
       title              = each.value.title
       volume_id          = each.value.volume_id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -252,7 +252,7 @@ pipeline "correct_one_ebs_volume_using_io1" {
             volume_id   = param.volume_id
             volume_type = "io2"
             region      = param.region
-            cred        = param.cred
+            conn        = param.conn
           }
           success_msg = "Updated EBS volume ${param.title} to io2."
           error_msg   = "Error updating EBS volume ${param.title} to io2."

@@ -102,7 +102,7 @@ pipeline "correct_secretsmanager_secrets_if_unused" {
       title  = string
       name   = string
       region = string
-      cred   = string
+      conn   = string
     }))
   }
 
@@ -154,7 +154,7 @@ pipeline "correct_secretsmanager_secrets_if_unused" {
       title              = each.value.title
       name               = each.value.name
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -251,7 +251,7 @@ pipeline "correct_one_secretsmanager_secret_if_unused" {
           pipeline_args = {
             name      = param.name
             region    = param.region
-            cred      = param.cred
+            conn      = param.conn
             secret_id = param.name
           }
           success_msg = "Deleted SecretsManager secret ${param.title}."

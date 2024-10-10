@@ -119,7 +119,7 @@ pipeline "correct_rds_db_instances_with_low_connection_count" {
       title                  = string
       db_instance_identifier = string
       region                 = string
-      cred                   = string
+      conn                   = string
     }))
   }
 
@@ -171,7 +171,7 @@ pipeline "correct_rds_db_instances_with_low_connection_count" {
       title                  = each.value.title
       db_instance_identifier = each.value.db_instance_identifier
       region                 = each.value.region
-      cred                   = each.value.cred
+      conn                   = each.value.conn
       notifier               = param.notifier
       notification_level     = param.notification_level
       approvers              = param.approvers
@@ -268,7 +268,7 @@ pipeline "correct_one_rds_db_instance_with_low_connection_count" {
           pipeline_args = {
             db_instance_identifier = param.db_instance_identifier
             region                 = param.region
-            cred                   = param.cred
+            conn                   = param.conn
           }
           success_msg = "Deleted RDS DB Instance ${param.title}."
           error_msg   = "Error deleting RDS DB Instance ${param.title}."

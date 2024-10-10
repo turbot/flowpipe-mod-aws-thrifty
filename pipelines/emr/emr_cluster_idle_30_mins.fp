@@ -123,7 +123,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
       title  = string
       id     = string
       region = string
-      cred   = string
+      conn   = string
     }))
   }
 
@@ -175,7 +175,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
       title              = each.value.title
       id                 = each.value.id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -272,7 +272,7 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           pipeline_args = {
             cluster_ids = [param.id]
             region      = param.region
-            cred        = param.cred
+            conn        = param.conn
           }
           success_msg = "Deleted EMR cluster ${param.title}."
           error_msg   = "Error deleting EMR cluster ${param.title}."

@@ -108,7 +108,7 @@ pipeline "correct_route53_records_with_lower_ttl" {
       zone_id = string
       type    = string
       records = list(string)
-      cred    = string
+      conn    = string
     }))
   }
 
@@ -163,7 +163,7 @@ pipeline "correct_route53_records_with_lower_ttl" {
       zone_id            = each.value.zone_id
       type               = each.value.type
       records            = each.value.records
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -274,7 +274,7 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
           pipeline_ref = local.aws_pipeline_update_route53_record
           pipeline_args = {
             region         = param.region
-            cred           = param.cred
+            conn           = param.conn
             hosted_zone_id = param.zone_id
             record_name    = param.name
             record_type    = param.type

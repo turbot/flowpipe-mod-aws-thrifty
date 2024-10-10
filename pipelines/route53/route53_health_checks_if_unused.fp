@@ -113,7 +113,7 @@ pipeline "correct_route53_health_checks_if_unused" {
       title  = string
       id     = string
       region = string
-      cred   = string
+      conn   = string
     }))
   }
 
@@ -165,7 +165,7 @@ pipeline "correct_route53_health_checks_if_unused" {
       title              = each.value.title
       id                 = each.value.id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -261,7 +261,7 @@ pipeline "correct_one_route53_health_check_if_unused" {
           pipeline_ref = local.aws_pipeline_delete_route53_health_check
           pipeline_args = {
             region          = param.region
-            cred            = param.cred
+            conn            = param.conn
             health_check_id = param.id
           }
           success_msg = "Deleted unused Route53 health check ${param.title}."

@@ -102,7 +102,7 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
       title       = string
       snapshot_id = string
       region      = string
-      cred        = string
+      conn        = string
     }))
     description = local.description_items
   }
@@ -155,7 +155,7 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
       title              = each.value.title
       snapshot_id        = each.value.snapshot_id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -252,7 +252,7 @@ pipeline "correct_one_ebs_snapshot_exceeding_max_age" {
           pipeline_args = {
             snapshot_id = param.snapshot_id
             region      = param.region
-            cred        = param.cred
+            conn        = param.conn
           }
           success_msg = "Deleted EBS snapshot ${param.title}."
           error_msg   = "Error deleting EBS snapshot ${param.title}."

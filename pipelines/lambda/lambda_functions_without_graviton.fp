@@ -105,7 +105,7 @@ pipeline "correct_lambda_functions_without_graviton" {
       title  = string
       name   = string
       region = string
-      cred   = string
+      conn   = string
     }))
   }
 
@@ -157,7 +157,7 @@ pipeline "correct_lambda_functions_without_graviton" {
       title              = each.value.title
       name               = each.value.name
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -254,7 +254,7 @@ pipeline "correct_one_lambda_function_without_graviton" {
           pipeline_args = {
             function_name = [param.name]
             region        = param.region
-            cred          = param.cred
+            conn          = param.conn
           }
           success_msg = "Deleted Lambda function ${param.title}."
           error_msg   = "Error deleting Lambda function ${param.title}."

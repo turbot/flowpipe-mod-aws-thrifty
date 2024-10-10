@@ -113,7 +113,7 @@ pipeline "correct_vpc_nat_gateways_if_unused" {
       title          = string
       nat_gateway_id = string
       region         = string
-      cred           = string
+      conn           = string
     }))
     description = local.description_items
   }
@@ -166,7 +166,7 @@ pipeline "correct_vpc_nat_gateways_if_unused" {
       title              = each.value.title
       nat_gateway_id     = each.value.nat_gateway_id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -263,7 +263,7 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
           pipeline_args = {
             nat_gateway_id = param.nat_gateway_id
             region         = param.region
-            cred           = param.cred
+            conn           = param.conn
           }
           success_msg = "Deleted NAT Gateway ${param.title}."
           error_msg   = "Error deleting NAT Gateway ${param.title}."

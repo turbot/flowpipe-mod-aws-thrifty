@@ -112,7 +112,7 @@ pipeline "correct_ec2_gateway_load_balancers_if_unused" {
       title  = string
       arn    = string
       region = string
-      cred   = string
+      conn   = string
     }))
   }
 
@@ -160,7 +160,7 @@ pipeline "correct_ec2_gateway_load_balancers_if_unused" {
       title              = each.value.title
       arn                = each.value.arn
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -257,7 +257,7 @@ pipeline "correct_one_ec2_gateway_load_balancer_if_unused" {
           pipeline_args = {
             load_balancer_arn = param.arn
             region            = param.region
-            cred              = param.cred
+            conn              = param.conn
           }
           success_msg = "Deleted EC2 gateway load balancer ${param.title}."
           error_msg   = "Error deleting EC2 gateway load balancer ${param.title}."

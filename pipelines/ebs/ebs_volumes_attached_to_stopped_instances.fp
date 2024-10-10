@@ -121,7 +121,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
       title     = string
       volume_id = string
       region    = string
-      cred      = string
+      conn      = string
     }))
   }
 
@@ -173,7 +173,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
       title              = each.value.title
       volume_id          = each.value.volume_id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -270,7 +270,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
-            cred      = param.cred
+            conn      = param.conn
           }
           success_msg = "Detached EBS volume ${param.title} from the instance."
           error_msg   = "Error detaching EBS volume ${param.title} from the instance."
@@ -283,7 +283,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
-            cred      = param.cred
+            conn      = param.conn
           }
           success_msg = "Deleted EBS Volume ${param.title}."
           error_msg   = "Error deleting EBS Volume ${param.title}."
@@ -296,7 +296,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
-            cred      = param.cred
+            conn      = param.conn
           }
           success_msg = "Snapshotted & Deleted EBS Volume ${param.title}."
           error_msg   = "Error snapshotting & deleting EBS Volume ${param.title}."
@@ -329,7 +329,7 @@ pipeline "snapshot_and_delete_ebs_volume" {
     pipeline = local.aws_pipeline_create_ebs_snapshot
     args = {
       region    = param.region
-      cred      = param.cred
+      conn      = param.conn
       volume_id = param.volume_id
     }
   }
@@ -339,7 +339,7 @@ pipeline "snapshot_and_delete_ebs_volume" {
     pipeline   = local.aws_pipeline_delete_ebs_volume
     args = {
       region    = param.region
-      cred      = param.cred
+      conn      = param.conn
       volume_id = param.volume_id
     }
   }

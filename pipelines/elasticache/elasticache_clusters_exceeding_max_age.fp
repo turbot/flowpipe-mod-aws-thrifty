@@ -130,7 +130,7 @@ pipeline "correct_elasticache_clusters_exceeding_max_age" {
       title  = string
       name   = string
       region = string
-      cred   = string
+      conn   = string
     }))
   }
 
@@ -182,7 +182,7 @@ pipeline "correct_elasticache_clusters_exceeding_max_age" {
       title                    = each.value.title
       name                     = each.value.name
       region                   = each.value.region
-      cred                     = each.value.cred
+      conn                     = each.value.conn
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
@@ -279,7 +279,7 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
           pipeline_args = {
             cache_cluster_id = param.name
             region           = param.region
-            cred             = param.cred
+            conn             = param.conn
           }
           success_msg = "Deleted Elasticache Cluster ${param.title}."
           error_msg   = "Error deleting Elasticache Cluster ${param.title}."

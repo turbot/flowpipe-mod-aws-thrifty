@@ -102,7 +102,7 @@ pipeline "correct_vpc_eips_if_unattached" {
       title         = string
       allocation_id = string
       region        = string
-      cred          = string
+      conn          = string
     }))
   }
 
@@ -158,7 +158,7 @@ pipeline "correct_vpc_eips_if_unattached" {
       title              = each.value.title
       allocation_id      = each.value.allocation_id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -255,7 +255,7 @@ pipeline "correct_one_vpc_eip_if_unattached" {
           pipeline_args = {
             allocation_id = param.allocation_id
             region        = param.region
-            cred          = param.cred
+            conn          = param.conn
           }
           success_msg = "Released elastic IP address ${param.title}."
           error_msg   = "Error releasing elastic IP address ${param.title}."

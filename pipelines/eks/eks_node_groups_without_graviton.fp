@@ -135,7 +135,7 @@ pipeline "correct_eks_node_groups_without_graviton" {
       cluster_name   = string
       nodegroup_name = string
       region         = string
-      cred           = string
+      conn           = string
     }))
   }
 
@@ -188,7 +188,7 @@ pipeline "correct_eks_node_groups_without_graviton" {
       cluster_name             = each.value.cluster_name
       nodegroup_name           = each.value.nodegroup_name
       region                   = each.value.region
-      cred                     = each.value.cred
+      conn                     = each.value.conn
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
@@ -291,7 +291,7 @@ pipeline "correct_one_eks_node_group_without_graviton" {
             cluster_name   = param.cluster_name
             nodegroup_name = param.nodegroup_name
             region         = param.region
-            cred           = param.cred
+            conn           = param.conn
           }
           success_msg = "Deleted EKS Node Group ${param.title}."
           error_msg   = "Error deleting EKS Node Group ${param.title}."

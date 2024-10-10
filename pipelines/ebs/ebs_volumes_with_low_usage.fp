@@ -146,7 +146,7 @@ pipeline "correct_ebs_volumes_with_low_usage" {
       title     = string
       volume_id = string
       region    = string
-      cred      = string
+      conn      = string
     }))
   }
 
@@ -198,7 +198,7 @@ pipeline "correct_ebs_volumes_with_low_usage" {
       title              = each.value.title
       volume_id          = each.value.volume_id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -295,7 +295,7 @@ pipeline "correct_one_ebs_volume_with_low_usage" {
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
-            cred      = param.cred
+            conn      = param.conn
           }
           success_msg = "Deleted EBS Volume ${param.title}."
           error_msg   = "Error deleting EBS Volume ${param.title}."

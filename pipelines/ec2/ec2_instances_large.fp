@@ -103,7 +103,7 @@ pipeline "correct_ec2_instances_large" {
       title       = string
       instance_id = string
       region      = string
-      cred        = string
+      conn        = string
     }))
   }
 
@@ -155,7 +155,7 @@ pipeline "correct_ec2_instances_large" {
       title              = each.value.title
       instance_id        = each.value.instance_id
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -252,7 +252,7 @@ pipeline "correct_one_ec2_instance_large" {
           pipeline_args = {
             instance_ids = [param.instance_id]
             region       = param.region
-            cred         = param.cred
+            conn         = param.conn
           }
           success_msg = "Stopped EC2 Instance ${param.title}."
           error_msg   = "Error stopping EC2 Instance ${param.title}."
@@ -265,7 +265,7 @@ pipeline "correct_one_ec2_instance_large" {
           pipeline_args = {
             instance_ids = [param.instance_id]
             region       = param.region
-            cred         = param.cred
+            conn         = param.conn
           }
           success_msg = "Deleted EC2 Instance ${param.title}."
           error_msg   = "Error deleting EC2 Instance ${param.title}."

@@ -103,7 +103,7 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
       title  = string
       name   = string
       region = string
-      cred   = string
+      conn   = string
     }))
     description = local.description_items
   }
@@ -156,7 +156,7 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
       title              = each.value.title
       name               = each.value.name
       region             = each.value.region
-      cred               = each.value.cred
+      conn               = each.value.conn
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
@@ -253,7 +253,7 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
           pipeline_args = {
             table_name = param.name
             region     = param.region
-            cred       = param.cred
+            conn       = param.conn
           }
           success_msg = "Deleted DynamoDB table ${param.title}."
           error_msg   = "Error deleting DynamoDB table ${param.title}."
