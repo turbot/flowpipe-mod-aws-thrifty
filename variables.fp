@@ -1,3 +1,9 @@
+variable "approvers" {
+  type        = list(notifier)
+  description = "List of notifiers to be used for obtaining action/approval decisions, when empty list will perform the default response associated with the detection."
+  default     = [notifier.default]
+}
+
 variable "notifier" {
   type        = notifier
   description = "The notifier to use for sending notification messages."
@@ -8,12 +14,6 @@ variable "notification_level" {
   type        = string
   description = "The verbosity level of notification messages to send. Valid options are 'verbose', 'info', 'error'."
   default     = "info"
-}
-
-variable "approvers" {
-  type        = list(notifier)
-  description = "List of notifiers to be used for obtaining action/approval decisions, when empty list will perform the default response associated with the detection."
-  default     = [notifier.default]
 }
 
 variable "database" {

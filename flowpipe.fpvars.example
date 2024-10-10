@@ -1,9 +1,11 @@
 # Core options
-database           = "postgres://steampipe@localhost:9193/steampipe"
-notifier           = "default"
+approvers          = [notifier.default]
+notifier           = notifier.default
 notification_level = "info"
-approvers          = ["default"]
-max_concurrency    = 1
+
+# Advanced options
+database        = connection.steampipe.default
+max_concurrency = 1
 
 # DynamoDB table with stale data
 # dynamodb_tables_with_stale_data_max_days = 90

@@ -29,22 +29,22 @@ steampipe plugin install aws
 
 Steampipe will automatically use your default AWS credentials. Optionally, you can [setup multiple accounts](https://hub.steampipe.io/plugins/turbot/aws#multi-account-connections) or [customize AWS credentials](https://hub.steampipe.io/plugins/turbot/aws#configuring-aws-credentials).
 
-Create a `credential_import` resource to import your Steampipe AWS connections:
+Create a `connection_import` resource to import your Steampipe AWS connections:
 
 ```sh
 vi ~/.flowpipe/config/aws.fpc
 ```
 
 ```hcl
-credential_import "aws" {
+connection_import "aws" {
   source      = "~/.steampipe/config/aws.spc"
   connections = ["*"]
 }
 ```
 
-For more information on importing credentials, please see [Credential Import](https://flowpipe.io/docs/reference/config-files/credential_import).
+For more information on importing connections, please see [Connection Import](https://flowpipe.io/docs/reference/config-files/connection_import).
 
-For more information on credentials in Flowpipe, please see [Managing Credentials](https://flowpipe.io/docs/run/credentials).
+For more information on connections in Flowpipe, please see [Managing Connections](https://flowpipe.io/docs/run/connections).
 
 Clone the mod:
 
@@ -116,11 +116,13 @@ This will then run the pipeline and depending on your configured running mode; p
 - Automatic
 
 #### Wizard
+
 This is the `default` running mode, allowing for a hands-on approach to approving changes to resources by prompting for [input](https://flowpipe.io/docs/build/input) for each detected resource.
 
 Whilst the out of the box default is to run the workflow directly in the terminal. You can use Flowpipe [server](https://flowpipe.io/docs/run/server) and [external integrations](https://flowpipe.io/docs/build/input#create-an-integration) to prompt in `http`, `slack`, `teams`, etc.
 
 #### Notify
+
 This mode as the name implies is used purely to report detections via notifications either directly to your terminal when running in client mode or via another configured [notifier](https://flowpipe.io/docs/reference/config-files/notifier) when running in server mode for each detected resource.
 
 To run in `notify` mode, you will need to set the `approvers` variable to an empty list `[]` and ensure the resource-specific `default_action` variable is set to `notify`, either in your fpvars file
@@ -138,6 +140,7 @@ flowpipe pipeline run detect_and_correct_ebs_snapshots_exceeding_max_age --arg='
 ```
 
 #### Automatic
+
 This behavior allows for a hands-off approach to remediating resources.
 
 To run in `automatic` mode, you will need to set the `approvers` variable to an empty list `[]` and the the resource-specific `default_action` variable to one of the available options.
