@@ -36,6 +36,7 @@ variable "s3_buckets_without_lifecycle_policy_default_action" {
   type        = string
   description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
+  enum        = ["notify", "skip", "apply_policy"]
   tags = {
     folder = "Advanced/S3"
   }
@@ -45,6 +46,7 @@ variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
   type        = list(string)
   description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "apply_policy"]
+  enum        = ["skip", "apply_policy"]
   tags = {
     folder = "Advanced/S3"
   }
@@ -162,12 +164,14 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
     type        = string
     description = local.description_default_action
     default     = var.s3_buckets_without_lifecycle_policy_default_action
+    enum        = ["notify", "skip", "apply_policy"]
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
+    enum        = ["skip", "apply_policy"]
   }
 
   step "query" "detect" {
