@@ -55,7 +55,12 @@ variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
 variable "s3_buckets_without_lifecycle_policy_default_policy" {
   type        = string
   description = "The default S3 bucket lifecycle policy to apply"
-  default     = <<-EOF
+
+  tags = {
+    folder = "Advanced/S3"
+  }
+
+  default = <<-EOF
 {
   "Rules": [
     {
