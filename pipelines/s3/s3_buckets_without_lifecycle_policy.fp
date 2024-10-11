@@ -143,7 +143,6 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   param "notifier" {
     type        = notifier
     description = local.description_notifier
-    #default     = notifier.default
     default     = var.notifier
   }
 
@@ -156,7 +155,6 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    #default     = [notifier.default]
     default     = var.approvers
   }
 
@@ -217,7 +215,6 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   param "notifier" {
     type        = notifier
     description = local.description_notifier
-    #default     = notifier.default
     default     = var.notifier
   }
 
@@ -230,7 +227,6 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    #default     = [notifier.default]
     default     = var.approvers
   }
 
@@ -264,7 +260,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
       title              = each.value.title
       name               = each.value.name
       region             = each.value.region
-      conn               = each.value.conn
+      conn               = connection.aws[each.value.conn]
       policy             = param.policy
       notifier           = param.notifier
       notification_level = param.notification_level
@@ -297,8 +293,7 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   }
 
   param "conn" {
-    type        = string
-    #type        = connection.aws
+    type        = connection.aws
     description = local.description_connection
   }
 
@@ -311,7 +306,6 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   param "notifier" {
     type        = notifier
     description = local.description_notifier
-    #default     = notifier.default
     default     = var.notifier
   }
 
@@ -324,7 +318,6 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   param "approvers" {
     type        = list(notifier)
     description = local.description_approvers
-    #default     = [notifier.default]
     default     = var.approvers
   }
 
@@ -371,7 +364,7 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
           pipeline_args = {
             bucket_name = param.name
             region      = param.region
-            conn        = connection.aws[param.conn]
+            conn        = param.conn
             policy      = param.policy
           }
           success_msg = "Applied lifecycle policy to S3 Bucket ${param.title}."
