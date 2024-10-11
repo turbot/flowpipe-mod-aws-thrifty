@@ -154,7 +154,7 @@ pipeline "correct_rds_db_instances_exceeding_max_age" {
       title                  = each.value.title
       db_instance_identifier = each.value.db_instance_identifier
       region                 = each.value.region
-      conn                   = each.value.conn
+      conn                   = connection.aws[each.value.conn]
       notifier               = param.notifier
       notification_level     = param.notification_level
       approvers              = param.approvers

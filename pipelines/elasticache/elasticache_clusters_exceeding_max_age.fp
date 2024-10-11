@@ -182,7 +182,7 @@ pipeline "correct_elasticache_clusters_exceeding_max_age" {
       title                    = each.value.title
       name                     = each.value.name
       region                   = each.value.region
-      conn                     = each.value.conn
+      conn                     = connection.aws[each.value.conn]
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers

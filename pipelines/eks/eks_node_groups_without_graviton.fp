@@ -188,7 +188,7 @@ pipeline "correct_eks_node_groups_without_graviton" {
       cluster_name             = each.value.cluster_name
       nodegroup_name           = each.value.nodegroup_name
       region                   = each.value.region
-      conn                     = each.value.conn
+      conn                     = connection.aws[each.value.conn]
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers

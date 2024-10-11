@@ -175,7 +175,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
       title              = each.value.title
       id                 = each.value.id
       region             = each.value.region
-      conn               = each.value.conn
+      conn               = connection.aws[each.value.conn]
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers

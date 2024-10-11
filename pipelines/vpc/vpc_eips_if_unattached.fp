@@ -158,7 +158,7 @@ pipeline "correct_vpc_eips_if_unattached" {
       title              = each.value.title
       allocation_id      = each.value.allocation_id
       region             = each.value.region
-      conn               = each.value.conn
+      conn               = connection.aws[each.value.conn]
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers

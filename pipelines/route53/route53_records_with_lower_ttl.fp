@@ -163,7 +163,7 @@ pipeline "correct_route53_records_with_lower_ttl" {
       zone_id            = each.value.zone_id
       type               = each.value.type
       records            = each.value.records
-      conn               = each.value.conn
+      conn               = connection.aws[each.value.conn]
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers

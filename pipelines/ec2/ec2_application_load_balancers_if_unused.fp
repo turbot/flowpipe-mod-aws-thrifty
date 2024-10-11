@@ -162,7 +162,7 @@ pipeline "correct_ec2_application_load_balancers_if_unused" {
       title              = each.value.title
       arn                = each.value.arn
       region             = each.value.region
-      conn               = each.value.conn
+      conn               = connection.aws[each.value.conn]
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers

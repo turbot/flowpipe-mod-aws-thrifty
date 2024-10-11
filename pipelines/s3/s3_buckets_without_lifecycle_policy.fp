@@ -265,7 +265,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
       title              = each.value.title
       name               = each.value.name
       region             = each.value.region
-      conn               = connection.aws[each.value.conn]
+      conn               = connection.aws[connection.aws[each.value.conn]]
       policy             = param.policy
       notifier           = param.notifier
       notification_level = param.notification_level

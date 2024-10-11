@@ -166,7 +166,7 @@ pipeline "correct_vpc_nat_gateways_if_unused" {
       title              = each.value.title
       nat_gateway_id     = each.value.nat_gateway_id
       region             = each.value.region
-      conn               = each.value.conn
+      conn               = connection.aws[each.value.conn]
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers

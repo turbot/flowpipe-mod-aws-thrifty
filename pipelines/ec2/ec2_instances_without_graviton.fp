@@ -155,7 +155,7 @@ pipeline "correct_ec2_instances_without_graviton" {
       title              = each.value.title
       instance_id        = each.value.instance_id
       region             = each.value.region
-      conn               = each.value.conn
+      conn               = connection.aws[each.value.conn]
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers

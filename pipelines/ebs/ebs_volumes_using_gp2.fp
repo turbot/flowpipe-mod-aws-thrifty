@@ -154,7 +154,7 @@ pipeline "correct_ebs_volumes_using_gp2" {
       title              = each.value.title
       volume_id          = each.value.volume_id
       region             = each.value.region
-      conn               = each.value.conn
+      conn               = connection.aws[each.value.conn]
       notifier           = param.notifier
       notification_level = param.notification_level
       approvers          = param.approvers
