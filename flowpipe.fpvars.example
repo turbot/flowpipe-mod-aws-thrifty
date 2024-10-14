@@ -178,7 +178,7 @@ max_concurrency = 1
 # route53_records_with_lower_ttl_enabled_actions  = ["skip", "update_ttl"]
 
 # S3 buckets without lifecycle policy
-# s3_buckets_without_lifecycle_policy_default_policy = <<-EOF
+# s3_buckets_without_lifecycle_policy_default_lifecycle_configuration = <<-EOF
 # {
 #   "Rules": [
 #     {
@@ -220,7 +220,7 @@ max_concurrency = 1
 # s3_buckets_without_lifecycle_policy_trigger_enabled  = false
 # s3_buckets_without_lifecycle_policy_trigger_schedule = "15m"
 # s3_buckets_without_lifecycle_policy_default_action   = "notify"
-# s3_buckets_without_lifecycle_policy_enabled_actions  = ["skip", "apply_policy"]
+# s3_buckets_without_lifecycle_policy_enabled_actions  = ["skip", "apply_lifecycle_configuration"]
 
 # SecretsManager secrets if unused
 # secretsmanager_secrets_if_unused_days = 90
