@@ -13,6 +13,9 @@ mod "aws_thrifty" {
   }
 
   require {
+    flowpipe {
+      min_version = "1.0.0"
+    }
     mod "github.com/turbot/flowpipe-mod-aws" {
       version = "1.0.0-rc.5"
     }
