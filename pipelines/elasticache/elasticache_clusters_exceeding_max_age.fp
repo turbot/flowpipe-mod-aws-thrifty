@@ -262,7 +262,7 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -275,7 +275,7 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
           label        = "Delete Cluster"
           value        = "delete_cluster"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_elasticache_cluster
+          pipeline_ref = aws.pipeline.delete_elasticache_cluster
           pipeline_args = {
             cache_cluster_id = param.name
             region           = param.region

@@ -255,7 +255,7 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -268,7 +268,7 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
           label        = "Delete Cluster"
           value        = "delete_cluster"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_terminate_emr_clusters
+          pipeline_ref = aws.pipeline.terminate_emr_clusters
           pipeline_args = {
             cluster_ids = [param.id]
             region      = param.region

@@ -246,7 +246,7 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -259,7 +259,7 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
           label        = "Delete"
           value        = "delete"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_nat_gateway
+          pipeline_ref = aws.pipeline.delete_nat_gateway
           pipeline_args = {
             nat_gateway_id = param.nat_gateway_id
             region         = param.region

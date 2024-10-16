@@ -230,7 +230,7 @@ pipeline "correct_one_ec2_classic_load_balancer_if_unused" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == "verbose"
@@ -243,7 +243,7 @@ pipeline "correct_one_ec2_classic_load_balancer_if_unused" {
           label        = "Delete Load Balancer"
           value        = "delete_load_balancer"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_elb_load_balancer
+          pipeline_ref = aws.pipeline.delete_elb_load_balancer
           pipeline_args = {
             load_balancer_name = param.name
             region             = param.region

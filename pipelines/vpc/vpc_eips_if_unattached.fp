@@ -238,7 +238,7 @@ pipeline "correct_one_vpc_eip_if_unattached" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -251,7 +251,7 @@ pipeline "correct_one_vpc_eip_if_unattached" {
           label        = "Release"
           value        = "release"
           style        = local.style_ok
-          pipeline_ref = local.aws_pipeline_release_eip
+          pipeline_ref = aws.pipeline.release_eip
           pipeline_args = {
             allocation_id = param.allocation_id
             region        = param.region

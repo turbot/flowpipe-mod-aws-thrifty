@@ -234,7 +234,7 @@ pipeline "correct_one_ec2_instance_of_older_generation" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -247,7 +247,7 @@ pipeline "correct_one_ec2_instance_of_older_generation" {
           label        = "Stop Instance"
           value        = "stop_instance"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_stop_ec2_instances
+          pipeline_ref = aws.pipeline.stop_ec2_instances
           pipeline_args = {
             instance_ids = [param.instance_id]
             region       = param.region
@@ -260,7 +260,7 @@ pipeline "correct_one_ec2_instance_of_older_generation" {
           label        = "Terminate Instance"
           value        = "terminate_instance"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_terminate_ec2_instances
+          pipeline_ref = aws.pipeline.terminate_ec2_instances
           pipeline_args = {
             instance_ids = [param.instance_id]
             region       = param.region

@@ -253,7 +253,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -266,7 +266,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           label        = "Detach Volume"
           value        = "detach_volume"
           style        = local.style_info
-          pipeline_ref = local.aws_pipeline_detach_ebs_volume
+          pipeline_ref = aws.pipeline.detach_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
@@ -279,7 +279,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
           label        = "Delete Volume"
           value        = "delete_volume"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_ebs_volume
+          pipeline_ref = aws.pipeline.delete_ebs_volume
           pipeline_args = {
             volume_id = param.volume_id
             region    = param.region
@@ -326,7 +326,7 @@ pipeline "snapshot_and_delete_ebs_volume" {
   }
 
   step "pipeline" "create_ebs_snapshot" {
-    pipeline = local.aws_pipeline_create_ebs_snapshot
+    pipeline = aws.pipeline.create_ebs_snapshot
     args = {
       region    = param.region
       conn      = param.conn
@@ -336,7 +336,7 @@ pipeline "snapshot_and_delete_ebs_volume" {
 
   step "pipeline" "delete_ebs_volume" {
     depends_on = [step.pipeline.create_ebs_snapshot]
-    pipeline   = local.aws_pipeline_delete_ebs_volume
+    pipeline   = aws.pipeline.delete_ebs_volume
     args = {
       region    = param.region
       conn      = param.conn

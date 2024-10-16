@@ -234,7 +234,7 @@ pipeline "correct_one_rds_db_instance_of_older_generation" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -247,7 +247,7 @@ pipeline "correct_one_rds_db_instance_of_older_generation" {
           label        = "Delete Instance"
           value        = "delete_instance"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_rds_db_instance
+          pipeline_ref = aws.pipeline.delete_rds_db_instance
           pipeline_args = {
             db_instance_identifier = param.db_instance_identifier
             region                 = param.region

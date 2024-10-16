@@ -235,7 +235,7 @@ pipeline "correct_one_ebs_volume_with_low_iops" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -248,7 +248,7 @@ pipeline "correct_one_ebs_volume_with_low_iops" {
           label        = "Update to gp3"
           value        = "update_to_gp3"
           style        = local.style_ok
-          pipeline_ref = local.aws_pipeline_modify_ebs_volume
+          pipeline_ref = aws.pipeline.modify_ebs_volume
           pipeline_args = {
             volume_id   = param.volume_id
             volume_type = "gp3"

@@ -273,7 +273,7 @@ pipeline "correct_one_eks_node_group_without_graviton" {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -286,7 +286,7 @@ pipeline "correct_one_eks_node_group_without_graviton" {
           label        = "Delete Node Group"
           value        = "delete_node_group"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_eks_node_group
+          pipeline_ref = aws.pipeline.delete_eks_node_group
           pipeline_args = {
             cluster_name   = param.cluster_name
             nodegroup_name = param.nodegroup_name
