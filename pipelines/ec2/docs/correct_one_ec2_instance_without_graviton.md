@@ -1,5 +1,3 @@
-# Correct one EC2 instance without graviton processor
-
 ## Overview
 
 EC2 instances without graviton processor incur cost over time, so it's crucial to delete instances without the graviton processor to optimize expenses.

@@ -11,6 +11,56 @@ locals {
     date_part('day', now()-launch_time) > ${var.ec2_instances_exceeding_max_age_days}
     and instance_state in ('running', 'pending', 'rebooting')
   EOQ
+
+  ec2_instances_exceeding_max_age_default_action_enum  = ["notify", "skip", "stop_instance", "terminate_instance"]
+  ec2_instances_exceeding_max_age_enabled_actions_enum = ["skip", "stop_instance", "terminate_instance"]
+}
+
+variable "ec2_instances_exceeding_max_age_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/EC2"
+  }
+}
+
+variable "ec2_instances_exceeding_max_age_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/EC2"
+  }
+}
+
+variable "ec2_instances_exceeding_max_age_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "stop_instance", "terminate_instance"]
+  tags = {
+    folder = "Advanced/EC2"
+  }
+}
+
+variable "ec2_instances_exceeding_max_age_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "stop_instance", "terminate_instance"]
+  enum        = ["skip", "stop_instance", "terminate_instance"]
+  tags = {
+    folder = "Advanced/EC2"
+  }
+}
+
+variable "ec2_instances_exceeding_max_age_days" {
+  type        = number
+  description = "The maximum number of days EC2 instances can be retained."
+  default     = 90
+  tags = {
+    folder = "Advanced/EC2"
+  }
 }
 
 trigger "query" "detect_and_correct_ec2_instances_exceeding_max_age" {
@@ -66,12 +116,14 @@ pipeline "detect_and_correct_ec2_instances_exceeding_max_age" {
     type        = string
     description = local.description_default_action
     default     = var.ec2_instances_exceeding_max_age_default_action
+    enum        = local.ec2_instances_exceeding_max_age_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ec2_instances_exceeding_max_age_enabled_actions
+    enum        = local.ec2_instances_exceeding_max_age_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -96,7 +148,7 @@ pipeline "correct_ec2_instances_exceeding_max_age" {
   title         = "Correct EC2 instances exceeding max age"
   description   = "Executes corrective actions on EC2 instances exceeding max age."
   documentation = file("./pipelines/ec2/docs/correct_ec2_instances_exceeding_max_age.md")
-  tags          = merge(local.ec2_common_tags, { class = "unused" })
+  tags          = merge(local.ec2_common_tags, { class = "unused", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -129,12 +181,14 @@ pipeline "correct_ec2_instances_exceeding_max_age" {
     type        = string
     description = local.description_default_action
     default     = var.ec2_instances_exceeding_max_age_default_action
+    enum        = local.ec2_instances_exceeding_max_age_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ec2_instances_exceeding_max_age_enabled_actions
+    enum        = local.ec2_instances_exceeding_max_age_enabled_actions_enum
   }
 
   step "pipeline" "correct_item" {
@@ -159,7 +213,7 @@ pipeline "correct_one_ec2_instance_exceeding_max_age" {
   title         = "Correct one EC2 instance exceeding max age"
   description   = "Runs corrective action on a single EC2 instance exceeding max age."
   documentation = file("./pipelines/ec2/docs/correct_one_ec2_instance_exceeding_max_age.md")
-  tags          = merge(local.ec2_common_tags, { class = "unused" })
+  tags          = merge(local.ec2_common_tags, { class = "unused", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -203,12 +257,14 @@ pipeline "correct_one_ec2_instance_exceeding_max_age" {
     type        = string
     description = local.description_default_action
     default     = var.ec2_instances_exceeding_max_age_default_action
+    enum        = local.ec2_instances_exceeding_max_age_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ec2_instances_exceeding_max_age_enabled_actions
+    enum        = local.ec2_instances_exceeding_max_age_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -262,50 +318,5 @@ pipeline "correct_one_ec2_instance_exceeding_max_age" {
         }
       }
     }
-  }
-}
-
-variable "ec2_instances_exceeding_max_age_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/EC2"
-  }
-}
-
-variable "ec2_instances_exceeding_max_age_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/EC2"
-  }
-}
-
-variable "ec2_instances_exceeding_max_age_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/EC2"
-  }
-}
-
-variable "ec2_instances_exceeding_max_age_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "stop_instance", "terminate_instance"]
-  tags = {
-    folder = "Advanced/EC2"
-  }
-}
-
-variable "ec2_instances_exceeding_max_age_days" {
-  type        = number
-  description = "The maximum number of days EC2 instances can be retained."
-  default     = 90
-  tags = {
-    folder = "Advanced/EC2"
   }
 }

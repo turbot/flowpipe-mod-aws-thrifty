@@ -1,5 +1,3 @@
-# Correct one EBS volume using gp2
-
 ## Overview
 
 EBS gp2 volumes are more expensive and less performant than gp3 volumes.

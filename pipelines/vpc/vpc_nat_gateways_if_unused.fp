@@ -1,26 +1,67 @@
 locals {
   vpc_nat_gateways_if_unused_query = <<-EOQ
-select
-  concat(nat.nat_gateway_id, ' [', nat.region, '/', nat.account_id, ']') as title,
-  nat.nat_gateway_id,
-  nat.region,
-  nat.sp_connection_name as conn
-from
-  aws_vpc_nat_gateway as nat
-left join
-  aws_vpc_nat_gateway_metric_bytes_out_to_destination as dest
-on
-  nat.nat_gateway_id = dest.nat_gateway_id
-where
-  nat.state = 'available'
-group by
-  nat.nat_gateway_id,
-  nat.region,
-  nat.account_id,
-  nat.sp_connection_name ->> 'connection_name'
-having
-  sum(coalesce(dest.average, 0)) = 0;
+    select
+      concat(nat.nat_gateway_id, ' [', nat.region, '/', nat.account_id, ']') as title,
+      nat.nat_gateway_id,
+      nat.region,
+      nat.sp_connection_name as conn
+    from
+      aws_vpc_nat_gateway as nat
+    left join
+      aws_vpc_nat_gateway_metric_bytes_out_to_destination as dest
+    on
+      nat.nat_gateway_id = dest.nat_gateway_id
+    where
+      nat.state = 'available'
+    group by
+      nat.nat_gateway_id,
+      nat.region,
+      nat.account_id,
+      nat.sp_connection_name ->> 'connection_name'
+    having
+      sum(coalesce(dest.average, 0)) = 0;
   EOQ
+
+  vpc_nat_gateways_if_unused_default_action_enum  = ["notify", "skip", "delete"]
+  vpc_nat_gateways_if_unused_enabled_actions_enum = ["skip", "delete"]
+}
+
+variable "vpc_nat_gateways_if_unused_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/VPC"
+  }
+}
+
+variable "vpc_nat_gateways_if_unused_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/VPC"
+  }
+}
+
+variable "vpc_nat_gateways_if_unused_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "delete"]
+  tags = {
+    folder = "Advanced/VPC"
+  }
+}
+
+variable "vpc_nat_gateways_if_unused_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "delete"]
+  enum        = ["skip", "delete"]
+  tags = {
+    folder = "Advanced/VPC"
+  }
 }
 
 trigger "query" "detect_and_correct_vpc_nat_gateways_if_unused" {
@@ -76,12 +117,14 @@ pipeline "detect_and_correct_vpc_nat_gateways_if_unused" {
     type        = string
     description = local.description_default_action
     default     = var.vpc_nat_gateways_if_unused_default_action
+    enum        = local.vpc_nat_gateways_if_unused_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.vpc_nat_gateways_if_unused_enabled_actions
+    enum        = local.vpc_nat_gateways_if_unused_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -106,7 +149,7 @@ pipeline "correct_vpc_nat_gateways_if_unused" {
   title         = "Correct VPC NAT gateways if unused"
   description   = "Runs corrective action on a collection of NAT Gateways which are unused."
   documentation = file("./pipelines/vpc/docs/correct_vpc_nat_gateways_if_unused.md")
-  tags          = merge(local.vpc_common_tags, { class = "unused" })
+  tags          = merge(local.vpc_common_tags, { class = "unused", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -140,12 +183,14 @@ pipeline "correct_vpc_nat_gateways_if_unused" {
     type        = string
     description = local.description_default_action
     default     = var.vpc_nat_gateways_if_unused_default_action
+    enum        = local.vpc_nat_gateways_if_unused_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.vpc_nat_gateways_if_unused_enabled_actions
+    enum        = local.vpc_nat_gateways_if_unused_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -180,7 +225,7 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
   title         = "Correct one VPC NAT gateway if unused"
   description   = "Runs corrective action on an unused NAT Gateway."
   documentation = file("./pipelines/vpc/docs/correct_one_vpc_nat_gateway_if_unused.md")
-  tags          = merge(local.vpc_common_tags, { class = "unused" })
+  tags          = merge(local.vpc_common_tags, { class = "unused", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -224,12 +269,14 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
     type        = string
     description = local.description_default_action
     default     = var.vpc_nat_gateways_if_unused_default_action
+    enum        = local.vpc_nat_gateways_if_unused_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.vpc_nat_gateways_if_unused_enabled_actions
+    enum        = local.vpc_nat_gateways_if_unused_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -270,41 +317,5 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
         }
       }
     }
-  }
-}
-
-variable "vpc_nat_gateways_if_unused_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/VPC"
-  }
-}
-
-variable "vpc_nat_gateways_if_unused_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/VPC"
-  }
-}
-
-variable "vpc_nat_gateways_if_unused_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/VPC"
-  }
-}
-
-variable "vpc_nat_gateways_if_unused_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "delete"]
-  tags = {
-    folder = "Advanced/VPC"
   }
 }

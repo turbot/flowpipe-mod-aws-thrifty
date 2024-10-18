@@ -1,4 +1,4 @@
-# Detect & correct ElastiCache clusters exceeding max age
+## Overview
 
 ElastiCache clusters have an ongoing cost, so clusters that exceed a specific age should be retired to prevent unnecessary expenses.
 

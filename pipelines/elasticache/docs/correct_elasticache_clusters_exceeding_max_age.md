@@ -1,5 +1,3 @@
-# Correct ElastiCache clusters exceeding max age
-
 ## Overview
 
 ElastiCache clusters incur ongoing costs, so it's important to retire clusters that surpass a certain age to optimize resource use and minimize unnecessary expenses.

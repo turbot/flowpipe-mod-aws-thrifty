@@ -1,5 +1,3 @@
-# Correct EBS snapshots exceeding max age
-
 ## Overview
 
 EBS snapshots can be quite costly to retain, it is also likely that after a certain point in time they're no longer required and should be cleaned up to prevent further costs.

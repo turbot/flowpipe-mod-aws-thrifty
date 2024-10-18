@@ -31,6 +31,49 @@ locals {
       u.id is null
       and  avagsum = 1 and count >= 7;
   EOQ
+
+  emr_clusters_idle_30_mins_default_action_enum  = ["notify", "skip", "delete_cluster"]
+  emr_clusters_idle_30_mins_enabled_actions_enum = ["skip", "delete_cluster"]
+}
+
+// Variable definitions
+
+variable "emr_clusters_idle_30_mins_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/EMR"
+  }
+}
+
+variable "emr_clusters_idle_30_mins_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/EMR"
+  }
+}
+
+variable "emr_clusters_idle_30_mins_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "delete_cluster"]
+  tags = {
+    folder = "Advanced/EMR"
+  }
+}
+
+variable "emr_clusters_idle_30_mins_enabled_actions" {
+  type        = list(string)
+  description = "The response options given to approvers to determine the chosen response."
+  default     = ["skip", "delete_cluster"]
+  enum        = ["skip", "delete_cluster"]
+  tags = {
+    folder = "Advanced/EMR"
+  }
 }
 
 trigger "query" "detect_and_correct_emr_clusters_idle_30_mins" {
@@ -86,12 +129,14 @@ pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
     type        = string
     description = local.description_default_action
     default     = var.emr_clusters_idle_30_mins_default_action
+    enum        = local.emr_clusters_idle_30_mins_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.emr_clusters_idle_30_mins_enabled_actions
+    enum        = local.emr_clusters_idle_30_mins_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -116,7 +161,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
   title         = "Correct EMR Clusters idle 30 mins"
   description   = "Runs corrective action on a collection of EMR clusters idle for more than 30 mins."
   documentation = file("./pipelines/emr/docs/correct_emr_clusters_idle_30_mins.md")
-  tags          = merge(local.emr_common_tags, { class = "unused" })
+  tags          = merge(local.emr_common_tags, { class = "unused", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -149,12 +194,14 @@ pipeline "correct_emr_clusters_idle_30_mins" {
     type        = string
     description = local.description_default_action
     default     = var.emr_clusters_idle_30_mins_default_action
+    enum        = local.emr_clusters_idle_30_mins_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.emr_clusters_idle_30_mins_enabled_actions
+    enum        = local.emr_clusters_idle_30_mins_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -189,7 +236,7 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
   title         = "Correct one EMR Cluster idle 30 mins"
   description   = "Runs corrective action on an EMR cluster idle for more than 30 mins."
   documentation = file("./pipelines/emr/docs/correct_one_emr_cluster_idle_30_mins.md")
-  tags          = merge(local.emr_common_tags, { class = "unused" })
+  tags          = merge(local.emr_common_tags, { class = "unused", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -233,12 +280,14 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
     type        = string
     description = local.description_default_action
     default     = var.emr_clusters_idle_30_mins_default_action
+    enum        = local.emr_clusters_idle_30_mins_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.emr_clusters_idle_30_mins_enabled_actions
+    enum        = local.emr_clusters_idle_30_mins_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -282,40 +331,3 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
   }
 }
 
-// Variable definitions
-
-variable "emr_clusters_idle_30_mins_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/EMR"
-  }
-}
-
-variable "emr_clusters_idle_30_mins_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/EMR"
-  }
-}
-
-variable "emr_clusters_idle_30_mins_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/EMR"
-  }
-}
-
-variable "emr_clusters_idle_30_mins_enabled_actions" {
-  type        = list(string)
-  description = "The response options given to approvers to determine the chosen response."
-  default     = ["skip", "delete_cluster"]
-  tags = {
-    folder = "Advanced/EMR"
-  }
-}

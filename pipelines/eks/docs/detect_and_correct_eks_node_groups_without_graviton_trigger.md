@@ -1,4 +1,4 @@
-# Detect & correct EKS node groups without Graviton
+## Overview
 
 Amazon EKS node groups that don't use Graviton processor may result in higher operational costs. This query trigger identifies non-Graviton node groups and either sends notifications or attempts predefined corrective actions.
 

@@ -1,4 +1,4 @@
-# Detect & correct EC2 classic load balancers if unused
+## Overview
 
 Amazon EC2 classic load balancers with no instances attached still cost money and should be deleted. This query trigger identifies EC2 classic load balancers with no instances attached and either sends notifications or attempts predefined corrective actions.
 

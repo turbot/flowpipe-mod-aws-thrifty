@@ -60,7 +60,7 @@ variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
 variable "s3_buckets_without_lifecycle_policy_default_lifecycle_configuration" {
   type        = string
   description = "The default S3 bucket lifecycle configuration to apply."
-
+  format      = "json"
   tags = {
     folder = "Advanced/S3"
   }
@@ -146,6 +146,7 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
 
   param "lifecycle_configuration" {
     type        = string
+    format      = "json"
     description = "Lifecycle configuration to apply to the S3 bucket, if 'apply' is the chosen response."
     default     = var.s3_buckets_without_lifecycle_policy_default_lifecycle_configuration
   }
@@ -205,7 +206,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
   title         = "Correct S3 buckets without lifecycle policy"
   description   = "Runs corrective action on a collection of S3 buckets which do not have a lifecycle policy."
   documentation = file("./pipelines/s3/docs/correct_s3_buckets_without_lifecycle_policy.md")
-  tags          = merge(local.s3_common_tags, { class = "managed", type = "internal" })
+  tags          = merge(local.s3_common_tags, { class = "managed", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -218,6 +219,7 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
 
   param "lifecycle_configuration" {
     type        = string
+    format      = "json"
     description = "Lifecycle configuration to apply to the S3 bucket, if 'apply' is the chosen response."
     default     = var.s3_buckets_without_lifecycle_policy_default_lifecycle_configuration
   }
@@ -287,7 +289,7 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
   title         = "Correct one S3 bucket without lifecycle policy"
   description   = "Runs corrective action on an individual S3 bucket which does not have a lifecycle policy."
   documentation = file("./pipelines/s3/docs/correct_one_s3_bucket_without_lifecycle_policy.md")
-  tags          = merge(local.s3_common_tags, { class = "managed", type = "internal" })
+  tags          = merge(local.s3_common_tags, { class = "managed", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -311,6 +313,7 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
 
   param "lifecycle_configuration" {
     type        = string
+    format      = "json"
     description = "Lifecycle configuration to apply to the S3 Bucket."
     default     = var.s3_buckets_without_lifecycle_policy_default_lifecycle_configuration
   }

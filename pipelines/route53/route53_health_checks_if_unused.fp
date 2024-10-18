@@ -21,6 +21,47 @@ locals {
   where
     c.health_check_id is null
   EOQ
+
+  route53_health_checks_if_unused_default_action_enum  = ["notify", "skip", "delete_health_check"]
+  route53_health_checks_if_unused_enabled_actions_enum = ["skip", "delete_health_check"]
+}
+
+variable "route53_health_checks_if_unused_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/Route53"
+  }
+}
+
+variable "route53_health_checks_if_unused_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/Route53"
+  }
+}
+
+variable "route53_health_checks_if_unused_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "delete_health_check"]
+  tags = {
+    folder = "Advanced/Route53"
+  }
+}
+
+variable "route53_health_checks_if_unused_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "delete_health_check"]
+  enum        = ["skip", "delete_health_check"]
+  tags = {
+    folder = "Advanced/Route53"
+  }
 }
 
 trigger "query" "detect_and_correct_route53_health_checks_if_unused" {
@@ -76,12 +117,14 @@ pipeline "detect_and_correct_route53_health_checks_if_unused" {
     type        = string
     description = local.description_default_action
     default     = var.route53_health_checks_if_unused_default_action
+    enum        = local.route53_health_checks_if_unused_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.route53_health_checks_if_unused_enabled_actions
+    enum        = local.route53_health_checks_if_unused_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -106,7 +149,7 @@ pipeline "correct_route53_health_checks_if_unused" {
   title         = "Correct Route53 health checks if unused"
   description   = "Runs corrective action on a collection of Route53 health checks that are detected as unused."
   documentation = file("./pipelines/route53/docs/correct_route53_health_checks_if_unused.md")
-  tags          = merge(local.route53_common_tags, { class = "unused" })
+  tags          = merge(local.route53_common_tags, { class = "unused", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -139,12 +182,14 @@ pipeline "correct_route53_health_checks_if_unused" {
     type        = string
     description = local.description_default_action
     default     = var.route53_health_checks_if_unused_default_action
+    enum        = local.route53_health_checks_if_unused_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.route53_health_checks_if_unused_enabled_actions
+    enum        = local.route53_health_checks_if_unused_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -179,7 +224,7 @@ pipeline "correct_one_route53_health_check_if_unused" {
   title         = "Correct one Route53 health check if unused"
   description   = "Runs corrective action on an unused Route53 health check."
   documentation = file("./pipelines/route53/docs/correct_one_route53_health_check_if_unused.md")
-  tags          = merge(local.route53_common_tags, { class = "unused" })
+  tags          = merge(local.route53_common_tags, { class = "unused", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -223,12 +268,14 @@ pipeline "correct_one_route53_health_check_if_unused" {
     type        = string
     description = local.description_default_action
     default     = var.route53_health_checks_if_unused_default_action
+    enum        = local.route53_health_checks_if_unused_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.route53_health_checks_if_unused_enabled_actions
+    enum        = local.route53_health_checks_if_unused_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -269,41 +316,5 @@ pipeline "correct_one_route53_health_check_if_unused" {
         }
       }
     }
-  }
-}
-
-variable "route53_health_checks_if_unused_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/Route53"
-  }
-}
-
-variable "route53_health_checks_if_unused_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/Route53"
-  }
-}
-
-variable "route53_health_checks_if_unused_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/Route53"
-  }
-}
-
-variable "route53_health_checks_if_unused_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "delete_health_check"]
-  tags = {
-    folder = "Advanced/Route53"
   }
 }

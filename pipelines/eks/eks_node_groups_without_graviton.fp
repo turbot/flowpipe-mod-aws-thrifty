@@ -42,6 +42,47 @@ locals {
   where
     ami_type = 'CUSTOM%' and a.architecture <> 'arm_64' and a.platform = 'linux';
   EOQ
+
+  eks_node_groups_without_graviton_default_action_enum  = ["notify", "skip", "delete_node_group"]
+  eks_node_groups_without_graviton_enabled_actions_enum = ["skip", "delete_node_group"]
+}
+
+variable "eks_node_groups_without_graviton_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/EKS"
+  }
+}
+
+variable "eks_node_groups_without_graviton_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/EKS"
+  }
+}
+
+variable "eks_node_groups_without_graviton_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "delete_node_group"]
+  tags = {
+    folder = "Advanced/EKS"
+  }
+}
+
+variable "eks_node_groups_without_graviton_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "delete_node_group"]
+  enum        = ["skip", "delete_node_group"]
+  tags = {
+    folder = "Advanced/EKS"
+  }
 }
 
 trigger "query" "detect_and_correct_eks_node_groups_without_graviton" {
@@ -93,16 +134,18 @@ pipeline "detect_and_correct_eks_node_groups_without_graviton" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.description_default_action
     default     = var.eks_node_groups_without_graviton_default_action
+    enum        = local.eks_node_groups_without_graviton_default_action_enum
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.eks_node_groups_without_graviton_enabled_actions
+    enum        = local.eks_node_groups_without_graviton_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -117,8 +160,8 @@ pipeline "detect_and_correct_eks_node_groups_without_graviton" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -127,7 +170,7 @@ pipeline "correct_eks_node_groups_without_graviton" {
   title         = "Correct EKS node groups without graviton"
   description   = "Runs corrective action on a collection of EKS node groups without graviton processor."
   documentation = file("./pipelines/eks/docs/correct_eks_node_groups_without_graviton.md")
-  tags          = merge(local.eks_common_tags, { class = "deprecated" })
+  tags          = merge(local.eks_common_tags, { class = "deprecated", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -157,16 +200,18 @@ pipeline "correct_eks_node_groups_without_graviton" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.description_default_action
     default     = var.eks_node_groups_without_graviton_default_action
+    enum        = local.eks_node_groups_without_graviton_default_action_enum
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.eks_node_groups_without_graviton_enabled_actions
+    enum        = local.eks_node_groups_without_graviton_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -192,8 +237,8 @@ pipeline "correct_eks_node_groups_without_graviton" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action           = param.default_action
+      enabled_actions          = param.enabled_actions
     }
   }
 }
@@ -202,7 +247,7 @@ pipeline "correct_one_eks_node_group_without_graviton" {
   title         = "Correct one EKS node group without graviton"
   description   = "Runs corrective action on an EKS node group without graviton processor."
   documentation = file("./pipelines/eks/docs/correct_one_eks_node_group_without_graviton.md")
-  tags          = merge(local.eks_common_tags, { class = "deprecated" })
+  tags          = merge(local.eks_common_tags, { class = "deprecated", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -247,16 +292,18 @@ pipeline "correct_one_eks_node_group_without_graviton" {
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.description_default_action
     default     = var.eks_node_groups_without_graviton_default_action
+    enum        = local.eks_node_groups_without_graviton_default_action_enum
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.eks_node_groups_without_graviton_enabled_actions
+    enum        = local.eks_node_groups_without_graviton_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -267,7 +314,7 @@ pipeline "correct_one_eks_node_group_without_graviton" {
       approvers                = param.approvers
       detect_msg               = "Detected EKS Node Group ${param.title} without graviton processor."
       default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      enabled_actions = param.enabled_actions
       response_options = {
         "skip" = {
           label        = "Skip"
@@ -301,38 +348,4 @@ pipeline "correct_one_eks_node_group_without_graviton" {
   }
 }
 
-variable "eks_node_groups_without_graviton_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/EKS"
-  }
-}
 
-variable "eks_node_groups_without_graviton_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/EKS"
-  }
-}
-
-variable "eks_node_groups_without_graviton_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "delete_node_group"]
-  tags = {
-    folder = "Advanced/EKS"
-  }
-}
-
-variable "eks_node_groups_without_graviton_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/EKS"
-  }
-}

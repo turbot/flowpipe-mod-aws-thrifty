@@ -1,5 +1,3 @@
-# Correct one EC2 application load balancer if unused
-
 ## Overview
 
 Amazon EC2 application load balancers with no targets attached still cost money and should be deleted.

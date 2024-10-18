@@ -29,6 +29,9 @@ locals {
   where
     has_stopped_instances = true;
   EOQ
+
+  ebs_volumes_attached_to_stopped_instances_default_action_enum  = ["notify", "skip", "detach_volume", "delete_volume", "snapshot_and_delete_volume"]
+  ebs_volumes_attached_to_stopped_instances_enabled_actions_enum = ["skip", "detach_volume", "delete_volume", "snapshot_and_delete_volume"]
 }
 
 trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
@@ -49,6 +52,45 @@ trigger "query" "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
     }
   }
 }
+
+variable "ebs_volumes_attached_to_stopped_instances_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/EBS"
+  }
+}
+
+variable "ebs_volumes_attached_to_stopped_instances_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/EBS"
+  }
+}
+
+variable "ebs_volumes_attached_to_stopped_instances_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "detach_volume", "delete_volume", "snapshot_and_delete_volume"]
+  tags = {
+    folder = "Advanced/EBS"
+  }
+}
+
+variable "ebs_volumes_attached_to_stopped_instances_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "detach_volume", "delete_volume", "snapshot_and_delete_volume"]
+  enum        = ["skip", "detach_volume", "delete_volume", "snapshot_and_delete_volume"]
+  tags = {
+    folder = "Advanced/EBS"
+  }
+}
+
 
 pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
   title         = "Detect & correct EBS volumes attached to stopped instances"
@@ -84,12 +126,14 @@ pipeline "detect_and_correct_ebs_volumes_attached_to_stopped_instances" {
     type        = string
     description = local.description_default_action
     default     = var.ebs_volumes_attached_to_stopped_instances_default_action
+    enum        = local.ebs_volumes_attached_to_stopped_instances_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ebs_volumes_attached_to_stopped_instances_enabled_actions
+    enum        = local.ebs_volumes_attached_to_stopped_instances_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -114,7 +158,7 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
   title         = "Correct EBS volumes attached to stopped instances"
   description   = "Runs corrective action on a collection of EBS volumes attached to stopped instances."
   documentation = file("./pipelines/ebs/docs/correct_ebs_volumes_attached_to_stopped_instances.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags          = merge(local.ebs_common_tags, { class = "unused", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -147,12 +191,14 @@ pipeline "correct_ebs_volumes_attached_to_stopped_instances" {
     type        = string
     description = local.description_default_action
     default     = var.ebs_volumes_attached_to_stopped_instances_default_action
+    enum        = local.ebs_volumes_attached_to_stopped_instances_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ebs_volumes_attached_to_stopped_instances_enabled_actions
+    enum        = local.ebs_volumes_attached_to_stopped_instances_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -187,7 +233,7 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
   title         = "Correct one EBS volume attached to stopped instance"
   description   = "Runs corrective action on an EBS volume attached to a stopped instance."
   documentation = file("./pipelines/ebs/docs/correct_one_ebs_volume_attached_to_stopped_instance.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags          = merge(local.ebs_common_tags, { class = "unused", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -231,12 +277,14 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
     type        = string
     description = local.description_default_action
     default     = var.ebs_volumes_attached_to_stopped_instances_default_action
+    enum        = local.ebs_volumes_attached_to_stopped_instances_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ebs_volumes_attached_to_stopped_instances_enabled_actions
+    enum        = local.ebs_volumes_attached_to_stopped_instances_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -309,7 +357,10 @@ pipeline "correct_one_ebs_volume_attached_to_stopped_instance" {
 pipeline "snapshot_and_delete_ebs_volume" {
   title       = "Snapshot & Delete EBS Volume"
   description = "A utility pipeline which snapshots and deletes an EBS volume."
-
+  tags = {
+    folder  = "Internal"
+  }
+  
   param "region" {
     type        = string
     description = local.description_region
@@ -342,41 +393,5 @@ pipeline "snapshot_and_delete_ebs_volume" {
       conn      = param.conn
       volume_id = param.volume_id
     }
-  }
-}
-
-variable "ebs_volumes_attached_to_stopped_instances_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/EBS"
-  }
-}
-
-variable "ebs_volumes_attached_to_stopped_instances_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/EBS"
-  }
-}
-
-variable "ebs_volumes_attached_to_stopped_instances_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/EBS"
-  }
-}
-
-variable "ebs_volumes_attached_to_stopped_instances_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "detach_volume", "delete_volume", "snapshot_and_delete_volume"]
-  tags = {
-    folder = "Advanced/EBS"
   }
 }

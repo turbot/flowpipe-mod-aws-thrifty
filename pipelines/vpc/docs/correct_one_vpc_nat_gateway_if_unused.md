@@ -1,5 +1,3 @@
-# Correct one VPC NAT gateway if unused
-
 ## Overview
 
 NAT gateways are charged per hour once they are provisioned and available, so unused gateways should be deleted to prevent costs.

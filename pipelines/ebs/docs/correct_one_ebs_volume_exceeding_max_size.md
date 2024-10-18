@@ -1,5 +1,3 @@
-# Correct one EBS volume exceeding max size
-
 ## Overview
 
 Excessively large EBS volumes accrue high costs and usually aren't required to be so large, these should be reviewed and if not required removed.

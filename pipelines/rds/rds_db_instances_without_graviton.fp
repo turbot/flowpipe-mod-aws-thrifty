@@ -10,6 +10,47 @@ locals {
   where
     class not like 'db.%g%.%';
   EOQ
+  
+  rds_db_instances_without_graviton_default_action_enum  = ["notify", "skip", "delete_instance"]
+  rds_db_instances_without_graviton_enabled_actions_enum = ["skip", "delete_instance"]
+}
+
+variable "rds_db_instances_without_graviton_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/RDS"
+  }
+}
+
+variable "rds_db_instances_without_graviton_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/RDS"
+  }
+}
+
+variable "rds_db_instances_without_graviton_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "delete_instance"]
+  tags = {
+    folder = "Advanced/RDS"
+  }
+}
+
+variable "rds_db_instances_without_graviton_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "delete_instance"]
+  enum        = ["skip", "delete_instance"]
+  tags = {
+    folder = "Advanced/RDS"
+  }
 }
 
 trigger "query" "detect_and_correct_rds_db_instances_without_graviton" {
@@ -65,12 +106,14 @@ pipeline "detect_and_correct_rds_db_instances_without_graviton" {
     type        = string
     description = local.description_default_action
     default     = var.rds_db_instances_without_graviton_default_action
+    enum        = local.rds_db_instances_without_graviton_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.rds_db_instances_without_graviton_enabled_actions
+    enum        = local.rds_db_instances_without_graviton_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -95,7 +138,7 @@ pipeline "correct_rds_db_instances_without_graviton" {
   title         = "Correct RDS DB instances without graviton processor"
   description   = "Runs corrective action on a collection of RDS DB instances without graviton processor."
   documentation = file("./pipelines/rds/docs/correct_rds_db_instances_without_graviton.md")
-  tags          = merge(local.rds_common_tags, { class = "deprecated" })
+  tags          = merge(local.rds_common_tags, { class = "deprecated", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -128,12 +171,14 @@ pipeline "correct_rds_db_instances_without_graviton" {
     type        = string
     description = local.description_default_action
     default     = var.rds_db_instances_without_graviton_default_action
+    enum        = local.rds_db_instances_without_graviton_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.rds_db_instances_without_graviton_enabled_actions
+    enum        = local.rds_db_instances_without_graviton_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -168,7 +213,7 @@ pipeline "correct_one_rds_db_instance_without_graviton" {
   title         = "Correct one RDS DB instance without graviton processor"
   description   = "Runs corrective action on an RDS DB instance without graviton processor."
   documentation = file("./pipelines/rds/docs/correct_one_rds_db_instance_without_graviton.md")
-  tags          = merge(local.rds_common_tags, { class = "deprecated" })
+  tags          = merge(local.rds_common_tags, { class = "deprecated", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -212,12 +257,14 @@ pipeline "correct_one_rds_db_instance_without_graviton" {
     type        = string
     description = local.description_default_action
     default     = var.rds_db_instances_without_graviton_default_action
+    enum        = local.rds_db_instances_without_graviton_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.rds_db_instances_without_graviton_enabled_actions
+    enum        = local.rds_db_instances_without_graviton_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -258,41 +305,5 @@ pipeline "correct_one_rds_db_instance_without_graviton" {
         }
       }
     }
-  }
-}
-
-variable "rds_db_instances_without_graviton_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/RDS"
-  }
-}
-
-variable "rds_db_instances_without_graviton_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/RDS"
-  }
-}
-
-variable "rds_db_instances_without_graviton_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/RDS"
-  }
-}
-
-variable "rds_db_instances_without_graviton_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "delete_instance"]
-  tags = {
-    folder = "Advanced/RDS"
   }
 }

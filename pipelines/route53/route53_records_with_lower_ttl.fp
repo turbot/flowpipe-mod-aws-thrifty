@@ -13,6 +13,47 @@ locals {
   where
     ttl :: int < 3600
   EOQ
+
+  route53_records_with_lower_ttl_default_action_enum  = ["notify", "skip", "update_ttl"]
+  route53_records_with_lower_ttl_enabled_actions_enum = ["skip", "update_ttl"]
+}
+
+variable "route53_records_with_lower_ttl_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/Route53"
+  }
+}
+
+variable "route53_records_with_lower_ttl_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/Route53"
+  }
+}
+
+variable "route53_records_with_lower_ttl_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "update_ttl"]
+  tags = {
+    folder = "Advanced/Route53"
+  }
+}
+
+variable "route53_records_with_lower_ttl_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "update_ttl"]
+  enum        = ["skip", "update_ttl"]
+  tags = {
+    folder = "Advanced/Route53"
+  }
 }
 
 trigger "query" "detect_and_correct_route53_records_with_lower_ttl" {
@@ -68,12 +109,14 @@ pipeline "detect_and_correct_route53_records_with_lower_ttl" {
     type        = string
     description = local.description_default_action
     default     = var.route53_records_with_lower_ttl_default_action
+    enum        = local.route53_records_with_lower_ttl_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.route53_records_with_lower_ttl_enabled_actions
+    enum        = local.route53_records_with_lower_ttl_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -98,7 +141,7 @@ pipeline "correct_route53_records_with_lower_ttl" {
   title         = "Correct Route53 records with lower TTL"
   description   = "Runs corrective action on a collection of Route53 records with TTL lower than 3600 seconds."
   documentation = file("./pipelines/route53/docs/correct_route53_records_with_lower_ttl.md")
-  tags          = merge(local.route53_common_tags, { class = "higher" })
+  tags          = merge(local.route53_common_tags, { class = "higher", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -134,12 +177,14 @@ pipeline "correct_route53_records_with_lower_ttl" {
     type        = string
     description = local.description_default_action
     default     = var.route53_records_with_lower_ttl_default_action
+    enum        = local.route53_records_with_lower_ttl_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.route53_records_with_lower_ttl_enabled_actions
+    enum        = local.route53_records_with_lower_ttl_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -177,7 +222,7 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
   title         = "Correct one Route53 record with lower TTL"
   description   = "Runs corrective action on a Route53 record with TTL lower than 3600 seconds."
   documentation = file("./pipelines/route53/docs/correct_one_route53_record_with_lower_ttl.md")
-  tags          = merge(local.route53_common_tags, { class = "higher" })
+  tags          = merge(local.route53_common_tags, { class = "higher", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -236,12 +281,14 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
     type        = string
     description = local.description_default_action
     default     = var.route53_records_with_lower_ttl_default_action
+    enum        = local.route53_records_with_lower_ttl_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.route53_records_with_lower_ttl_enabled_actions
+    enum        = local.route53_records_with_lower_ttl_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -286,41 +333,5 @@ pipeline "correct_one_route53_record_with_lower_ttl" {
         }
       }
     }
-  }
-}
-
-variable "route53_records_with_lower_ttl_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/Route53"
-  }
-}
-
-variable "route53_records_with_lower_ttl_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/Route53"
-  }
-}
-
-variable "route53_records_with_lower_ttl_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/Route53"
-  }
-}
-
-variable "route53_records_with_lower_ttl_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "update_ttl"]
-  tags = {
-    folder = "Advanced/Route53"
   }
 }

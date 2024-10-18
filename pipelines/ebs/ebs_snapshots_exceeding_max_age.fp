@@ -10,6 +10,56 @@ locals {
   where
     (current_timestamp - (${var.ebs_snapshots_exceeding_max_age_days}::int || ' days')::interval) > start_time
   EOQ
+
+  ebs_snapshots_exceeding_max_age_default_action_enum = ["notify", "skip", "delete_snapshot"]
+  ebs_snapshots_exceeding_max_age_enabled_actions_enum = ["skip", "delete_snapshot"]
+}
+
+variable "ebs_snapshots_exceeding_max_age_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/EBS"
+  }
+}
+
+variable "ebs_snapshots_exceeding_max_age_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/EBS"
+  }
+}
+
+variable "ebs_snapshots_exceeding_max_age_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "delete_snapshot"]
+  tags = {
+    folder = "Advanced/EBS"
+  }
+}
+
+variable "ebs_snapshots_exceeding_max_age_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "delete_snapshot"]
+  enum        = ["skip", "delete_snapshot"]
+  tags = {
+    folder = "Advanced/EBS"
+  }
+}
+
+variable "ebs_snapshots_exceeding_max_age_days" {
+  type        = number
+  description = "The maximum number of days EBS snapshots can be retained."
+  default     = 90
+  tags = {
+    folder = "Advanced/EBS"
+  }
 }
 
 trigger "query" "detect_and_correct_ebs_snapshots_exceeding_max_age" {
@@ -65,12 +115,14 @@ pipeline "detect_and_correct_ebs_snapshots_exceeding_max_age" {
     type        = string
     description = local.description_default_action
     default     = var.ebs_snapshots_exceeding_max_age_default_action
+    enum        = local.ebs_snapshots_exceeding_max_age_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ebs_snapshots_exceeding_max_age_enabled_actions
+    enum        = local.ebs_snapshots_exceeding_max_age_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -95,7 +147,7 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
   title         = "Correct EBS snapshots exceeding max age"
   description   = "Runs corrective action on a collection of EBS snapshots exceeding max age."
   documentation = file("./pipelines/ebs/docs/correct_ebs_snapshots_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags          = merge(local.ebs_common_tags, { class = "unused", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -129,12 +181,14 @@ pipeline "correct_ebs_snapshots_exceeding_max_age" {
     type        = string
     description = local.description_default_action
     default     = var.ebs_snapshots_exceeding_max_age_default_action
+    enum        = local.ebs_snapshots_exceeding_max_age_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ebs_snapshots_exceeding_max_age_enabled_actions
+    enum        = local.ebs_snapshots_exceeding_max_age_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -169,7 +223,7 @@ pipeline "correct_one_ebs_snapshot_exceeding_max_age" {
   title         = "Correct one EBS snapshot exceeding max age"
   description   = "Runs corrective action on an EBS snapshot exceeding max age."
   documentation = file("./pipelines/ebs/docs/correct_one_ebs_snapshot_exceeding_max_age.md")
-  tags          = merge(local.ebs_common_tags, { class = "unused" })
+  tags          = merge(local.ebs_common_tags, { class = "unused", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -213,12 +267,14 @@ pipeline "correct_one_ebs_snapshot_exceeding_max_age" {
     type        = string
     description = local.description_default_action
     default     = var.ebs_snapshots_exceeding_max_age_default_action
+    enum        = local.ebs_snapshots_exceeding_max_age_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.ebs_snapshots_exceeding_max_age_enabled_actions
+    enum        = local.ebs_snapshots_exceeding_max_age_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -259,50 +315,5 @@ pipeline "correct_one_ebs_snapshot_exceeding_max_age" {
         }
       }
     }
-  }
-}
-
-variable "ebs_snapshots_exceeding_max_age_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/EBS"
-  }
-}
-
-variable "ebs_snapshots_exceeding_max_age_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/EBS"
-  }
-}
-
-variable "ebs_snapshots_exceeding_max_age_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/EBS"
-  }
-}
-
-variable "ebs_snapshots_exceeding_max_age_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "delete_snapshot"]
-  tags = {
-    folder = "Advanced/EBS"
-  }
-}
-
-variable "ebs_snapshots_exceeding_max_age_days" {
-  type        = number
-  description = "The maximum number of days EBS snapshots can be retained."
-  default     = 90
-  tags = {
-    folder = "Advanced/EBS"
   }
 }

@@ -1,4 +1,4 @@
-# Detect & correct EC2 application load balancers if unused
+## Overview
 
 Amazon EC2 application load balancers with no targets attached still cost money and should be deleted. This pipeline identifies EC2 application load balancers with no targets attached and either sends notifications or attempts predefined corrective actions.
 

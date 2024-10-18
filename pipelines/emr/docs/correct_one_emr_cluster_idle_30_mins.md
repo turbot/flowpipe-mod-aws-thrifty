@@ -1,5 +1,3 @@
-# Correct one EMR cluster idle for more than 30 mins
-
 ## Overview
 
 EMR clusters incur cost over time, so it's crucial to delete clusters that have been idle for more than 30 minutes.

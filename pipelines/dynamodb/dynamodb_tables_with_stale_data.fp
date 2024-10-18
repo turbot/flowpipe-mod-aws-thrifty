@@ -1,5 +1,4 @@
 locals {
-
   dynamodb_tables_with_stale_data_query = <<-EOQ
   select
     concat(name, ' [', region, '/', account_id, ']') as title,
@@ -11,6 +10,56 @@ locals {
   where
     (current_timestamp - (${var.dynamodb_tables_with_stale_data_max_days}::int || ' days')::interval) > (latest_stream_label::timestamp)
   EOQ
+
+  dynamodb_tables_with_stale_data_default_action_enum  = ["notify", "skip", "delete_table"] 
+  dynamodb_tables_with_stale_data_enabled_actions_enum = ["skip", "delete_table"]
+}
+
+variable "dynamodb_tables_with_stale_data_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/DynamoDB"
+  }
+}
+
+variable "dynamodb_tables_with_stale_data_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/DynamoDB"
+  }
+}
+
+variable "dynamodb_tables_with_stale_data_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "delete_table"]
+  tags = {
+    folder = "Advanced/DynamoDB"
+  }
+}
+
+variable "dynamodb_tables_with_stale_data_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "delete_table"]
+  enum        = ["skip", "delete_table"]
+  tags = {
+    folder = "Advanced/DynamoDB"
+  }
+}
+
+variable "dynamodb_tables_with_stale_data_max_days" {
+  type        = number
+  description = "The maximum number of days DynamoDB table stale data can be retained."
+  default     = 90
+  tags = {
+    folder = "Advanced/DynamoDB"
+  }
 }
 
 trigger "query" "detect_and_correct_dynamodb_tables_with_stale_data" {
@@ -96,7 +145,7 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
   title         = "Correct DynamoDB table with stale data"
   description   = "Runs corrective action on a collection of DynamoDB table with stale data."
   documentation = file("./pipelines/dynamodb/docs/correct_dynamodb_tables_with_stale_data.md")
-  tags          = merge(local.dynamodb_common_tags, { class = "unused" })
+  tags          = merge(local.dynamodb_common_tags, { class = "unused", folder = "Internal" })
 
   param "items" {
     type = list(object({
@@ -130,12 +179,14 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
     type        = string
     description = local.description_default_action
     default     = var.dynamodb_tables_with_stale_data_default_action
+    enum        = local.dynamodb_tables_with_stale_data_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.dynamodb_tables_with_stale_data_enabled_actions
+    enum        = local.dynamodb_tables_with_stale_data_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -170,7 +221,7 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
   title         = "Correct one DynamoDB table with stale data"
   description   = "Runs corrective action on an DynamoDB table with stale data."
   documentation = file("./pipelines/dynamodb/docs/correct_one_dynamodb_table_with_stale_data.md")
-  tags          = merge(local.dynamodb_common_tags, { class = "unused" })
+  tags          = merge(local.dynamodb_common_tags, { class = "unused", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -214,12 +265,14 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
     type        = string
     description = local.description_default_action
     default     = var.dynamodb_tables_with_stale_data_default_action
+    enum        = local.dynamodb_tables_with_stale_data_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.dynamodb_tables_with_stale_data_enabled_actions
+    enum        = local.dynamodb_tables_with_stale_data_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -260,50 +313,5 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
         }
       }
     }
-  }
-}
-
-variable "dynamodb_tables_with_stale_data_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-  tags = {
-    folder = "Advanced/DynamoDB"
-  }
-}
-
-variable "dynamodb_tables_with_stale_data_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-  tags = {
-    folder = "Advanced/DynamoDB"
-  }
-}
-
-variable "dynamodb_tables_with_stale_data_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-  tags = {
-    folder = "Advanced/DynamoDB"
-  }
-}
-
-variable "dynamodb_tables_with_stale_data_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "delete_table"]
-  tags = {
-    folder = "Advanced/DynamoDB"
-  }
-}
-
-variable "dynamodb_tables_with_stale_data_max_days" {
-  type        = number
-  description = "The maximum number of days DynamoDB table stale data can be retained."
-  default     = 90
-  tags = {
-    folder = "Advanced/DynamoDB"
   }
 }
