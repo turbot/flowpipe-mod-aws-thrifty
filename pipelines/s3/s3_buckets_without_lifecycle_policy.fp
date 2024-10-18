@@ -12,6 +12,9 @@ locals {
     and lifecycle_rules is null
   limit 3;
   EOQ
+
+  s3_buckets_without_lifecycle_policy_default_action_enum  = ["notify", "skip", "apply_lifecycle_configuration"]
+  s3_buckets_without_lifecycle_policy_enabled_actions_enum = ["skip", "apply_lifecycle_configuration"]
 }
 
 variable "s3_buckets_without_lifecycle_policy_trigger_enabled" {
@@ -37,6 +40,7 @@ variable "s3_buckets_without_lifecycle_policy_default_action" {
   description = "The default action to use for the detected item, used if no input is provided."
   default     = "notify"
   enum        = ["notify", "skip", "apply_lifecycle_configuration"]
+
   tags = {
     folder = "Advanced/S3"
   }
@@ -47,6 +51,7 @@ variable "s3_buckets_without_lifecycle_policy_enabled_actions" {
   description = "The list of enabled actions to provide to approvers for selection."
   default     = ["skip", "apply_lifecycle_configuration"]
   enum        = ["skip", "apply_lifecycle_configuration"]
+
   tags = {
     folder = "Advanced/S3"
   }
@@ -167,14 +172,14 @@ pipeline "detect_and_correct_s3_buckets_without_lifecycle_policy" {
     type        = string
     description = local.description_default_action
     default     = var.s3_buckets_without_lifecycle_policy_default_action
-    enum        = ["notify", "skip", "apply_lifecycle_configuration"]
+    enum        = local.s3_buckets_without_lifecycle_policy_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
-    enum        = ["skip", "apply_lifecycle_configuration"]
+    enum        = local.s3_buckets_without_lifecycle_policy_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -239,12 +244,14 @@ pipeline "correct_s3_buckets_without_lifecycle_policy" {
     type        = string
     description = local.description_default_action
     default     = var.s3_buckets_without_lifecycle_policy_default_action
+    enum        = local.s3_buckets_without_lifecycle_policy_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
+    enum        = local.s3_buckets_without_lifecycle_policy_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
@@ -330,12 +337,14 @@ pipeline "correct_one_s3_bucket_without_lifecycle_policy" {
     type        = string
     description = local.description_default_action
     default     = var.s3_buckets_without_lifecycle_policy_default_action
+    enum        = local.s3_buckets_without_lifecycle_policy_default_action_enum
   }
 
   param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.s3_buckets_without_lifecycle_policy_enabled_actions
+    enum        = local.s3_buckets_without_lifecycle_policy_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
