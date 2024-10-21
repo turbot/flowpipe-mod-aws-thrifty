@@ -8,9 +8,7 @@ locals {
   from
     aws_s3_bucket
   where
-    name = 'mike-flowpipe-test'
-    and lifecycle_rules is null
-  limit 3;
+    lifecycle_rules is null;
   EOQ
 
   s3_buckets_without_lifecycle_policy_default_action_enum  = ["notify", "skip", "apply_lifecycle_configuration"]
