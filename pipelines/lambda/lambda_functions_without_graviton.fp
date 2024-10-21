@@ -95,6 +95,7 @@ pipeline "detect_and_correct_lambda_functions_without_graviton" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -163,6 +164,7 @@ pipeline "correct_lambda_functions_without_graviton" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -249,6 +251,7 @@ pipeline "correct_one_lambda_function_without_graviton" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {

@@ -103,6 +103,7 @@ pipeline "detect_and_correct_rds_db_instances_exceeding_max_age" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -168,6 +169,7 @@ pipeline "correct_rds_db_instances_exceeding_max_age" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -254,6 +256,7 @@ pipeline "correct_one_rds_db_instance_exceeding_max_age" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -275,7 +278,7 @@ pipeline "correct_one_rds_db_instance_exceeding_max_age" {
     default     = var.rds_db_instances_exceeding_max_age_enabled_actions
     enum        = local.rds_db_instances_exceeding_max_age_enabled_actions_enum
   }
-  
+
   step "pipeline" "respond" {
     pipeline = detect_correct.pipeline.correction_handler
     args = {

@@ -105,6 +105,7 @@ pipeline "detect_and_correct_vpc_nat_gateways_if_unused" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -171,6 +172,7 @@ pipeline "correct_vpc_nat_gateways_if_unused" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -257,6 +259,7 @@ pipeline "correct_one_vpc_nat_gateway_if_unused" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {

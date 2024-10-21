@@ -17,6 +17,12 @@ locals {
   style_alert   = "alert"
 }
 
+// Notification level
+
+locals {
+  notification_level_enum = ["info", "verbose", "error"]
+}
+
 // Common Texts
 locals {
   description_database         = "Database connection string."

@@ -103,6 +103,7 @@ pipeline "detect_and_correct_dynamodb_tables_with_stale_data" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -167,6 +168,7 @@ pipeline "correct_dynamodb_tables_with_stale_data" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -253,6 +255,7 @@ pipeline "correct_one_dynamodb_table_with_stale_data" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {

@@ -117,6 +117,7 @@ pipeline "detect_and_correct_emr_clusters_idle_30_mins" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -182,6 +183,7 @@ pipeline "correct_emr_clusters_idle_30_mins" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -268,6 +270,7 @@ pipeline "correct_one_emr_cluster_idle_30_mins" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {

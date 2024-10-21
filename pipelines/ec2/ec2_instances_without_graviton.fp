@@ -95,6 +95,7 @@ pipeline "detect_and_correct_ec2_instances_without_graviton" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -160,6 +161,7 @@ pipeline "correct_ec2_instances_without_graviton" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -246,6 +248,7 @@ pipeline "correct_one_ec2_instance_without_graviton" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {

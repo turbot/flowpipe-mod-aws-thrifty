@@ -94,6 +94,7 @@ pipeline "detect_and_correct_ebs_volumes_using_gp2" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -159,6 +160,7 @@ pipeline "correct_ebs_volumes_using_gp2" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -245,6 +247,7 @@ pipeline "correct_one_ebs_volume_using_gp2" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {

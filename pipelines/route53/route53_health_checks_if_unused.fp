@@ -105,6 +105,7 @@ pipeline "detect_and_correct_route53_health_checks_if_unused" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -170,6 +171,7 @@ pipeline "correct_route53_health_checks_if_unused" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
@@ -256,6 +258,7 @@ pipeline "correct_one_route53_health_check_if_unused" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
