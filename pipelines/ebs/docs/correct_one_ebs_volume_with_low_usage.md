@@ -1,5 +1,3 @@
-# Correct one EBS volume with low usage
-
 ## Overview
 
 EBS volumes with low usage may be indicative that they're no longer required, these should be reviewed.

@@ -1,5 +1,3 @@
-# Correct one RDS DB instance exceeding max age
-
 ## Overview
 
 RDS DB Instances that run for a long time should either be associated with a Reserved Instance or removed to reduce costs.

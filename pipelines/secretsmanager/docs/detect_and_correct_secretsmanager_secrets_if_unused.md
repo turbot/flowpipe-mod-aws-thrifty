@@ -1,4 +1,4 @@
-# Detect & correct SecretsManager secrets if unused
+## Overview
 
 SecretsManager secrets have an inherent monthly cost, therefore secrets which are no longer accessed / used should be removed to prevent further charges.
 

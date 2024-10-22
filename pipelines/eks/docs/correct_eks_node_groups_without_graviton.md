@@ -1,5 +1,3 @@
-# Correct EKS node groups without Graviton
-
 ## Overview
 
 Amazon EKS node groups that don't use Graviton processor may incur higher costs compared to those that do. Switching to Graviton processor can help reduce your operational expenses.

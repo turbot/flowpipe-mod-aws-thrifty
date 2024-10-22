@@ -1,5 +1,3 @@
-# Correct one EBS volume using io1
-
 ## Overview
 
 EBS io1 volumes are less reliable than io2 volumes for the same cost.

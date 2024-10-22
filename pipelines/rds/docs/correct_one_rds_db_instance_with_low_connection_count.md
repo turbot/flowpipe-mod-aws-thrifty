@@ -1,4 +1,4 @@
-# Correct one RDS DB instance with low connection count
+## Overview
 
 RDS instances can be costly to run, especially if they're rarely used, instances with low average connection counts per day should be reviewed to determine if they're still required.
 

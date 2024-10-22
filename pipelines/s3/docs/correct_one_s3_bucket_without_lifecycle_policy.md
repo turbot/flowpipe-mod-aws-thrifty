@@ -1,5 +1,3 @@
-# Correct one S3 bucket without lifecycle policy
-
 ## Overview
 
 S3 Buckets without a lifecycle policy will not move objects between storage layers or expire objects, causing them to remain in their initial tier perpetually, this is inefficient and can be costly.

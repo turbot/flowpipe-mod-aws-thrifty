@@ -1,5 +1,3 @@
-# Correct one RDS DB instance without graviton processor
-
 ## Overview
 
 RDS instances running non-graviton processors are likely to incur higher charges, these should be reviewed.

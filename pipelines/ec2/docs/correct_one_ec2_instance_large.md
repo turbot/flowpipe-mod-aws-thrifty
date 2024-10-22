@@ -1,5 +1,3 @@
-# Correct one EC2 instance if large
-
 ## Overview
 
 EC2 instances can be quite costly to retain, it is also likely that after a certain point in time they're no longer required and should be cleaned up to prevent further costs. Large EC2 instances are unusual, expensive and should be reviewed.

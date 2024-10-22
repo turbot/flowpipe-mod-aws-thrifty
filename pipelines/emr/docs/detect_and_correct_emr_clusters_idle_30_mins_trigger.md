@@ -1,4 +1,4 @@
-# Detect & correct EMR clusters idle for more than 30 mins
+## Overview
 
 EMR clusters which are live but not currently running tasks should be reviewed and checked whether the cluster has been idle for more than 30 minutes. It is ideal to delete such clusters for cost optimization.
 

@@ -1,5 +1,3 @@
-# Detect & correct EBS volumes if unattached
-
 ## Overview
 
 EBS volumes which are not attached will still incur charges and provide no real use, these volumes should be reviewed and if necessary tidied up.

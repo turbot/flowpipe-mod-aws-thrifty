@@ -1,5 +1,3 @@
-# Detect & correct S3 buckets without lifecycle policy
-
 ## Overview
 
 S3 Buckets without a lifecycle policy will not move objects between storage layers or expire objects, causing them to remain in their initial tier perpetually, this is inefficient and can be costly.
@@ -10,7 +8,7 @@ This pipeline detects S3 buckets which do not have a lifecycle policy attached a
 
 This control will work out-of-the-box with some sensible defaults (configurable via [variables](https://flowpipe.io/docs/build/mod-variables)).
 
-> Note: You should review the variable `s3_buckets_without_lifecycle_policy_default_policy` to ensure this meets your requirements prior to using the `apply_policy` action.
+> Note: You should review the variable `s3_buckets_without_lifecycle_policy_default_lifecycle_configuration` to ensure this meets your requirements prior to using the `apply_lifecycle_configuration` action.
 
 You should be able to simply run the following command in your terminal:
 ```sh
