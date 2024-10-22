@@ -18,10 +18,10 @@ mod "aws_thrifty" {
       min_version = "1.0.0"
     }
     mod "github.com/turbot/flowpipe-mod-aws" {
-      version = "1.0.0-rc.7"
+      version = "^1"
     }
     mod "github.com/turbot/flowpipe-mod-detect-correct" {
-      version = "1.0.0-rc.0"
+      version = "^1"
     }
   }
 }
