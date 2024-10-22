@@ -2,16 +2,28 @@
 
 _Breaking changes_
 
-- Flowpipe `v1.0.0` is now required. For a full list of CLI changes, please see the [Flowpipe v1.0.0 CHANGELOG](https://flowpipe.io/changelog/flowpipe-cli-v1-0-0).
+- Flowpipe v1.0.0 is now required. For a full list of CLI changes, please see the [Flowpipe v1.0.0 CHANGELOG](https://flowpipe.io/changelog/flowpipe-cli-v1-0-0).
 - In Flowpipe configuration files (`.fpc`), `credential` and `credential_import` resources have been renamed to `connection` and `connection_import` respectively.
-- Renamed all `cred` params to `conn` and updated their types from `string` to `conn`.
+- Updated the following param types:
+  - `approvers`: `list(string)` to `list(notifier)`.
+  - `database`: `string` to `connection.steampipe`.
+  - `notifier`: `string` to `notifier`.
+- Updated the following variable types:
+  - `approvers`: `list(string)` to `list(notifier)`.
+  - `database`: `string` to `connection.steampipe`.
+  - `notifier`: `string` to `notifier`.
+- Renamed `cred` param to `conn` and updated its type from `string` to `conn`.
 
 _Enhancements_
 
-- Added `library` to the mod's categories.
+- Added `standard` to the mod's categories.
 - Updated the following pipeline tags:
   - `type = "featured"` to `recommended = "true"`
   - `type = "test"` to `folder = "Tests"`
+- Added the `folder = "Internal"` tag to pipelines that are not meant to be run directly.
+- Added the `folder = "Advanced/<service>"` tag to variables.
+- Added `enum` to `*_default_action`, `*_enabled_actions`, and `*_notification_level` params and variables.
+- Added `format` to params and variables that use multiline and JSON strings.
 
 ## v0.3.0 [2024-07-24]
 
