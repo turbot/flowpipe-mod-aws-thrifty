@@ -1,5 +1,3 @@
-# Correct EBS volumes attached to stopped instances
-
 ## Overview
 
 EBS volumes attached to stopped instances still incur costs even though they may not be used; these should be reviewed and either detached from the stopped instance or deleted.

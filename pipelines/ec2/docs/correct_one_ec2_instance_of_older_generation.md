@@ -1,5 +1,3 @@
-# Correct one EC2 instance of older generation
-
 ## Overview
 
 Older generation instance types are more expensive and less performant than the current generation equivalents, you should be using the latest generation to reduce costs and increase performance. 

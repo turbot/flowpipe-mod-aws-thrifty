@@ -17,11 +17,17 @@ locals {
   style_alert   = "alert"
 }
 
+// Notification level
+
+locals {
+  notification_level_enum = ["info", "verbose", "error"]
+}
+
 // Common Texts
 locals {
   description_database         = "Database connection string."
   description_approvers        = "List of notifiers to be used for obtaining action/approval decisions."
-  description_credential       = "Name of the credential to be used for any authenticated actions."
+  description_connection       = "Name of the AWS connection to be used for any authenticated actions."
   description_region           = "AWS Region of the resource(s)."
   description_title            = "Title of the resource, to be used as a display name."
   description_max_concurrency  = "The maximum concurrency to use for responding to detection items."
@@ -32,30 +38,4 @@ locals {
   description_trigger_enabled  = "If true, the trigger is enabled."
   description_trigger_schedule = "The schedule on which to run the trigger if enabled."
   description_items            = "A collection of detected resources to run corrective actions against."
-}
-
-// Pipeline References
-locals {
-  pipeline_optional_message                 = detect_correct.pipeline.optional_message
-  aws_pipeline_create_ebs_snapshot          = aws.pipeline.create_ebs_snapshot
-  aws_pipeline_delete_dynamodb_table        = aws.pipeline.delete_dynamodb_table
-  aws_pipeline_delete_ebs_snapshot          = aws.pipeline.delete_ebs_snapshot
-  aws_pipeline_delete_ebs_volume            = aws.pipeline.delete_ebs_volume
-  aws_pipeline_delete_eks_node_group        = aws.pipeline.delete_eks_node_group
-  aws_pipeline_delete_elasticache_cluster   = aws.pipeline.delete_elasticache_cluster
-  aws_pipeline_delete_elb_load_balancer     = aws.pipeline.delete_elb_load_balancer
-  aws_pipeline_delete_elbv2_load_balancer   = aws.pipeline.delete_elbv2_load_balancer
-  aws_pipeline_delete_lambda_function       = aws.pipeline.delete_lambda_function
-  aws_pipeline_delete_nat_gateway           = aws.pipeline.delete_nat_gateway
-  aws_pipeline_delete_rds_db_instance       = aws.pipeline.delete_rds_db_instance
-  aws_pipeline_delete_route53_health_check  = aws.pipeline.delete_route53_health_check
-  aws_pipeline_delete_secretsmanager_secret = aws.pipeline.delete_secretsmanager_secret
-  aws_pipeline_detach_ebs_volume            = aws.pipeline.detach_ebs_volume
-  aws_pipeline_modify_ebs_volume            = aws.pipeline.modify_ebs_volume
-  aws_pipeline_put_s3_lifecycle_policy      = aws.pipeline.put_s3_bucket_lifecycle_policy
-  aws_pipeline_release_eip                  = aws.pipeline.release_eip
-  aws_pipeline_stop_ec2_instances           = aws.pipeline.stop_ec2_instances
-  aws_pipeline_terminate_ec2_instances      = aws.pipeline.terminate_ec2_instances
-  aws_pipeline_terminate_emr_clusters       = aws.pipeline.terminate_emr_clusters
-  aws_pipeline_update_route53_record        = aws.pipeline.update_route53_record
 }

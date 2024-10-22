@@ -1,5 +1,3 @@
-# Correct one Route53 health check if unused
-
 ## Overview
 
 Route53 health checks have an associated monthly cost, therefore those which are no longer required should be removed to prevent further charges.

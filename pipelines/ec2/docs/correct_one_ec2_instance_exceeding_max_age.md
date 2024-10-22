@@ -1,5 +1,3 @@
-# Correct one EC2 instance exceeding max age
-
 ## Overview
 
 EC2 instances can be quite costly to retain, it is also likely that after a certain point in time they're no longer required and should be cleaned up to prevent further costs.

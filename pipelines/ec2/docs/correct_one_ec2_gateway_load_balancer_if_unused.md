@@ -1,5 +1,3 @@
-# Correct one EC2 gateway load balancer if unused
-
 ## Overview
 
 Amazon EC2 gateway load balancers with no targets attached still cost money and should be deleted.

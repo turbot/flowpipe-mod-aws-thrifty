@@ -1,5 +1,3 @@
-# Correct one EBS volume with low IOPS
-
 ## Overview
 
 EBS volumes with lower than 16k base IOPS should be using gp3 rather than the more costly io1/io2 volumes types.

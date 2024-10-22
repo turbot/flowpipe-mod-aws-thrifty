@@ -1,4 +1,4 @@
-# Detect & correct EKS node groups without Graviton
+## Overview
 
 Amazon EKS node groups that don't use Graviton processor can incur higher operational costs. This pipeline detects non-Graviton EKS node groups and either sends a notification or attempts to perform a predefined corrective action.
 

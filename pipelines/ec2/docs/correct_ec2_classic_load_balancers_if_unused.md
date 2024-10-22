@@ -1,5 +1,3 @@
-# Correct EC2 classic load balancers if unused
-
 ## Overview
 
 Amazon EC2 classic load balancers with no instances attached still cost money and should be deleted.

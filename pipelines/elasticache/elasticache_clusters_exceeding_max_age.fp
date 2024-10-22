@@ -5,7 +5,7 @@ locals {
     select
       distinct c.replication_group_id as name,
       c.cache_cluster_create_time,
-      c._ctx,
+      c.sp_connection_name,
       c.region,
       c.account_id,
       'redis' as engine,
@@ -17,7 +17,7 @@ locals {
     select
       cache_cluster_id as name,
       cache_cluster_create_time,
-      _ctx,
+      sp_connection_name,
       region,
       account_id,
       engine,
@@ -32,12 +32,62 @@ locals {
     name,
     region,
     account_id,
-    _ctx ->> 'connection_name' as cred
+    sp_connection_name as conn
   from
     filter_clusters
   where
     date_part('day', now() - cache_cluster_create_time) > ${var.elasticache_clusters_exceeding_max_age_days};
   EOQ
+
+  elasticache_clusters_exceeding_max_age_default_action_enum  = ["notify", "skip", "delete_cluster"]
+  elasticache_clusters_exceeding_max_age_enabled_actions_enum = ["skip", "delete_cluster"]
+}
+
+variable "elasticache_clusters_exceeding_max_age_trigger_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, the trigger is enabled."
+  tags = {
+    folder = "Advanced/ElastiCache"
+  }
+}
+
+variable "elasticache_clusters_exceeding_max_age_trigger_schedule" {
+  type        = string
+  default     = "15m"
+  description = "The schedule on which to run the trigger if enabled."
+  tags = {
+    folder = "Advanced/ElastiCache"
+  }
+}
+
+variable "elasticache_clusters_exceeding_max_age_days" {
+  type        = number
+  description = "The maximum number of days Elasticache clusters can be retained."
+  default     = 90
+  tags = {
+    folder = "Advanced/ElastiCache"
+  }
+}
+
+variable "elasticache_clusters_exceeding_max_age_default_action" {
+  type        = string
+  description = "The default action to use for the detected item, used if no input is provided."
+  default     = "notify"
+  enum        = ["notify", "skip", "delete_cluster"]
+  tags = {
+    folder = "Advanced/ElastiCache"
+  }
+}
+
+variable "elasticache_clusters_exceeding_max_age_enabled_actions" {
+  type        = list(string)
+  description = "The list of enabled actions to provide to approvers for selection."
+  default     = ["skip", "delete_cluster"]
+  enum        = ["skip", "delete_cluster"]
+  tags = {
+    folder = "Advanced/ElastiCache"
+  }
 }
 
 trigger "query" "detect_and_correct_elasticache_clusters_exceeding_max_age" {
@@ -63,16 +113,16 @@ pipeline "detect_and_correct_elasticache_clusters_exceeding_max_age" {
   title         = "Detect & correct Elasticache clusters exceeding max age"
   description   = "Detects Elasticache clusters exceeding max age and responds with your chosen action."
   documentation = file("./pipelines/elasticache/docs/detect_and_correct_elasticache_clusters_exceeding_max_age.md")
-  tags          = merge(local.elasticache_common_tags, { class = "managed", type = "featured" })
+  tags          = merge(local.elasticache_common_tags, { class = "managed", recommended = "true" })
 
   param "database" {
-    type        = string
+    type        = connection.steampipe
     description = local.description_database
     default     = var.database
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -81,24 +131,27 @@ pipeline "detect_and_correct_elasticache_clusters_exceeding_max_age" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.description_default_action
     default     = var.elasticache_clusters_exceeding_max_age_default_action
+    enum        = local.elasticache_clusters_exceeding_max_age_default_action_enum
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.elasticache_clusters_exceeding_max_age_enabled_actions
+    enum        = local.elasticache_clusters_exceeding_max_age_enabled_actions_enum
   }
 
   step "query" "detect" {
@@ -113,8 +166,8 @@ pipeline "detect_and_correct_elasticache_clusters_exceeding_max_age" {
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -123,19 +176,19 @@ pipeline "correct_elasticache_clusters_exceeding_max_age" {
   title         = "Correct Elasticache clusters exceeding max age"
   description   = "Runs corrective action on a collection of Elasticache clusters exceeding max age."
   documentation = file("./pipelines/elasticache/docs/correct_elasticache_clusters_exceeding_max_age.md")
-  tags          = merge(local.elasticache_common_tags, { class = "managed" })
+  tags          = merge(local.elasticache_common_tags, { class = "managed", folder = "Internal" })
 
   param "items" {
     type = list(object({
       title  = string
       name   = string
       region = string
-      cred   = string
+      conn   = string
     }))
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -144,29 +197,32 @@ pipeline "correct_elasticache_clusters_exceeding_max_age" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.description_default_action
     default     = var.elasticache_clusters_exceeding_max_age_default_action
+    enum        = local.elasticache_clusters_exceeding_max_age_default_action_enum
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.elasticache_clusters_exceeding_max_age_enabled_actions
+    enum        = local.elasticache_clusters_exceeding_max_age_enabled_actions_enum
   }
 
   step "message" "notify_detection_count" {
     if       = var.notification_level == local.level_verbose
-    notifier = notifier[param.notifier]
+    notifier = param.notifier
     text     = "Detected ${length(param.items)} Elasticache Clusters exceeding maximum age."
   }
 
@@ -182,12 +238,12 @@ pipeline "correct_elasticache_clusters_exceeding_max_age" {
       title                    = each.value.title
       name                     = each.value.name
       region                   = each.value.region
-      cred                     = each.value.cred
+      conn                     = connection.aws[each.value.conn]
       notifier                 = param.notifier
       notification_level       = param.notification_level
       approvers                = param.approvers
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
     }
   }
 }
@@ -196,7 +252,7 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
   title         = "Correct one Elasticache cluster exceeding max age"
   description   = "Runs corrective action on an Elasticache cluster exceeding max age."
   documentation = file("./pipelines/elasticache/docs/correct_one_elasticache_cluster_exceeding_max_age.md")
-  tags          = merge(local.elasticache_common_tags, { class = "managed" })
+  tags          = merge(local.elasticache_common_tags, { class = "managed", folder = "Internal" })
 
   param "title" {
     type        = string
@@ -213,13 +269,13 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
     description = local.description_region
   }
 
-  param "cred" {
-    type        = string
-    description = local.description_credential
+  param "conn" {
+    type        = connection.aws
+    description = local.description_connection
   }
 
   param "notifier" {
-    type        = string
+    type        = notifier
     description = local.description_notifier
     default     = var.notifier
   }
@@ -228,24 +284,27 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
     type        = string
     description = local.description_notifier_level
     default     = var.notification_level
+    enum        = local.notification_level_enum
   }
 
   param "approvers" {
-    type        = list(string)
+    type        = list(notifier)
     description = local.description_approvers
     default     = var.approvers
   }
 
-  param "default_response_option" {
+  param "default_action" {
     type        = string
     description = local.description_default_action
     default     = var.elasticache_clusters_exceeding_max_age_default_action
+    enum        = local.elasticache_clusters_exceeding_max_age_default_action_enum
   }
 
-  param "enabled_response_options" {
+  param "enabled_actions" {
     type        = list(string)
     description = local.description_enabled_actions
     default     = var.elasticache_clusters_exceeding_max_age_enabled_actions
+    enum        = local.elasticache_clusters_exceeding_max_age_enabled_actions_enum
   }
 
   step "pipeline" "respond" {
@@ -255,14 +314,14 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
       notification_level       = param.notification_level
       approvers                = param.approvers
       detect_msg               = "Detected Elasticache Cluster ${param.title} exceeding maximum age."
-      default_response_option  = param.default_response_option
-      enabled_response_options = param.enabled_response_options
+      default_action  = param.default_action
+      enabled_actions = param.enabled_actions
       response_options = {
         "skip" = {
           label        = "Skip"
           value        = "skip"
           style        = local.style_info
-          pipeline_ref = local.pipeline_optional_message
+          pipeline_ref = detect_correct.pipeline.optional_message
           pipeline_args = {
             notifier = param.notifier
             send     = param.notification_level == local.level_verbose
@@ -275,11 +334,11 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
           label        = "Delete Cluster"
           value        = "delete_cluster"
           style        = local.style_alert
-          pipeline_ref = local.aws_pipeline_delete_elasticache_cluster
+          pipeline_ref = aws.pipeline.delete_elasticache_cluster
           pipeline_args = {
             cache_cluster_id = param.name
             region           = param.region
-            cred             = param.cred
+            conn             = param.conn
           }
           success_msg = "Deleted Elasticache Cluster ${param.title}."
           error_msg   = "Error deleting Elasticache Cluster ${param.title}."
@@ -289,32 +348,3 @@ pipeline "correct_one_elasticache_cluster_exceeding_max_age" {
   }
 }
 
-variable "elasticache_clusters_exceeding_max_age_trigger_enabled" {
-  type        = bool
-  default     = false
-  description = "If true, the trigger is enabled."
-}
-
-variable "elasticache_clusters_exceeding_max_age_trigger_schedule" {
-  type        = string
-  default     = "15m"
-  description = "The schedule on which to run the trigger if enabled."
-}
-
-variable "elasticache_clusters_exceeding_max_age_days" {
-  type        = number
-  description = "The maximum number of days Elasticache clusters can be retained."
-  default     = 90
-}
-
-variable "elasticache_clusters_exceeding_max_age_default_action" {
-  type        = string
-  description = "The default action to use for the detected item, used if no input is provided."
-  default     = "notify"
-}
-
-variable "elasticache_clusters_exceeding_max_age_enabled_actions" {
-  type        = list(string)
-  description = "The list of enabled actions to provide to approvers for selection."
-  default     = ["skip", "delete_cluster"]
-}

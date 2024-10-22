@@ -1,5 +1,3 @@
-# Correct one Lambda function without graviton processor
-
 ## Overview
 
 Lambda functions without graviton processor incur cost over time, so it's crucial to delete functions without the graviton processor to optimize expenses.

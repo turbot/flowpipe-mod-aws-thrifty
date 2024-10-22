@@ -1,4 +1,4 @@
-# Detect & correct EC2 gateway load balancers if unused
+## Overview
 
 Amazon EC2 gateway load balancers with no targets attached still cost money and should be deleted. This query trigger identifies EC2 gateway load balancers with no targets attached and either sends notifications or attempts predefined corrective actions.
 

@@ -1,4 +1,4 @@
-# Detect & correct Lambda functions without graviton processor
+## Overview
 
 Lambda functions without graviton processor incur cost over time, with graviton processor (arm64 - 64-bit ARM architecture), you can save money in two ways: First, your functions run more efficiently due to the Graviton architecture. Second, you pay less for the time that they run. In fact, Lambda functions powered by Graviton are designed to deliver up to 19 percent better performance at 20 percent lower cost.
 

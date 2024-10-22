@@ -4,7 +4,8 @@ mod "aws_thrifty" {
   color         = "#FF9900"
   documentation = file("./README.md")
   icon          = "/images/mods/turbot/aws-thrifty.svg"
-  categories    = ["aws", "cost", "thrifty", "public cloud"]
+  categories    = ["aws", "cost", "public cloud", "standard", "thrifty"]
+  database      = var.database
 
   opengraph {
     title       = "AWS Thrifty Mod for Flowpipe"
@@ -13,11 +14,14 @@ mod "aws_thrifty" {
   }
 
   require {
+    flowpipe {
+      min_version = "1.0.0"
+    }
     mod "github.com/turbot/flowpipe-mod-aws" {
-      version = "*"
+      version = "^1"
     }
     mod "github.com/turbot/flowpipe-mod-detect-correct" {
-      version = "*"
+      version = "^1"
     }
   }
 }
