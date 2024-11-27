@@ -46,7 +46,7 @@ For more information on importing connections, please see [Connection Import](ht
 
 For more information on connections in Flowpipe, please see [Managing Connections](https://flowpipe.io/docs/run/connections).
 
-Clone the mod:
+Install the mod:
 
 ```sh
 mkdir aws-thrifty
